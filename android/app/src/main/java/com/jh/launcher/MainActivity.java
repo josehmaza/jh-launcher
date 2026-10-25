@@ -187,10 +187,33 @@ public class MainActivity extends Activity {
         public void sendMusicCommand(String action) {
             mainHandler.post(() -> {
                 try {
+                    if ("PLAY_PAUSE".equalsIgnoreCase(action) || "PLAY".equalsIgnoreCase(action)) {
+                        if (!isAppProcessRunning("com.jh.caraudio")) {
+                            launchJhMusic();
+                            return;
+                        }
+                    }
                     Intent cmd = new Intent("com.jh.music.action." + action.toUpperCase());
                     sendBroadcast(cmd);
                 } catch (Exception ignored) {}
             });
+        }
+
+        private boolean isAppProcessRunning(String packageName) {
+            try {
+                android.app.ActivityManager am = (android.app.ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                if (am != null) {
+                    List<android.app.ActivityManager.RunningAppProcessInfo> list = am.getRunningAppProcesses();
+                    if (list != null) {
+                        for (android.app.ActivityManager.RunningAppProcessInfo info : list) {
+                            if (info != null && packageName.equals(info.processName)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
+            return false;
         }
 
         @JavascriptInterface
