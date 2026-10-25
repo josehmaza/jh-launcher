@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Badge de formato pegado a la esquina de arriba a la derecha de la carátula (.audio-badge de la web):
+     curva propia igual a la de la carátula (17,5dp + 1dp que sobresale), fondo sólido y borde solo
+     a la izquierda y abajo, para que no se vea la carátula por el borde de la esquina -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="18.5dp"
+                android:bottomRightRadius="0dp"
+                android:bottomLeftRadius="10dp" />
+            <solid android:color="#29FFFFFF" />
+        </shape>
+    </item>
+    <item
+        android:left="1dp"
+        android:bottom="1dp">
+        <shape android:shape="rectangle">
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="18.5dp"
+                android:bottomRightRadius="0dp"
+                android:bottomLeftRadius="9dp" />
+            <solid android:color="#0C0E12" />
+        </shape>
+    </item>
+</layer-list>

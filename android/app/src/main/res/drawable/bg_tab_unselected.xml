@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pestaña sin elegir: oscura translúcida, deja ver el color de la carátula -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android" android:inset="2dp">
+    <shape>
+        <solid android:color="#38000000" />
+        <corners android:radius="8dp" />
+        <stroke android:width="1dp" android:color="#14ffffff" />
+    </shape>
+</inset>

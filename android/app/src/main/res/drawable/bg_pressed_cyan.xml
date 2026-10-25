@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Al tocar: cian translúcido (en vez del resaltado de Android, que en el emulador y en algunos radios sale naranja) -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <corners android:radius="8dp" />
+            <solid android:color="#4038bdf8" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

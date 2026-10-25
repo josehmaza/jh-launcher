@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Botón + de una carpeta, al lado de [N ▶] -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="#2c3749" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1.5dp" android:color="#38bdf8" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#151922" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1.5dp" android:color="#38bdf8" />
+        </shape>
+    </item>
+</selector>

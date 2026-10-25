@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pestaña elegida: cian lleno con brillo (como la web) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="#2638bdf8" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="2dp">
+        <shape>
+            <solid android:color="#38bdf8" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</layer-list>

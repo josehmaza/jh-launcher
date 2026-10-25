@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Panel del menú ☰: oscuro con borde cian tenue -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#0e141c" />
+    <corners android:radius="16dp" />
+    <stroke android:width="1dp" android:color="#5938bdf8" />
+</shape>

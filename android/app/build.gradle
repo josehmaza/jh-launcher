@@ -1,0 +1,84 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.jh.launcher'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.jh.launcher"
+        minSdk 21
+        targetSdk 28
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "JH-LAUNCHER-v${variant.versionName}.apk"
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.6.0'
+}
+
+// Sincroniza la maqueta aprobada con los assets del APK
+tasks.register('syncWebAssets') {
+    doLast {
+        def launcherRoot = rootProject.projectDir.parentFile
+        def assetsDir = file("${projectDir}/src/main/assets")
+        assetsDir.mkdirs()
+
+        copy {
+            from launcherRoot
+            into assetsDir
+            include 'index.html', 'style.css', 'app.js'
+        }
+
+        def imgAssetsDir = file("${assetsDir}/assets")
+        imgAssetsDir.mkdirs()
+        copy {
+            from "${launcherRoot}/assets"
+            into imgAssetsDir
+            include '*.jpg', '*.png'
+        }
+    }
+}
+
+tasks.named('preBuild').configure {
+    dependsOn 'syncWebAssets'
+}
+
+// Al terminar assembleDebug, copia el APK a la raíz de jh-launcher/
+tasks.register('copyApkToRoot') {
+    doLast {
+        def repoRoot = rootProject.projectDir.parentFile
+        project.delete(fileTree(repoRoot) { include 'JH-LAUNCHER-v*.apk' })
+        project.copy {
+            from layout.buildDirectory.dir('outputs/apk/debug')
+            into repoRoot
+            include '*.apk'
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.named('assembleDebug').configure { finalizedBy 'copyApkToRoot' }
+}

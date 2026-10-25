@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Automix ON: cuadro cian lleno con brillo alrededor (el brillo usa los 4dp de margen del botón) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="#2238bdf8" />
+            <corners android:radius="13dp" />
+        </shape>
+    </item>
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="2dp">
+        <shape>
+            <solid android:color="#4038bdf8" />
+            <corners android:radius="11dp" />
+        </shape>
+    </item>
+    <item android:left="4dp" android:top="4dp" android:right="4dp" android:bottom="4dp">
+        <shape>
+            <solid android:color="#38bdf8" />
+            <corners android:radius="9dp" />
+        </shape>
+    </item>
+</layer-list>

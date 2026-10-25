@@ -320,16 +320,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2200);
   }
 
-  // En Android nativo, estos clicks lanzarán el Intent correspondiente
-  document.getElementById('btnLaunchJhMusic').addEventListener('click', () => showToast("Iniciando app JH Music (com.jh.music)..."));
-  document.getElementById('dockBtnMusic').addEventListener('click', () => showToast("Iniciando app JH Music (com.jh.music)..."));
+  // En Android nativo, estos clicks llaman a AndroidBridge o simulan el toast
+  const launchMusicAction = () => {
+    if (window.AndroidBridge && window.AndroidBridge.launchJhMusic) {
+      window.AndroidBridge.launchJhMusic();
+    } else {
+      showToast("Iniciando app JH Music (com.jh.caraudio)...");
+    }
+  };
+  document.getElementById('btnLaunchJhMusic').addEventListener('click', launchMusicAction);
+  document.getElementById('dockBtnMusic').addEventListener('click', launchMusicAction);
   
-  document.getElementById('btnLaunchJhVideo').addEventListener('click', () => showToast("Iniciando app JH Video (com.jh.video)..."));
-  document.getElementById('dockBtnVideo').addEventListener('click', () => showToast("Iniciando app JH Video (com.jh.video)..."));
+  const launchVideoAction = () => {
+    if (window.AndroidBridge && window.AndroidBridge.launchJhVideo) {
+      window.AndroidBridge.launchJhVideo();
+    } else {
+      showToast("Iniciando app JH Video (com.jh.carvideo)...");
+    }
+  };
+  document.getElementById('btnLaunchJhVideo').addEventListener('click', launchVideoAction);
+  document.getElementById('dockBtnVideo').addEventListener('click', launchVideoAction);
 
-  // --------------------------------------------------------------------------
-  // SINTONIZADOR DIRECTO DE RADIO FM (ZERO LAYER)
-  // --------------------------------------------------------------------------
+  // Radio FM nativa y Sintonizador Rápido
   const radioFreqDisplay = document.getElementById('radioFreqDisplay');
   const btnRadioPrev = document.getElementById('btnRadioPrev');
   const btnRadioNext = document.getElementById('btnRadioNext');
@@ -360,6 +372,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRadioPrev.addEventListener('click', (e) => {
       e.stopPropagation();
       updateFmStation(currentFmIdx - 1);
+      if (window.AndroidBridge && window.AndroidBridge.tuneRadioPrev) {
+        window.AndroidBridge.tuneRadioPrev();
+      }
     });
   }
 
@@ -367,23 +382,49 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRadioNext.addEventListener('click', (e) => {
       e.stopPropagation();
       updateFmStation(currentFmIdx + 1);
+      if (window.AndroidBridge && window.AndroidBridge.tuneRadioNext) {
+        window.AndroidBridge.tuneRadioNext();
+      }
     });
   }
 
+  const launchRadioAction = () => {
+    if (window.AndroidBridge && window.AndroidBridge.launchRadio) {
+      window.AndroidBridge.launchRadio();
+    } else {
+      showToast("Abriendo Radio FM nativa (com.autochips.radio)...");
+    }
+  };
+  document.getElementById('btnLaunchRadio').addEventListener('click', launchRadioAction);
+  document.getElementById('dockBtnRadio').addEventListener('click', launchRadioAction);
   if (radioFreqBadge) {
-    radioFreqBadge.addEventListener('click', () => {
-      showToast("Abriendo sintonizador de Radio FM (com.autochips.radio)...");
-    });
+    radioFreqBadge.addEventListener('click', launchRadioAction);
   }
 
-  // Explicación de la Radio FM: abre directamente el paquete interno de la radio
-  document.getElementById('btnLaunchRadio').addEventListener('click', () => showToast("Abriendo Radio FM nativa (com.autochips.radio)..."));
-  document.getElementById('dockBtnRadio').addEventListener('click', () => showToast("Abriendo Radio FM nativa (com.autochips.radio)..."));
-
-  document.getElementById('dockBtnBt').addEventListener('click', () => showToast("Abriendo Manos Libres Bluetooth (com.autochips.bluetooth)..."));
+  // Bluetooth Manos Libres
+  document.getElementById('dockBtnBt').addEventListener('click', () => {
+    if (window.AndroidBridge && window.AndroidBridge.launchBluetooth) {
+      window.AndroidBridge.launchBluetooth();
+    } else {
+      showToast("Abriendo Manos Libres Bluetooth (com.autochips.bluetooth)...");
+    }
+  });
   
-  document.getElementById('btnAllApps').addEventListener('click', () => showToast("Abriendo Cajón de Todas las Aplicaciones..."));
-  document.getElementById('btnSystemSettings').addEventListener('click', () => showToast("Abriendo Configuración del Radio..."));
+  document.getElementById('btnAllApps').addEventListener('click', () => {
+    if (window.AndroidBridge && window.AndroidBridge.launchAllApps) {
+      window.AndroidBridge.launchAllApps();
+    } else {
+      showToast("Abriendo Cajón de Todas las Aplicaciones...");
+    }
+  });
+
+  document.getElementById('btnSystemSettings').addEventListener('click', () => {
+    if (window.AndroidBridge && window.AndroidBridge.launchSettings) {
+      window.AndroidBridge.launchSettings();
+    } else {
+      showToast("Abriendo Configuración del Radio...");
+    }
+  });
 
   // --------------------------------------------------------------------------
   // 6. MONITOR DE HARDWARE PERMANENTE (BAJO EL AUTO)

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Carpeta abierta en la pestaña de canciones / videos cuando no es la que suena: solo un borde cian fino -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#800a0c11" />
+    <stroke
+        android:width="1.5dp"
+        android:color="#9938bdf8" />
+    <corners android:radius="10dp" />
+</shape>

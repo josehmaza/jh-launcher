@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Botón de silencio (como la web): gris normal; en silencio, rojo translúcido con borde rojo -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <shape>
+            <solid android:color="#2ef43f5e" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1.5dp" android:color="#f43f5e" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="#232a38" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1.5dp" android:color="#2a3346" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#181b22" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1.5dp" android:color="#2d3444" />
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Anterior / Siguiente: sin caja (solo el ícono blanco). Al tocar (presionado, o los 180 ms que pone el código)
+     se ilumina un círculo cian detrás del ícono -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="oval">
+            <solid android:color="#2e38bdf8" />
+        </shape>
+    </item>
+    <item android:state_activated="true">
+        <shape android:shape="oval">
+            <solid android:color="#2e38bdf8" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

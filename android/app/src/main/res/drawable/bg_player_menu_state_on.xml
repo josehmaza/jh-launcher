@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cuadrito ON de la fila del menú: cian lleno -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#38bdf8" />
+    <corners android:radius="8dp" />
+</shape>
