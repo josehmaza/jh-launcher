@@ -1,14 +1,17 @@
 package com.jh.launcher;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -21,8 +24,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class MainActivity extends Activity {
@@ -30,6 +38,39 @@ public class MainActivity extends Activity {
     private WebView webView;
     private AudioManager audioManager;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    private final BroadcastReceiver jhMusicReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+            String action = intent.getAction();
+            if ("com.jh.music.action.TRACK_CHANGED".equals(action)) {
+                String title = intent.getStringExtra("extra_title");
+                String artist = intent.getStringExtra("extra_artist");
+                String path = intent.getStringExtra("extra_path");
+                String duration = intent.getStringExtra("extra_duration");
+                int totalSec = intent.getIntExtra("extra_total_sec", 0);
+                boolean isPlaying = intent.getBooleanExtra("extra_is_playing", false);
+
+                try {
+                    JSONObject json = new JSONObject();
+                    json.put("title", title != null ? title : "");
+                    json.put("artist", artist != null ? artist : "");
+                    json.put("path", path != null ? path : "");
+                    json.put("duration", duration != null ? duration : "00:00");
+                    json.put("totalSec", totalSec);
+                    json.put("isPlaying", isPlaying);
+
+                    final String jsonStr = json.toString();
+                    mainHandler.post(() -> {
+                        if (webView != null) {
+                            webView.evaluateJavascript("if (window.updateLiveJhMusicTrack) { window.updateLiveJhMusicTrack(" + jsonStr + "); }", null);
+                        }
+                    });
+                } catch (Exception ignored) {}
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +109,32 @@ public class MainActivity extends Activity {
             }
         });
 
+        // Registrar receptor de cambios de canción desde JH Music
+        IntentFilter musicFilter = new IntentFilter("com.jh.music.action.TRACK_CHANGED");
+        registerReceiver(jhMusicReceiver, musicFilter);
+
         // Carga la interfaz local desde los assets del APK (100% Offline)
         webView.loadUrl("file:///android_asset/index.html");
 
         setContentView(webView);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setImmersiveMode();
+        // Solicita el estado actual a JH Music si ya se está reproduciendo
+        try {
+            sendBroadcast(new Intent("com.jh.music.action.REQUEST_STATE"));
+        } catch (Exception ignored) {}
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            unregisterReceiver(jhMusicReceiver);
+        } catch (Exception ignored) {}
     }
 
     private void setImmersiveMode() {
@@ -102,6 +165,33 @@ public class MainActivity extends Activity {
      * Puente que expone métodos nativos a la interfaz JavaScript
      */
     public class LauncherBridge {
+
+        @JavascriptInterface
+        public String getJhMusicCurrentTrackJson() {
+            try {
+                File file = new File(Environment.getExternalStorageDirectory(), ".jh_music_state.json");
+                if (file.exists() && file.length() > 0) {
+                    try (FileInputStream fis = new FileInputStream(file)) {
+                        byte[] buffer = new byte[(int) file.length()];
+                        int read = fis.read(buffer);
+                        if (read > 0) {
+                            return new String(buffer, 0, read, StandardCharsets.UTF_8);
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
+            return "{}";
+        }
+
+        @JavascriptInterface
+        public void sendMusicCommand(String action) {
+            mainHandler.post(() -> {
+                try {
+                    Intent cmd = new Intent("com.jh.music.action." + action.toUpperCase());
+                    sendBroadcast(cmd);
+                } catch (Exception ignored) {}
+            });
+        }
 
         @JavascriptInterface
         public void launchJhMusic() {

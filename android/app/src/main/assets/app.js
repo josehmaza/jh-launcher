@@ -160,17 +160,125 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentUsbIdx = 0;
   let currentBtIdx = 0;
   let isPlaying = false;
-  let progressSec = 134;
+  let progressSec = 0;
+  let currentTrackDurationSec = 0;
+  let jhMusicTrack = null;
+
+  function updatePlayPauseBtnUi(playing) {
+    btnPlayPause.innerHTML = playing
+      ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`
+      : `<svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+    if (vinylDisc) {
+      vinylDisc.classList.toggle('spinning', playing);
+    }
+  }
+
+  function updateProgressUi() {
+    let total = 0;
+    let durStr = "00:00";
+    if (currentAudioSource === 'usb') {
+      if (jhMusicTrack && jhMusicTrack.totalSec > 0) {
+        total = jhMusicTrack.totalSec;
+        durStr = jhMusicTrack.duration;
+      } else {
+        total = usbTracks[currentUsbIdx].totalSec;
+        durStr = usbTracks[currentUsbIdx].duration;
+      }
+    } else {
+      total = btTracks[currentBtIdx].totalSec;
+      durStr = btTracks[currentBtIdx].duration;
+    }
+
+    if (total > 0) {
+      const pct = Math.min((progressSec / total) * 100, 100);
+      musicProgressFill.style.width = `${pct}%`;
+      const mins = String(Math.floor(progressSec / 60)).padStart(2, '0');
+      const secs = String(progressSec % 60).padStart(2, '0');
+      timeReadout.textContent = `${mins}:${secs} / ${durStr}`;
+    }
+  }
+
+  function applyJhMusicData(data) {
+    if (!data || !data.title) return;
+    jhMusicTrack = {
+      title: data.title,
+      artist: data.artist || "JH Music · USB 1",
+      path: data.path || "",
+      duration: data.duration || "00:00",
+      totalSec: data.totalSec || 0,
+      isPlaying: !!data.isPlaying
+    };
+
+    if (currentAudioSource === 'usb') {
+      trackTitle.textContent = jhMusicTrack.title;
+      trackArtist.textContent = jhMusicTrack.artist;
+      if (stealthTrackName) {
+        stealthTrackName.textContent = `${jhMusicTrack.title} — ${jhMusicTrack.artist}`;
+      }
+      if (data.path) {
+        const parts = data.path.split('/');
+        if (parts.length >= 2) {
+          const folder = parts[parts.length - 2];
+          sourceExtraBadge.textContent = folder.toUpperCase();
+        }
+      }
+      isPlaying = jhMusicTrack.isPlaying;
+      updatePlayPauseBtnUi(isPlaying);
+      if (typeof data.position === 'number') {
+        progressSec = data.position;
+      }
+      updateProgressUi();
+    }
+  }
+
+  function syncFromNativeJhMusicState() {
+    if (window.AndroidBridge && window.AndroidBridge.getJhMusicCurrentTrackJson) {
+      try {
+        const jsonStr = window.AndroidBridge.getJhMusicCurrentTrackJson();
+        if (jsonStr && jsonStr !== '{}') {
+          const data = JSON.parse(jsonStr);
+          if (data && data.title) {
+            applyJhMusicData(data);
+          }
+        }
+      } catch (e) {
+        console.warn("Error leyendo estado inicial JH Music:", e);
+      }
+    }
+  }
+
+  // Callback expuesto a Android para recibir broadcasts en vivo de JH Music
+  window.updateLiveJhMusicTrack = function(data) {
+    applyJhMusicData(data);
+  };
+
+  window.onNativeAndroidReady = function() {
+    syncFromNativeJhMusicState();
+  };
 
   function updateTrackDisplay() {
-    const list = currentAudioSource === 'usb' ? usbTracks : btTracks;
-    const idx = currentAudioSource === 'usb' ? currentUsbIdx : currentBtIdx;
-    const track = list[idx];
-
-    trackTitle.textContent = track.title;
-    trackArtist.textContent = track.artist;
-    if (stealthTrackName) {
-      stealthTrackName.textContent = `${track.title} — ${track.artist}`;
+    if (currentAudioSource === 'usb') {
+      if (jhMusicTrack) {
+        trackTitle.textContent = jhMusicTrack.title;
+        trackArtist.textContent = jhMusicTrack.artist;
+        if (stealthTrackName) {
+          stealthTrackName.textContent = `${jhMusicTrack.title} — ${jhMusicTrack.artist}`;
+        }
+        return;
+      }
+      const track = usbTracks[currentUsbIdx];
+      trackTitle.textContent = track.title;
+      trackArtist.textContent = track.artist;
+      if (stealthTrackName) {
+        stealthTrackName.textContent = `${track.title} — ${track.artist}`;
+      }
+    } else {
+      const track = btTracks[currentBtIdx];
+      trackTitle.textContent = track.title;
+      trackArtist.textContent = track.artist;
+      if (stealthTrackName) {
+        stealthTrackName.textContent = `${track.title} — ${track.artist}`;
+      }
     }
   }
 
@@ -180,12 +288,11 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSourceBt.classList.toggle('active', source === 'bt');
 
     if (source === 'usb') {
-      sourceExtraBadge.textContent = "MI MIX (109)";
+      sourceExtraBadge.textContent = jhMusicTrack && jhMusicTrack.path ? "USB 1" : "MI MIX (109)";
       sourceStatusChip.textContent = "USB 1";
       sourceStatusChip.style.color = "var(--accent-cyan)";
       sourceStatusChip.style.borderColor = "rgba(0, 210, 255, 0.35)";
       
-      // Carátula de vinilo para música local
       musicArtCover.innerHTML = `
         <svg viewBox="0 0 24 24" fill="currentColor" class="art-placeholder-icon">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
@@ -195,13 +302,13 @@ document.addEventListener('DOMContentLoaded', () => {
       btnLaunchJhMusic.querySelector('.open-title').textContent = "ABRIR JH MUSIC";
       btnLaunchJhMusic.querySelector('.open-sub').textContent = "Ver carpetas y listas de reproducción";
       showToast("Fuente: JH MUSIC (Pendrive USB 1)");
+      syncFromNativeJhMusicState();
     } else {
       sourceExtraBadge.textContent = "AVRCP REMOTO";
       sourceStatusChip.textContent = "BT AUDIO";
       sourceStatusChip.style.color = "var(--accent-cyan)";
       sourceStatusChip.style.borderColor = "rgba(0, 210, 255, 0.4)";
 
-      // Icono de Bluetooth con onda de transmisión
       musicArtCover.innerHTML = `
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="art-placeholder-icon" style="color: var(--accent-cyan);">
           <path d="m7 7 10 10-5 5V2l5 5L7 17"/>
@@ -214,25 +321,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateTrackDisplay();
+    updateProgressUi();
   }
 
   btnSourceUsb.addEventListener('click', () => setAudioSource('usb'));
   btnSourceBt.addEventListener('click', () => setAudioSource('bt'));
 
-  // Play / Pausa (En USB pausa la app local; en BT envía AVRCP Play/Pause al teléfono)
+  // Play / Pausa
   btnPlayPause.addEventListener('click', () => {
-    isPlaying = !isPlaying;
-    btnPlayPause.innerHTML = isPlaying
-      ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`
-      : `<svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
-    
-    if (vinylDisc) {
-      vinylDisc.classList.toggle('spinning', isPlaying);
-    }
-
     if (currentAudioSource === 'usb') {
+      isPlaying = !isPlaying;
+      updatePlayPauseBtnUi(isPlaying);
+      if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
+        window.AndroidBridge.sendMusicCommand('PLAY_PAUSE');
+      }
       showToast(isPlaying ? "JH Music: Reproduciendo" : "JH Music: En Pausa");
     } else {
+      isPlaying = !isPlaying;
+      updatePlayPauseBtnUi(isPlaying);
+      if (window.AndroidBridge && window.AndroidBridge.sendMediaKey) {
+        window.AndroidBridge.sendMediaKey(isPlaying ? 'play' : 'pause');
+      }
       showToast(isPlaying ? "Bluetooth AVRCP: Play en Teléfono (YouTube)" : "Bluetooth AVRCP: Pausa en Teléfono");
     }
   });
@@ -240,43 +349,59 @@ document.addEventListener('DOMContentLoaded', () => {
   // Anterior canción / video
   btnPrevTrack.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
-      currentUsbIdx = (currentUsbIdx - 1 + usbTracks.length) % usbTracks.length;
-      showToast(`USB: ${usbTracks[currentUsbIdx].title}`);
+      if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
+        window.AndroidBridge.sendMusicCommand('PREV');
+      } else {
+        currentUsbIdx = (currentUsbIdx - 1 + usbTracks.length) % usbTracks.length;
+        updateTrackDisplay();
+      }
+      progressSec = 0;
+      showToast("JH Music: Canción Anterior");
     } else {
       currentBtIdx = (currentBtIdx - 1 + btTracks.length) % btTracks.length;
-      showToast(`Bluetooth AVRCP: Video/canción anterior en el teléfono`);
+      if (window.AndroidBridge && window.AndroidBridge.sendMediaKey) {
+        window.AndroidBridge.sendMediaKey('prev');
+      }
+      updateTrackDisplay();
+      progressSec = 0;
+      showToast("Bluetooth AVRCP: Anterior en teléfono");
     }
-    updateTrackDisplay();
-    progressSec = 0;
+    updateProgressUi();
   });
 
   // Siguiente canción / video
   btnNextTrack.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
-      currentUsbIdx = (currentUsbIdx + 1) % usbTracks.length;
-      showToast(`USB: ${usbTracks[currentUsbIdx].title}`);
+      if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
+        window.AndroidBridge.sendMusicCommand('NEXT');
+      } else {
+        currentUsbIdx = (currentUsbIdx + 1) % usbTracks.length;
+        updateTrackDisplay();
+      }
+      progressSec = 0;
+      showToast("JH Music: Siguiente Canción");
     } else {
       currentBtIdx = (currentBtIdx + 1) % btTracks.length;
-      showToast(`Bluetooth AVRCP: Siguiente video/canción en el teléfono`);
+      if (window.AndroidBridge && window.AndroidBridge.sendMediaKey) {
+        window.AndroidBridge.sendMediaKey('next');
+      }
+      updateTrackDisplay();
+      progressSec = 0;
+      showToast("Bluetooth AVRCP: Siguiente en teléfono");
     }
-    updateTrackDisplay();
-    progressSec = 0;
+    updateProgressUi();
   });
 
   // Avance del tiempo de reproducción
   setInterval(() => {
     if (isPlaying) {
       progressSec += 1;
-      const list = currentAudioSource === 'usb' ? usbTracks : btTracks;
-      const idx = currentAudioSource === 'usb' ? currentUsbIdx : currentBtIdx;
-      const totalSec = list[idx].totalSec;
-      const pct = Math.min((progressSec / totalSec) * 100, 100);
-      musicProgressFill.style.width = `${pct}%`;
-      const mins = String(Math.floor(progressSec / 60)).padStart(2, '0');
-      const secs = String(progressSec % 60).padStart(2, '0');
-      timeReadout.textContent = `${mins}:${secs} / ${list[idx].duration}`;
+      updateProgressUi();
     }
   }, 1000);
+
+  // Sincronización inicial al cargar
+  syncFromNativeJhMusicState();
 
   // --------------------------------------------------------------------------
   // 4. MODO STEALTH (SIGILO NOCTURNO PORSCHE / TESLA)
