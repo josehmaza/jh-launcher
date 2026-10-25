@@ -1,0 +1,14 @@
+# APK compilados: se generan con build.sh y no se versionan
+*.apk
+
+# Gradle y Android
+.gradle/
+**/build/
+local.properties
+*.iml
+.idea/
+.DS_Store
+Thumbs.db
+
+# Capturas temporales
+capturas/

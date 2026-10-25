@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JH LAUNCHER · Hyundai Tucson ix35 2013</title>
+  
+  <!-- Tipografía automotriz de alta gama -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-night">
+
+  <!-- Control de visualización en PC (Marco 1024x600 vs Pantalla Completa) -->
+  <div class="desktop-preview-toolbar">
+    <div class="toolbar-info">
+      <span class="pulse-indicator"></span>
+      <strong>JH LAUNCHER · Hyundai Tucson ix35 2013</strong> (1024 × 600 px)
+    </div>
+    <div class="toolbar-actions">
+      <button id="btnToggleFull" class="toolbar-btn">⛶ Pantalla Completa</button>
+      <button id="btnQuickColor" class="toolbar-btn">🎨 Tucson: Negro</button>
+      <button id="btnStealthPreview" class="toolbar-btn">🌙 Modo Stealth</button>
+    </div>
+  </div>
+
+  <!-- Contenedor del marco físico del radio (1024x600) -->
+  <div class="screen-frame-wrapper" id="frameWrapper">
+
+    <!-- OVERLAY MODO STEALTH / SIGILO NOCTURNO (TIPO PORSCHE / TESLA) -->
+    <div class="stealth-mode-overlay" id="stealthOverlay">
+      <div class="stealth-content">
+        <div class="stealth-clock" id="stealthClock">07:56</div>
+        <div class="stealth-date" id="stealthDate">DOMINGO, 25 DE OCTUBRE</div>
+        <div class="stealth-track" id="stealthTrack">
+          <span class="stealth-icon">♪</span>
+          <span id="stealthTrackName">I'm Sorry — Aventura</span>
+        </div>
+        <span class="stealth-hint">Toca cualquier parte para despertar la pantalla</span>
+      </div>
+    </div>
+
+    <!-- 1. BARRA SUPERIOR DE ESTADO (STATUS BAR LIMPIA) -->
+    <header class="status-bar">
+      <div class="status-col left">
+        <div class="brand-pill">
+          <span class="brand-logo-icon">HYUNDAI</span>
+          <span class="model-badge">TUCSON ix35 · 2013</span>
+        </div>
+      </div>
+
+      <div class="status-col center">
+        <div class="main-clock" id="statusClock">07:56</div>
+        <div class="main-date" id="statusDate">DOMINGO, 25 DE OCTUBRE</div>
+      </div>
+
+      <div class="status-col right">
+        <!-- Indicadores de Pendrives USB -->
+        <div class="usb-status-group">
+          <div class="usb-tag active" id="usb1Badge" title="Pendrive USB 1 montado">
+            <svg class="hw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 2v6m4-6v6m-7 4h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
+            </svg>
+            <span>USB 1</span>
+          </div>
+          <div class="usb-tag muted" id="usb2Badge" title="Puerto USB 2 disponible">
+            <svg class="hw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 2v6m4-6v6m-7 4h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/>
+            </svg>
+            <span>USB 2</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. CUERPO PRINCIPAL DEL DASHBOARD ERGONÓMICO -->
+    <main class="dashboard-body">
+
+      <!-- COLUMNA IZQUIERDA: GEMELO DIGITAL DEL AUTO (ROTACIÓN SUAVE 360°) -->
+      <section class="card vehicle-card" id="vehicleCard">
+        
+        <div class="vehicle-card-header">
+          <div class="user-greeting">
+            <span class="greeting-subtitle">BIENVENIDO AL MANDO</span>
+            <h1 class="greeting-title">Hola, Hernan</h1>
+          </div>
+
+          <!-- Selector minimalista de color del Tucson (Negro por defecto vs Gris Acero) -->
+          <div class="color-pill-switch" id="colorSwitch" title="Cambiar color del auto">
+            <button class="color-opt-btn active" id="btnColorBlack" data-color="black">
+              <span class="color-dot black-dot"></span> Negro
+            </button>
+            <button class="color-opt-btn" id="btnColorGrey" data-color="grey">
+              <span class="color-dot grey-dot"></span> Gris Acero
+            </button>
+          </div>
+        </div>
+
+        <!-- ESCENARIO DEL TUCSON 2013 ROTATORIO SUAVE -->
+        <div class="turntable-stage" id="turntableStage" title="Rotación suave continua 360°">
+          <!-- Imagen del Hyundai Tucson ix35 2013 -->
+          <div class="car-render-container" id="carRenderContainer">
+            <img id="carImage" src="assets/tucson2013_black_front.jpg" alt="Hyundai Tucson ix35 2013" draggable="false">
+          </div>
+
+          <!-- Indicador sutil de rotación continua -->
+          <div class="ambient-spin-badge">
+            <span class="spin-dot"></span>
+            <span>360° ACTIVO</span>
+          </div>
+        </div>
+
+        <!-- DEMO 2: MINI TELEMETRÍA DE HARDWARE BAJO EL AUTO -->
+        <div class="vehicle-hw-bar" id="vehicleHwBar" title="Hardware Monitor · Toca para abrir JH Monitor">
+          <div class="hw-chip-stat">
+            <div class="hw-chip-top">
+              <span class="hw-lbl">CPU</span>
+              <span class="hw-val" id="subCpuVal">22%</span>
+            </div>
+            <div class="hw-progress-track"><div class="hw-progress-fill cpu-fill" id="subCpuFill" style="width: 22%;"></div></div>
+          </div>
+
+          <div class="hw-chip-stat">
+            <div class="hw-chip-top">
+              <span class="hw-lbl">RAM (1.1 / 2 GB)</span>
+              <span class="hw-val" id="subRamVal">54%</span>
+            </div>
+            <div class="hw-progress-track"><div class="hw-progress-fill ram-fill" id="subRamFill" style="width: 54%;"></div></div>
+          </div>
+
+          <div class="hw-chip-stat">
+            <div class="hw-chip-top">
+              <span class="hw-lbl">ALMACENAMIENTO</span>
+              <span class="hw-val" id="subStorageVal">38%</span>
+            </div>
+            <div class="hw-progress-track"><div class="hw-progress-fill storage-fill" id="subStorageFill" style="width: 38%;"></div></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- COLUMNA DERECHA: ZERO LAYER HUD (JH MUSIC RELEVANTE + ACCESOS RÁPIDOS) -->
+      <section class="right-stack">
+
+        <!-- 1. TARJETA PRINCIPAL PROTAGONISTA: JH MUSIC (PANEL ALTO DE CONTROL DIRECTO) -->
+        <div class="card app-card music-app-card" id="cardJhMusic">
+          <div class="music-card-header">
+            <!-- Selector de Fuente Multimedia: USB (JH Music) vs Bluetooth Audio (Teléfono) -->
+            <div class="media-source-selector" id="mediaSourceSelector">
+              <button class="source-tab-btn active" id="btnSourceUsb" data-source="usb" title="Música local de los pendrives USB">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="tab-icon">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+                <span>JH MUSIC (USB)</span>
+              </button>
+
+              <button class="source-tab-btn" id="btnSourceBt" data-source="bt" title="Audio desde YouTube, Spotify o teléfono">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" class="tab-icon">
+                  <path d="m7 7 10 10-5 5V2l5 5L7 17"/>
+                </svg>
+                <span>BLUETOOTH AUDIO</span>
+              </button>
+            </div>
+            
+            <div class="header-right-badges">
+              <span class="playlist-chip" id="sourceExtraBadge">MI MIX (109)</span>
+              <span class="source-chip" id="sourceStatusChip">USB 1</span>
+            </div>
+          </div>
+
+          <!-- CONTENIDO MUSICAL EXPANDIDO -->
+          <div class="media-now-playing-large">
+            <div class="album-art-box-large">
+              <div class="vinyl-disc-large" id="vinylDisc"></div>
+              <div class="art-cover-large" id="musicArtCover">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="art-placeholder-icon">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="media-meta-large">
+              <div class="track-title-large" id="trackTitle">I'm Sorry</div>
+              <div class="track-artist-large" id="trackArtist">Aventura · The Last</div>
+              
+              <!-- Barra de progreso amplia -->
+              <div class="playback-progress-row">
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" id="musicProgressFill" style="width: 48%;"></div>
+                </div>
+                <div class="time-readout" id="timeReadout">02:14 / 04:36</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTONES TÁCTILES GIGANTES (FILOSOFÍA ZERO LAYER: MANEJO SEGURO SIN DISTRACCIÓN) -->
+          <div class="giant-controls-row">
+            <button class="haptic-btn ctrl-btn-giant" id="btnPrevTrack" title="Canción anterior">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+            </button>
+            
+            <button class="haptic-btn ctrl-btn-giant play-btn-giant" id="btnPlayPause" title="Reproducir / Pausa">
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            
+            <button class="haptic-btn ctrl-btn-giant" id="btnNextTrack" title="Siguiente canción">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="m6 18 8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+            
+            <button class="haptic-btn open-app-btn-giant" id="btnLaunchJhMusic" title="Abrir app completa JH Music">
+              <div class="open-label-group">
+                <span class="open-title">ABRIR JH MUSIC</span>
+                <span class="open-sub">Ver carpetas y listas de reproducción</span>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. FILA INFERIOR COMPACTA: ACCESOS DIRECTOS A JH VIDEO & RADIO FM -->
+        <div class="bottom-split-cards">
+
+          <!-- ACCESO COMPACTO: JH VIDEO -->
+          <div class="card sub-app-card" id="cardJhVideo">
+            <div class="sub-card-top-row">
+              <div class="sub-card-content">
+                <div class="app-badge-icon video-badge">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="m18 4 2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+                  </svg>
+                </div>
+                <div class="sub-card-title">
+                  <span class="sub-name">JH VIDEO</span>
+                  <span class="sub-desc">Videos USB offline</span>
+                </div>
+              </div>
+            </div>
+            <button class="haptic-btn sub-launch-pill" id="btnLaunchJhVideo">
+              <span>ABRIR VIDEOS</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+
+          <!-- ACCESO: RADIO FM CON CONTROLES DIRECTOS ANTERIOR / SIGUIENTE -->
+          <div class="card sub-app-card radio-live-card" id="cardRadioFm">
+            <div class="sub-card-top-row">
+              <div class="sub-card-content">
+                <div class="app-badge-icon radio-badge">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3.24 6.15C2.51 6.43 2 7.17 2 8v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-.83-.51-1.57-1.24-1.85L12 2 3.24 6.15zM12 4.41l6.76 2.59H5.24L12 4.41z"/>
+                  </svg>
+                </div>
+                <div class="sub-card-title">
+                  <span class="sub-name">RADIO FM</span>
+                  <span class="sub-desc">Antena de fábrica</span>
+                </div>
+              </div>
+              <button class="haptic-btn radio-open-btn" id="btnLaunchRadio" title="Abrir app de Radio completa">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+
+            <!-- CONTROLES DIRECTOS DE SINTONIZACIÓN ANTERIOR / SIGUIENTE -->
+            <div class="radio-tune-row">
+              <button class="haptic-btn radio-tune-btn" id="btnRadioPrev" title="Estación anterior">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+              </button>
+
+              <div class="radio-frequency-box" id="radioFreqBadge" title="Toca para abrir radio">
+                <span class="radio-freq-num" id="radioFreqDisplay">96.1</span>
+                <span class="radio-freq-unit">MHz</span>
+              </div>
+
+              <button class="haptic-btn radio-tune-btn" id="btnRadioNext" title="Siguiente estación">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m6 18 8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- 3. BARRA INFERIOR FLOTANTE (DOCK ERGONÓMICO DE GAMA ALTA) -->
+    <footer class="dock-bar">
+      <div class="dock-left">
+        <!-- Botón rápido Silencio / Mute -->
+        <button class="dock-action-btn" id="btnMuteToggle" title="Silenciar audio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <span id="muteLabel">AUDIO</span>
+        </button>
+
+        <!-- Botón Modo Stealth (Sigilo Nocturno Porsche/Tesla) -->
+        <button class="dock-action-btn" id="btnStealthMode" title="Modo Sigilo: Atenúa la pantalla de noche con 1 toque">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <span>STEALTH</span>
+        </button>
+      </div>
+
+      <div class="dock-center">
+        <!-- Accesos rápidos a apps principales -->
+        <button class="dock-icon-btn active" id="dockBtnMusic" title="JH Music">
+          <span class="dock-badge-dot"></span>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+          </svg>
+          <span>MÚSICA</span>
+        </button>
+
+        <button class="dock-icon-btn" id="dockBtnVideo" title="JH Video">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="m18 4 2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+          </svg>
+          <span>VIDEOS</span>
+        </button>
+
+        <button class="dock-icon-btn" id="dockBtnRadio" title="Radio FM Nativa">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3.24 6.15C2.51 6.43 2 7.17 2 8v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-.83-.51-1.57-1.24-1.85L12 2 3.24 6.15zM12 4.41l6.76 2.59H5.24L12 4.41z"/>
+          </svg>
+          <span>RADIO</span>
+        </button>
+
+        <button class="dock-icon-btn" id="dockBtnBt" title="Bluetooth Manos Libres">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="m7 7 10 10-5 5V2l5 5L7 17"/>
+          </svg>
+          <span>LLAMADAS</span>
+        </button>
+      </div>
+
+      <div class="dock-right">
+        <!-- Cajón de todas las aplicaciones de Android -->
+        <button class="dock-action-btn" id="btnAllApps" title="Todas las aplicaciones">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+          <span>APPS</span>
+        </button>
+
+        <!-- Ajustes del Sistema y Rescate de fábrica -->
+        <button class="dock-action-btn" id="btnSystemSettings" title="Configuración de la radio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>AJUSTES</span>
+        </button>
+      </div>
+    </footer>
+
+    <!-- MODAL DE TOQUE / SIMULACIÓN DE LANZAMIENTO DE APP -->
+    <div class="app-launch-toast" id="launchToast">
+      <span class="toast-icon">🚀</span>
+      <span class="toast-msg" id="toastMsg">Abriendo JH Music...</span>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
