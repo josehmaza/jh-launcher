@@ -131,12 +131,27 @@ body {
   flex-direction: column;
 }
 
-/* Modo pantalla completa sin marco */
-body.fullscreen-mode .screen-frame-wrapper {
-  border-radius: 0;
-  box-shadow: none;
-  width: 100vw;
-  height: 100vh;
+/* Modo pantalla completa y Android Nativo */
+body.fullscreen-mode,
+body.android-native {
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+body.fullscreen-mode .desktop-preview-toolbar,
+body.android-native .desktop-preview-toolbar {
+  display: none !important;
+}
+
+body.fullscreen-mode .screen-frame-wrapper,
+body.android-native .screen-frame-wrapper {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
 }
 
 /* --------------------------------------------------------------------------

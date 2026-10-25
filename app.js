@@ -5,6 +5,11 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // Si corre en la app nativa Android, ocultar controles de PC y ajustar al 100%
+  if (window.AndroidBridge || navigator.userAgent.includes('wv') || window.location.href.startsWith('file:///android_asset/')) {
+    document.body.classList.add('android-native');
+  }
+
   // --------------------------------------------------------------------------
   // 1. ROTACIÓN AUTOMÁTICA SUAVE 360° DEL HYUNDAI TUCSON 2013
   // --------------------------------------------------------------------------
