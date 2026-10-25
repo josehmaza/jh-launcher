@@ -285,18 +285,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnStealthPreview = document.getElementById('btnStealthPreview');
   const stealthOverlay = document.getElementById('stealthOverlay');
 
-  function enterStealthMode() {
+  let stealthActiveTimestamp = 0;
+
+  function enterStealthMode(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     stealthOverlay.classList.add('active');
+    stealthActiveTimestamp = Date.now();
   }
 
-  function exitStealthMode() {
+  function exitStealthMode(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    // Evitar que el clic residual del botón de entrada cierre la pantalla al instante
+    if (Date.now() - stealthActiveTimestamp < 500) {
+      return;
+    }
     stealthOverlay.classList.remove('active');
     showToast("Pantalla restaurada");
   }
 
-  if (btnStealthMode) btnStealthMode.addEventListener('click', enterStealthMode);
-  if (btnStealthPreview) btnStealthPreview.addEventListener('click', enterStealthMode);
-  if (stealthOverlay) stealthOverlay.addEventListener('click', exitStealthMode);
+  if (btnStealthMode) {
+    btnStealthMode.addEventListener('click', enterStealthMode);
+  }
+  if (btnStealthPreview) {
+    btnStealthPreview.addEventListener('click', enterStealthMode);
+  }
+  if (stealthOverlay) {
+    stealthOverlay.addEventListener('click', exitStealthMode);
+  }
 
   // Mute Audio
   const btnMuteToggle = document.getElementById('btnMuteToggle');

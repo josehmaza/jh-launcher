@@ -159,9 +159,14 @@ body.android-native .screen-frame-wrapper {
    -------------------------------------------------------------------------- */
 .stealth-mode-overlay {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: #020305;
-  z-index: 500;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,11 +347,12 @@ body.android-native .screen-frame-wrapper {
 .vehicle-hw-bar {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  grid-gap: 12px;
+  gap: 12px;
   background: rgba(10, 13, 20, 0.7);
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   cursor: pointer;
   transition: all 0.15s ease;
   margin-top: 4px;
@@ -359,13 +365,13 @@ body.android-native .screen-frame-wrapper {
 .hw-chip-stat {
   display: flex;
   flex-direction: column;
-  gap: 3px;
 }
 
 .hw-chip-top {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  margin-bottom: 4px;
 }
 
 .hw-lbl {
@@ -494,6 +500,13 @@ body.android-native .screen-frame-wrapper {
   padding: 2px;
 }
 
+.color-pill-switch > * {
+  margin-right: 4px;
+}
+.color-pill-switch > *:last-child {
+  margin-right: 0;
+}
+
 .color-opt-btn {
   background: transparent;
   border: none;
@@ -513,6 +526,7 @@ body.android-native .screen-frame-wrapper {
   width: 7px;
   height: 7px;
   border-radius: 50%;
+  margin-right: 5px;
 }
 .black-dot {
   background-color: #111;
@@ -729,6 +743,8 @@ body.android-native .screen-frame-wrapper {
   position: relative;
   width: 86px;
   height: 86px;
+  margin-right: 24px;
+  flex-shrink: 0;
 }
 
 .vinyl-disc-large {
@@ -776,6 +792,7 @@ body.android-native .screen-frame-wrapper {
 .media-meta-large {
   flex: 1;
   overflow: hidden;
+  min-width: 0;
 }
 
 .track-title-large {
@@ -811,6 +828,7 @@ body.android-native .screen-frame-wrapper {
   background: rgba(255, 255, 255, 0.12);
   border-radius: 3px;
   overflow: hidden;
+  margin-right: 12px;
 }
 
 .progress-bar-fill {
@@ -831,6 +849,13 @@ body.android-native .screen-frame-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.giant-controls-row > * {
+  margin-right: 10px;
+}
+.giant-controls-row > *:last-child {
+  margin-right: 0;
 }
 
 .haptic-btn {
@@ -974,6 +999,13 @@ body.android-native .screen-frame-wrapper {
   margin-top: 6px;
 }
 
+.radio-tune-row > * {
+  margin-right: 8px;
+}
+.radio-tune-row > *:last-child {
+  margin-right: 0;
+}
+
 .radio-tune-btn {
   width: 52px;
   height: 44px;
@@ -1056,10 +1088,24 @@ body.android-native .screen-frame-wrapper {
   display: flex;
   gap: 8px;
 }
+.dock-left > *,
+.dock-right > * {
+  margin-right: 8px;
+}
+.dock-left > *:last-child,
+.dock-right > *:last-child {
+  margin-right: 0;
+}
 
 .dock-center {
   display: flex;
   gap: 12px;
+}
+.dock-center > * {
+  margin-right: 12px;
+}
+.dock-center > *:last-child {
+  margin-right: 0;
 }
 
 /* Botones del Dock */

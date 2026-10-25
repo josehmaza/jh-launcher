@@ -261,6 +261,8 @@ public class MainActivity extends Activity {
             for (String pkg : candidates) {
                 Intent launchIntent = pm.getLaunchIntentForPackage(pkg);
                 if (launchIntent != null) {
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    launchIntent.removeFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                     mainHandler.post(() -> startActivity(launchIntent));
                     return true;
                 }
