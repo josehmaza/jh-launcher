@@ -187,13 +187,8 @@ public class MainActivity extends Activity {
         public void sendMusicCommand(String action) {
             mainHandler.post(() -> {
                 try {
-                    if ("PLAY_PAUSE".equalsIgnoreCase(action) || "PLAY".equalsIgnoreCase(action)) {
-                        if (!isAppProcessRunning("com.jh.caraudio")) {
-                            launchJhMusic();
-                            return;
-                        }
-                    }
                     Intent cmd = new Intent("com.jh.music.action." + action.toUpperCase());
+                    cmd.setPackage("com.jh.caraudio");
                     sendBroadcast(cmd);
                 } catch (Exception ignored) {}
             });

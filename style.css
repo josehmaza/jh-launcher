@@ -360,19 +360,18 @@ body.android-native .screen-frame-wrapper {
   opacity: 0.5;
 }
 
-/* DEMO 2: MINI TELEMETRÍA BAJO EL AUTO */
+/* DEMO 2: MINI TELEMETRÍA BAJO EL AUTO (LETRA GRANDE Y LEGIBLE AUTOMOTRIZ) */
 .vehicle-hw-bar {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 12px;
-  gap: 12px;
-  background: rgba(10, 13, 20, 0.7);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 6px 12px;
+  grid-gap: 14px;
+  background: rgba(10, 14, 22, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 8px 14px;
   cursor: pointer;
   transition: all 0.15s ease;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .vehicle-hw-bar:hover {
@@ -388,33 +387,33 @@ body.android-native .screen-frame-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 .hw-lbl {
-  font-size: 8px;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.8px;
 }
 
 .hw-val {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
 }
 
 .hw-progress-track {
-  height: 3px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .hw-progress-fill {
   height: 100%;
-  border-radius: 2px;
+  border-radius: 3px;
   transition: width 0.5s ease;
 }
 
@@ -423,8 +422,8 @@ body.android-native .screen-frame-wrapper {
 .storage-fill { background: var(--accent-amber); }
 
 .hw-icon {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   color: var(--accent-cyan);
 }
 
@@ -975,45 +974,59 @@ body.android-native .screen-frame-wrapper {
 .sub-card-content {
   display: flex;
   align-items: center;
-  gap: 10px;
+}
+
+.sub-card-content .app-badge-icon {
+  margin-right: 14px;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+.sub-card-content .app-badge-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .sub-card-title {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .sub-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
   color: #fff;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
 }
 
 .sub-desc {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #94a3b8;
+  margin-top: 3px;
+  line-height: 1.2;
 }
 
 .radio-open-btn {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   background: rgba(255, 170, 0, 0.12);
   border-color: rgba(255, 170, 0, 0.35);
   color: var(--accent-amber);
   border-radius: 8px;
 }
 .radio-open-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 /* SINTONIZADOR DIRECTO ANTERIOR / SIGUIENTE (ZERO LAYER) */
 .radio-tune-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .radio-tune-row > * {
@@ -1049,7 +1062,6 @@ body.android-native .screen-frame-wrapper {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 4px;
   cursor: pointer;
   transition: border-color 0.15s ease;
 }
@@ -1059,14 +1071,15 @@ body.android-native .screen-frame-wrapper {
 
 .radio-freq-num {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   color: #fff;
   line-height: 44px;
+  margin-right: 4px;
 }
 
 .radio-freq-unit {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--accent-amber);
 }
@@ -1074,16 +1087,18 @@ body.android-native .screen-frame-wrapper {
 .sub-launch-pill {
   height: 44px;
   width: 100%;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  gap: 8px;
   background: var(--bg-surface-2);
-  margin-top: 6px;
+  margin-top: 8px;
+}
+.sub-launch-pill span {
+  margin-right: 8px;
 }
 .sub-launch-pill svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1143,16 +1158,17 @@ body.android-native .screen-frame-wrapper {
 }
 
 .dock-icon-btn {
-  width: 82px;
+  width: 84px;
 }
 .dock-icon-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 .dock-icon-btn span {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  margin-top: 2px;
 }
 
 .dock-icon-btn.active {
@@ -1172,16 +1188,18 @@ body.android-native .screen-frame-wrapper {
 }
 
 .dock-action-btn {
-  width: 66px;
+  width: 68px;
 }
 .dock-action-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   color: var(--text-secondary);
 }
 .dock-action-btn span {
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  margin-top: 2px;
 }
 
 .dock-icon-btn:active, .dock-action-btn:active {
