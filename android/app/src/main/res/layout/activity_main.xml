@@ -1,0 +1,1332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JH LAUNCHER · Hyundai Tucson ix35 2013 (1024x600 @ 160 dpi: 1dp = 1px).
+     Réplica nativa de la maqueta index.html / style.css. Los tamaños de texto van en dp
+     a propósito: el diseño es fijo para la pantalla del radio. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/mainContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- ============ 1. BARRA SUPERIOR (48dp) ============ -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:background="@color/bg_bar"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:background="@drawable/bg_pill"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="12dp"
+                android:paddingTop="5dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="5dp">
+
+                <com.jh.launcher.JhTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.136"
+                    android:text="HYUNDAI"
+                    android:textColor="@color/accent_cyan"
+                    android:textSize="11dp"
+                    app:jhFont="brand" />
+
+                <com.jh.launcher.JhTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:letterSpacing="0.045"
+                    android:text="TUCSON ix35 · 2013"
+                    android:textColor="@color/text_primary"
+                    android:textSize="11dp"
+                    app:jhFont="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <com.jh.launcher.JhTextView
+                    android:id="@+id/statusClock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.05"
+                    android:textColor="@color/text_primary"
+                    android:textSize="20dp"
+                    app:jhFont="mono" />
+
+                <com.jh.launcher.JhTextView
+                    android:id="@+id/statusDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:letterSpacing="0.133"
+                    android:textColor="@color/accent_cyan"
+                    android:textSize="9dp"
+                    app:jhFont="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/usb1Badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="4dp">
+
+                    <ImageView
+                        android:id="@+id/usb1Icon"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/ic_usb"
+                        android:tint="@color/text_muted" />
+
+                    <com.jh.launcher.JhTextView
+                        android:id="@+id/usb1Text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="USB 1"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10dp"
+                        app:jhFont="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/usb2Badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:background="@drawable/bg_pill"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="4dp">
+
+                    <ImageView
+                        android:id="@+id/usb2Icon"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/ic_usb"
+                        android:tint="@color/text_muted" />
+
+                    <com.jh.launcher.JhTextView
+                        android:id="@+id/usb2Text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="USB 2"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10dp"
+                        app:jhFont="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/border_subtle" />
+
+        <!-- ============ 2. CUERPO PRINCIPAL (488dp) ============ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:paddingLeft="14dp"
+            android:paddingTop="12dp"
+            android:paddingRight="14dp"
+            android:paddingBottom="12dp">
+
+            <!-- ===== COLUMNA IZQUIERDA: TUCSON 2013 ===== -->
+            <LinearLayout
+                android:layout_width="420dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_card_vehicle"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingTop="14dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <com.jh.launcher.JhTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.12"
+                            android:text="@string/greeting_subtitle"
+                            android:textColor="@color/accent_cyan"
+                            android:textSize="10dp"
+                            app:jhFont="bold" />
+
+                        <com.jh.launcher.JhTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:letterSpacing="-0.012"
+                            android:text="@string/greeting_title"
+                            android:textColor="@color/text_primary"
+                            android:textSize="24dp"
+                            app:jhFont="extrabold" />
+                    </LinearLayout>
+
+                    <!-- Selector de color Negro / Gris Acero -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_color_switch"
+                        android:orientation="horizontal"
+                        android:padding="2dp">
+
+                        <LinearLayout
+                            android:id="@+id/btnColorBlack"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_color_opt"
+                            android:clickable="true"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingRight="10dp"
+                            android:paddingBottom="4dp">
+
+                            <View
+                                android:layout_width="7dp"
+                                android:layout_height="7dp"
+                                android:background="@drawable/bg_dot_black" />
+
+                            <com.jh.launcher.JhTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:duplicateParentState="true"
+                                android:text="Negro"
+                                android:textColor="@color/text_selected_white"
+                                android:textSize="10dp"
+                                app:jhFont="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/btnColorGrey"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="4dp"
+                            android:background="@drawable/bg_color_opt"
+                            android:clickable="true"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingRight="10dp"
+                            android:paddingBottom="4dp">
+
+                            <View
+                                android:layout_width="7dp"
+                                android:layout_height="7dp"
+                                android:background="@drawable/bg_dot_grey" />
+
+                            <com.jh.launcher.JhTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:duplicateParentState="true"
+                                android:text="Gris Acero"
+                                android:textColor="@color/text_selected_white"
+                                android:textSize="10dp"
+                                app:jhFont="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Escenario del auto + touchpad de gestos a ciegas -->
+                <FrameLayout
+                    android:id="@+id/turntableStage"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/carImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:maxHeight="290dp"
+                        android:scaleType="fitCenter" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginBottom="6dp"
+                        android:background="@drawable/bg_spin_badge"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:paddingTop="3dp"
+                        android:paddingRight="10dp"
+                        android:paddingBottom="3dp">
+
+                        <View
+                            android:id="@+id/spinDot"
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_dot_cyan" />
+
+                        <com.jh.launcher.JhTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6dp"
+                            android:letterSpacing="0.09"
+                            android:text="360° ACTIVO"
+                            android:textColor="@color/accent_cyan"
+                            android:textSize="9dp"
+                            app:jhFont="bold" />
+                    </LinearLayout>
+
+                    <!-- HUD de gestos a ciegas -->
+                    <LinearLayout
+                        android:id="@+id/gestureHud"
+                        android:layout_width="108dp"
+                        android:layout_height="108dp"
+                        android:layout_gravity="center"
+                        android:alpha="0"
+                        android:background="@drawable/bg_hud_circle"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="invisible">
+
+                        <ImageView
+                            android:id="@+id/gestureHudIcon"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:tint="@color/accent_cyan" />
+
+                        <!-- Ancho fijo: el texto cambia en cada paso de volumen sin re-layout -->
+                        <com.jh.launcher.JhTextView
+                            android:id="@+id/gestureHudLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:gravity="center"
+                            android:letterSpacing="0.12"
+                            android:textColor="@color/text_primary"
+                            android:textSize="10dp"
+                            app:jhFont="brand" />
+
+                        <!-- Nivel de volumen (solo en el gesto de volumen) -->
+                        <FrameLayout
+                            android:id="@+id/gestureHudBar"
+                            android:layout_width="60dp"
+                            android:layout_height="4dp"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/bg_track"
+                            android:visibility="gone">
+
+                            <View
+                                android:id="@+id/gestureHudBarFill"
+                                style="@style/HwFill"
+                                android:background="@drawable/bg_fill_cyan" />
+                        </FrameLayout>
+                    </LinearLayout>
+                </FrameLayout>
+
+                <!-- Telemetría real de hardware (solo informativa) -->
+                <LinearLayout
+                    android:id="@+id/hwBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_hw_bar"
+                    android:orientation="horizontal"
+                    android:paddingLeft="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="14dp"
+                    android:paddingBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <com.jh.launcher.JhTextView
+                                style="@style/HwLabel"
+                                android:text="CPU" />
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/hwCpuVal"
+                                style="@style/HwValue"
+                                android:text="--" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="5dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/bg_track">
+
+                            <View
+                                android:id="@+id/hwCpuFill"
+                                style="@style/HwFill"
+                                android:background="@drawable/bg_fill_cyan" />
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <com.jh.launcher.JhTextView
+                                style="@style/HwLabel"
+                                android:text="RAM" />
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/hwRamVal"
+                                style="@style/HwValue"
+                                android:text="--" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="5dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/bg_track">
+
+                            <View
+                                android:id="@+id/hwRamFill"
+                                style="@style/HwFill"
+                                android:background="@drawable/bg_fill_emerald" />
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <com.jh.launcher.JhTextView
+                                style="@style/HwLabel"
+                                android:text="ALM" />
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/hwStorageVal"
+                                style="@style/HwValue"
+                                android:text="--" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="5dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/bg_track">
+
+                            <View
+                                android:id="@+id/hwStorageFill"
+                                style="@style/HwFill"
+                                android:background="@drawable/bg_fill_amber" />
+                        </FrameLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ===== COLUMNA DERECHA: ZERO LAYER ===== -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Tarjeta JH Music (320dp) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="320dp"
+                    android:background="@drawable/bg_card_music"
+                    android:orientation="vertical"
+                    android:paddingLeft="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingRight="16dp"
+                    android:paddingBottom="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_source_selector"
+                            android:orientation="horizontal"
+                            android:padding="3dp">
+
+                            <LinearLayout
+                                android:id="@+id/btnSourceUsb"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_source_tab"
+                                android:clickable="true"
+                                android:gravity="center_vertical"
+                                android:paddingLeft="12dp"
+                                android:paddingTop="6dp"
+                                android:paddingRight="12dp"
+                                android:paddingBottom="6dp">
+
+                                <ImageView
+                                    android:layout_width="15dp"
+                                    android:layout_height="15dp"
+                                    android:duplicateParentState="true"
+                                    android:src="@drawable/ic_note"
+                                    android:tint="@color/tint_selected_cyan" />
+
+                                <com.jh.launcher.JhTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="6dp"
+                                    android:duplicateParentState="true"
+                                    android:letterSpacing="0.045"
+                                    android:text="JH MUSIC (USB)"
+                                    android:textColor="@color/text_selected_white"
+                                    android:textSize="11dp"
+                                    app:jhFont="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/btnSourceBt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="4dp"
+                                android:background="@drawable/bg_source_tab"
+                                android:clickable="true"
+                                android:gravity="center_vertical"
+                                android:paddingLeft="12dp"
+                                android:paddingTop="6dp"
+                                android:paddingRight="12dp"
+                                android:paddingBottom="6dp">
+
+                                <ImageView
+                                    android:layout_width="15dp"
+                                    android:layout_height="15dp"
+                                    android:duplicateParentState="true"
+                                    android:src="@drawable/ic_bluetooth"
+                                    android:tint="@color/tint_selected_cyan" />
+
+                                <com.jh.launcher.JhTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="6dp"
+                                    android:duplicateParentState="true"
+                                    android:letterSpacing="0.045"
+                                    android:text="BLUETOOTH AUDIO"
+                                    android:textColor="@color/text_selected_white"
+                                    android:textSize="11dp"
+                                    app:jhFont="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <com.jh.launcher.JhTextView
+                            android:id="@+id/sourceExtraBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_chip_playlist"
+                            android:paddingLeft="8dp"
+                            android:paddingTop="3dp"
+                            android:paddingRight="8dp"
+                            android:paddingBottom="3dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10dp"
+                            app:jhFont="bold" />
+
+                        <com.jh.launcher.JhTextView
+                            android:id="@+id/sourceStatusChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:background="@drawable/bg_chip_source"
+                            android:paddingLeft="8dp"
+                            android:paddingTop="3dp"
+                            android:paddingRight="8dp"
+                            android:paddingBottom="3dp"
+                            android:textColor="@color/accent_cyan"
+                            android:textSize="10dp"
+                            app:jhFont="bold" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <!-- Reproduciendo ahora: carátula con vinilo + datos -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipChildren="false"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="86dp"
+                            android:layout_height="86dp"
+                            android:layout_marginRight="44dp"
+                            android:clipChildren="false">
+
+                            <ImageView
+                                android:id="@+id/vinylDisc"
+                                android:layout_width="78dp"
+                                android:layout_height="78dp"
+                                android:layout_marginLeft="6dp"
+                                android:layout_marginTop="4dp" />
+
+                            <FrameLayout
+                                android:layout_width="86dp"
+                                android:layout_height="86dp"
+                                android:background="@drawable/bg_art_cover">
+
+                                <ImageView
+                                    android:id="@+id/artCoverIcon"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_disc"
+                                    android:tint="@color/accent_cyan" />
+                            </FrameLayout>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/trackTitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:letterSpacing="-0.01"
+                                android:singleLine="true"
+                                android:textColor="@color/text_primary"
+                                android:textSize="21dp"
+                                app:jhFont="extrabold" />
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/trackArtist"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13dp"
+                                app:jhFont="semibold" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <FrameLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_progress_track">
+
+                                    <View
+                                        android:id="@+id/musicProgressFill"
+                                        style="@style/HwFill"
+                                        android:background="@drawable/bg_fill_cyan" />
+                                </FrameLayout>
+
+                                <com.jh.launcher.JhTextView
+                                    android:id="@+id/timeReadout"
+                                    android:layout_width="92dp"
+                                    android:gravity="end"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="12dp"
+                                    android:singleLine="true"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="11dp"
+                                    app:jhFont="mono" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <!-- Controles gigantes -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@+id/btnPrevTrack"
+                            style="@style/HapticButton"
+                            android:layout_width="58dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_btn_haptic">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:layout_gravity="center"
+                                android:duplicateParentState="true"
+                                android:src="@drawable/ic_prev"
+                                android:tint="@color/tint_haptic" />
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/btnPlayPause"
+                            style="@style/HapticButton"
+                            android:layout_width="66dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/bg_btn_play">
+
+                            <ImageView
+                                android:id="@+id/playPauseIcon"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_play"
+                                android:tint="#000000" />
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/btnNextTrack"
+                            style="@style/HapticButton"
+                            android:layout_width="58dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/bg_btn_haptic">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:layout_gravity="center"
+                                android:duplicateParentState="true"
+                                android:src="@drawable/ic_next"
+                                android:tint="@color/tint_haptic" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:id="@+id/btnOpenMusic"
+                            style="@style/HapticButton"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_btn_open"
+                            android:orientation="horizontal"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <com.jh.launcher.JhTextView
+                                    android:id="@+id/openTitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:duplicateParentState="true"
+                                    android:letterSpacing="0.04"
+                                    android:singleLine="true"
+                                    android:textColor="@color/tint_haptic"
+                                    android:textSize="13dp"
+                                    app:jhFont="extrabold" />
+
+                                <com.jh.launcher.JhTextView
+                                    android:id="@+id/openSub"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:duplicateParentState="true"
+                                    android:ellipsize="end"
+                                    android:singleLine="true"
+                                    android:textColor="@color/tint_cyan_pressable"
+                                    android:textSize="10dp"
+                                    app:jhFont="semibold" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:duplicateParentState="true"
+                                android:src="@drawable/ic_chevron"
+                                android:tint="@color/tint_cyan_pressable" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Fila inferior: JH Video + Radio FM -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card"
+                        android:orientation="vertical"
+                        android:paddingLeft="14dp"
+                        android:paddingTop="12dp"
+                        android:paddingRight="14dp"
+                        android:paddingBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_badge_video">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_video" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="14dp"
+                                android:orientation="vertical">
+
+                                <com.jh.launcher.JhTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:letterSpacing="0.02"
+                                    android:text="JH VIDEO"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="16dp"
+                                    app:jhFont="extrabold" />
+
+                                <com.jh.launcher.JhTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="3dp"
+                                    android:text="Videos USB offline"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12dp"
+                                    app:jhFont="semibold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <LinearLayout
+                            android:id="@+id/btnLaunchJhVideo"
+                            style="@style/HapticButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_btn_pill"
+                            android:orientation="horizontal">
+
+                            <com.jh.launcher.JhTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:duplicateParentState="true"
+                                android:letterSpacing="0.04"
+                                android:text="ABRIR VIDEOS"
+                                android:textColor="@color/tint_haptic"
+                                android:textSize="13dp"
+                                app:jhFont="extrabold" />
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginLeft="8dp"
+                                android:duplicateParentState="true"
+                                android:src="@drawable/ic_chevron"
+                                android:tint="@color/tint_haptic" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="12dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card"
+                        android:orientation="vertical"
+                        android:paddingLeft="14dp"
+                        android:paddingTop="12dp"
+                        android:paddingRight="14dp"
+                        android:paddingBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_badge_radio">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_radio" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <com.jh.launcher.JhTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:letterSpacing="0.02"
+                                    android:text="RADIO FM"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="16dp"
+                                    app:jhFont="extrabold" />
+
+                                <com.jh.launcher.JhTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="3dp"
+                                    android:text="Antena de fábrica"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12dp"
+                                    app:jhFont="semibold" />
+                            </LinearLayout>
+
+                            <FrameLayout
+                                android:id="@+id/btnLaunchRadio"
+                                style="@style/HapticButton"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_btn_radio_open">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_gravity="center"
+                                    android:duplicateParentState="true"
+                                    android:src="@drawable/ic_chevron"
+                                    android:tint="@color/tint_amber_pressable" />
+                            </FrameLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:orientation="horizontal">
+
+                            <FrameLayout
+                                android:id="@+id/btnRadioPrev"
+                                style="@style/HapticButton"
+                                android:layout_width="52dp"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/bg_btn_radio_tune">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:duplicateParentState="true"
+                                    android:src="@drawable/ic_prev"
+                                    android:tint="@color/tint_tune" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:id="@+id/radioFreqBox"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginLeft="8dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_freq_box"
+                                android:baselineAligned="true"
+                                android:clickable="true"
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <com.jh.launcher.JhTextView
+                                    android:id="@+id/radioFreqDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="24dp"
+                                    app:jhFont="mono" />
+
+                                <com.jh.launcher.JhTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="4dp"
+                                    android:text="MHz"
+                                    android:textColor="@color/accent_amber"
+                                    android:textSize="11dp"
+                                    app:jhFont="bold" />
+                            </LinearLayout>
+
+                            <FrameLayout
+                                android:id="@+id/btnRadioNext"
+                                style="@style/HapticButton"
+                                android:layout_width="52dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginLeft="8dp"
+                                android:background="@drawable/bg_btn_radio_tune">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:duplicateParentState="true"
+                                    android:src="@drawable/ic_next"
+                                    android:tint="@color/tint_tune" />
+                            </FrameLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ============ 3. DOCK INFERIOR (64dp) ============ -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/border_subtle" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="63dp"
+            android:background="@color/bg_bar"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <LinearLayout
+                android:id="@+id/btnMute"
+                style="@style/DockButton"
+                android:layout_width="68dp">
+
+                <ImageView
+                    android:id="@+id/muteIcon"
+                    style="@style/DockIcon"
+                    android:src="@drawable/ic_volume" />
+
+                <com.jh.launcher.JhTextView
+                    android:id="@+id/muteLabel"
+                    style="@style/DockLabel"
+                    android:text="AUDIO" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnStealth"
+                style="@style/DockButton"
+                android:layout_width="68dp"
+                android:layout_marginLeft="8dp">
+
+                <ImageView
+                    style="@style/DockIcon"
+                    android:src="@drawable/ic_moon" />
+
+                <com.jh.launcher.JhTextView
+                    style="@style/DockLabel"
+                    android:text="STEALTH" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <FrameLayout
+                android:layout_width="84dp"
+                android:layout_height="50dp">
+
+                <LinearLayout
+                    android:id="@+id/dockMusic"
+                    style="@style/DockButton"
+                    android:layout_width="match_parent">
+
+                    <ImageView
+                        style="@style/DockIcon"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_note" />
+
+                    <com.jh.launcher.JhTextView
+                        style="@style/DockLabel"
+                        android:text="MÚSICA" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="12dp"
+                    android:background="@drawable/bg_dot_cyan" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/dockVideo"
+                style="@style/DockButton"
+                android:layout_width="84dp"
+                android:layout_marginLeft="12dp">
+
+                <ImageView
+                    style="@style/DockIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_video" />
+
+                <com.jh.launcher.JhTextView
+                    style="@style/DockLabel"
+                    android:text="VIDEOS" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/dockRadio"
+                style="@style/DockButton"
+                android:layout_width="84dp"
+                android:layout_marginLeft="12dp">
+
+                <ImageView
+                    style="@style/DockIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_radio" />
+
+                <com.jh.launcher.JhTextView
+                    style="@style/DockLabel"
+                    android:text="RADIO" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/dockBluetooth"
+                style="@style/DockButton"
+                android:layout_width="84dp"
+                android:layout_marginLeft="12dp">
+
+                <ImageView
+                    style="@style/DockIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_bluetooth" />
+
+                <com.jh.launcher.JhTextView
+                    style="@style/DockLabel"
+                    android:text="LLAMADAS" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:id="@+id/btnAllApps"
+                style="@style/DockButton"
+                android:layout_width="68dp">
+
+                <ImageView
+                    style="@style/DockIcon"
+                    android:src="@drawable/ic_apps" />
+
+                <com.jh.launcher.JhTextView
+                    style="@style/DockLabel"
+                    android:text="APPS" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnSettings"
+                style="@style/DockButton"
+                android:layout_width="68dp"
+                android:layout_marginLeft="8dp">
+
+                <ImageView
+                    style="@style/DockIcon"
+                    android:src="@drawable/ic_settings" />
+
+                <com.jh.launcher.JhTextView
+                    style="@style/DockLabel"
+                    android:text="AJUSTES" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Aviso flotante dentro del launcher (reemplaza los Toast del sistema) -->
+    <com.jh.launcher.JhTextView
+        android:id="@+id/launchToast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="60dp"
+        android:alpha="0"
+        android:background="@drawable/bg_toast"
+        android:paddingLeft="22dp"
+        android:paddingTop="10dp"
+        android:paddingRight="22dp"
+        android:paddingBottom="10dp"
+        android:textColor="@color/text_primary"
+        android:textSize="13dp"
+        android:visibility="invisible"
+        app:jhFont="bold" />
+
+    <!-- ============ MODO STEALTH (sigilo nocturno) ============ -->
+    <LinearLayout
+        android:id="@+id/stealthOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/stealth_bg"
+        android:clickable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.jh.launcher.JhTextView
+            android:id="@+id/stealthClock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:letterSpacing="0.0375"
+            android:textColor="@color/text_stealth"
+            android:textSize="80dp"
+            app:jhFont="mono" />
+
+        <com.jh.launcher.JhTextView
+            android:id="@+id/stealthDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:letterSpacing="0.14"
+            android:textColor="@color/text_stealth_date"
+            android:textSize="14dp"
+            app:jhFont="bold" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/bg_stealth_track"
+            android:gravity="center_vertical"
+            android:paddingLeft="22dp"
+            android:paddingTop="8dp"
+            android:paddingRight="22dp"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_note"
+                android:tint="@color/accent_cyan" />
+
+            <com.jh.launcher.JhTextView
+                android:id="@+id/stealthTrackName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:ellipsize="end"
+                android:maxWidth="500dp"
+                android:singleLine="true"
+                android:textColor="@color/text_stealth"
+                android:textSize="15dp"
+                app:jhFont="semibold" />
+        </LinearLayout>
+
+        <com.jh.launcher.JhTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="42dp"
+            android:letterSpacing="0.09"
+            android:text="TOCA CUALQUIER PARTE PARA DESPERTAR LA PANTALLA"
+            android:textColor="@color/text_stealth_hint"
+            android:textSize="11dp"
+            app:jhFont="semibold" />
+    </LinearLayout>
+</FrameLayout>
