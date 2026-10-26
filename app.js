@@ -505,62 +505,53 @@ document.addEventListener('DOMContentLoaded', () => {
     let touchCurrentX = 0;
     let touchStartTime = 0;
     let isTwoFingerTouch = false;
-    let lastTwoFingerTapTime = 0;
-    let singleTouchStartX = 0;
+    let lastTapTime = 0;
 
     turntableStage.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 2) {
+      touchStartTime = Date.now();
+      if (e.touches.length >= 2) {
         isTwoFingerTouch = true;
         touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
         touchCurrentX = touchStartX;
-        touchStartTime = Date.now();
       } else if (e.touches.length === 1) {
         isTwoFingerTouch = false;
         singleTouchStartX = e.touches[0].clientX;
+        touchCurrentX = singleTouchStartX;
       }
     }, { passive: true });
 
     turntableStage.addEventListener('touchmove', (e) => {
       if (isTwoFingerTouch && e.touches.length >= 2) {
         touchCurrentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-      } else if (isTwoFingerTouch && e.changedTouches.length >= 1) {
+      } else if (e.touches.length === 1) {
+        touchCurrentX = e.touches[0].clientX;
+      } else if (e.changedTouches.length >= 1) {
         touchCurrentX = e.changedTouches[0].clientX;
       }
     }, { passive: true });
 
     turntableStage.addEventListener('touchend', (e) => {
-      if (isTwoFingerTouch) {
-        const duration = Date.now() - touchStartTime;
-        const deltaX = touchCurrentX - touchStartX;
+      const duration = Date.now() - touchStartTime;
+      const deltaX = isTwoFingerTouch ? (touchCurrentX - touchStartX) : (touchCurrentX - singleTouchStartX);
 
-        if (Math.abs(deltaX) > 40) {
-          if (deltaX > 0) {
-            executeGestureAction('next');
-          } else {
-            executeGestureAction('prev');
-          }
-        } else if (duration < 380) {
-          const now = Date.now();
-          if (now - lastTwoFingerTapTime < 420) {
-            executeGestureAction('toggle');
-            lastTwoFingerTapTime = 0;
-          } else {
-            lastTwoFingerTapTime = now;
-          }
+      if (Math.abs(deltaX) > 40) {
+        // Deslizar horizontalmente (1 dedo o 2 dedos) ➔ Siguiente o Anterior
+        if (deltaX > 0) {
+          executeGestureAction('next');
+        } else {
+          executeGestureAction('prev');
         }
-        isTwoFingerTouch = false;
-      } else if (e.changedTouches.length === 1) {
-        const delta1X = e.changedTouches[0].clientX - singleTouchStartX;
-        if (Math.abs(delta1X) > 45) {
-          const angles = vehicleAngles[currentColor];
-          if (delta1X > 0) {
-            currentAngleIndex = (currentAngleIndex - 1 + angles.length) % angles.length;
-          } else {
-            currentAngleIndex = (currentAngleIndex + 1) % angles.length;
-          }
-          updateCarView(true);
+      } else if (duration < 380) {
+        // Doble toque (1 dedo o 2 dedos) ➔ Play / Pausa
+        const now = Date.now();
+        if (now - lastTapTime < 420) {
+          executeGestureAction('toggle');
+          lastTapTime = 0;
+        } else {
+          lastTapTime = now;
         }
       }
+      isTwoFingerTouch = false;
     }, { passive: true });
 
     // Soporte para pruebas en Ratón (PC / Emulador)
