@@ -386,7 +386,7 @@ body.android-native .screen-frame-wrapper {
 .hw-chip-top {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   margin-bottom: 5px;
 }
 
@@ -395,6 +395,7 @@ body.android-native .screen-frame-wrapper {
   font-weight: 800;
   color: #94a3b8;
   letter-spacing: 0.8px;
+  white-space: nowrap;
 }
 
 .hw-val {
@@ -402,6 +403,7 @@ body.android-native .screen-frame-wrapper {
   font-size: 13px;
   font-weight: 800;
   color: #ffffff;
+  white-space: nowrap;
 }
 
 .hw-progress-track {
@@ -915,6 +917,27 @@ body.android-native .screen-frame-wrapper {
 .play-btn-giant svg {
   width: 28px;
   height: 28px;
+}
+
+@keyframes spinLoading {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.icon-music-spinner {
+  width: 28px;
+  height: 28px;
+  animation: spinLoading 0.75s linear infinite;
+}
+
+@keyframes pulseLoadingBtn {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(0.95); filter: brightness(1.25); }
+}
+
+.play-btn-giant.loading-pulse {
+  animation: pulseLoadingBtn 0.8s ease-in-out infinite !important;
+  background: #38bdf8 !important;
 }
 
 .open-app-btn-giant {

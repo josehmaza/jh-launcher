@@ -2,6 +2,7 @@ package com.jh.launcher;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -117,12 +118,33 @@ public class MainActivity extends Activity {
         webView.loadUrl("file:///android_asset/index.html");
 
         setContentView(webView);
+
+        // Monitorear periódicamente si el audio se detuvo o si la app fue cerrada externamente
+        mainHandler.postDelayed(audioCheckRunnable, 1000);
     }
+
+    private final Runnable audioCheckRunnable = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                boolean active = audioManager != null && audioManager.isMusicActive();
+                boolean running = isAppProcessRunning("com.jh.caraudio");
+                if (!active || !running) {
+                    if (webView != null) {
+                        webView.evaluateJavascript("if (window.onSystemMusicStopped) { window.onSystemMusicStopped(); }", null);
+                    }
+                }
+            } catch (Exception ignored) {}
+            mainHandler.postDelayed(this, 1200);
+        }
+    };
 
     @Override
     protected void onResume() {
         super.onResume();
         setImmersiveMode();
+        mainHandler.removeCallbacks(audioCheckRunnable);
+        mainHandler.postDelayed(audioCheckRunnable, 1000);
         // Solicita el estado actual a JH Music si ya se está reproduciendo
         try {
             sendBroadcast(new Intent("com.jh.music.action.REQUEST_STATE"));
@@ -132,6 +154,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mainHandler.removeCallbacks(audioCheckRunnable);
         try {
             unregisterReceiver(jhMusicReceiver);
         } catch (Exception ignored) {}
@@ -156,9 +179,21 @@ public class MainActivity extends Activity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        // En un Launcher el botón atrás no debe cerrar la aplicación de inicio
+    private boolean isAppProcessRunning(String packageName) {
+        try {
+            android.app.ActivityManager am = (android.app.ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            if (am != null) {
+                List<android.app.ActivityManager.RunningAppProcessInfo> list = am.getRunningAppProcesses();
+                if (list != null) {
+                    for (android.app.ActivityManager.RunningAppProcessInfo info : list) {
+                        if (info != null && packageName.equals(info.processName)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
     }
 
     /**
@@ -184,31 +219,20 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public boolean isJhMusicRunning() {
+            return isAppProcessRunning("com.jh.caraudio");
+        }
+
+        @JavascriptInterface
         public void sendMusicCommand(String action) {
             mainHandler.post(() -> {
                 try {
                     Intent cmd = new Intent("com.jh.music.action." + action.toUpperCase());
-                    cmd.setPackage("com.jh.caraudio");
+                    cmd.setComponent(new ComponentName("com.jh.caraudio", "com.jh.caraudio.MusicRemoteReceiver"));
+                    cmd.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
                     sendBroadcast(cmd);
                 } catch (Exception ignored) {}
             });
-        }
-
-        private boolean isAppProcessRunning(String packageName) {
-            try {
-                android.app.ActivityManager am = (android.app.ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-                if (am != null) {
-                    List<android.app.ActivityManager.RunningAppProcessInfo> list = am.getRunningAppProcesses();
-                    if (list != null) {
-                        for (android.app.ActivityManager.RunningAppProcessInfo info : list) {
-                            if (info != null && packageName.equals(info.processName)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ignored) {}
-            return false;
         }
 
         @JavascriptInterface

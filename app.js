@@ -164,7 +164,42 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentTrackDurationSec = 0;
   let jhMusicTrack = null;
 
+  let isMusicLoading = false;
+  let musicLoadingTimer = null;
+
+  function setMusicLoading(loading, message = "Iniciando JH Music...") {
+    isMusicLoading = loading;
+    if (musicLoadingTimer) {
+      clearTimeout(musicLoadingTimer);
+      musicLoadingTimer = null;
+    }
+
+    if (loading) {
+      btnPlayPause.classList.add('loading-pulse');
+      btnPlayPause.innerHTML = `
+        <svg class="icon-music-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6">
+          <circle cx="12" cy="12" r="9" stroke="rgba(0, 0, 0, 0.25)" />
+          <path d="M12 3a9 9 0 0 1 9 9" stroke="#000000" stroke-linecap="round" />
+        </svg>
+      `;
+      showToast("⏳ " + message);
+      // Timeout de seguridad: volver a mostrar el botón tras 6 segundos si no hubo respuesta
+      musicLoadingTimer = setTimeout(() => {
+        if (isMusicLoading) {
+          isMusicLoading = false;
+          btnPlayPause.classList.remove('loading-pulse');
+          updatePlayPauseBtnUi(isPlaying);
+        }
+      }, 6000);
+    } else {
+      btnPlayPause.classList.remove('loading-pulse');
+      updatePlayPauseBtnUi(isPlaying);
+    }
+  }
+
   function updatePlayPauseBtnUi(playing) {
+    if (isMusicLoading) return;
+    btnPlayPause.classList.remove('loading-pulse');
     btnPlayPause.innerHTML = playing
       ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`
       : `<svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
@@ -200,6 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyJhMusicData(data) {
     if (!data || !data.title) return;
+    if (isMusicLoading) {
+      isMusicLoading = false;
+      if (musicLoadingTimer) clearTimeout(musicLoadingTimer);
+      btnPlayPause.classList.remove('loading-pulse');
+    }
     jhMusicTrack = {
       title: data.title,
       artist: data.artist || "JH Music · USB 1",
@@ -250,6 +290,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Callback expuesto a Android para recibir broadcasts en vivo de JH Music
   window.updateLiveJhMusicTrack = function(data) {
     applyJhMusicData(data);
+  };
+
+  // Se activa si la app externa de música fue cerrada o el audio se detuvo en el sistema
+  window.onSystemMusicStopped = function() {
+    if (isMusicLoading) {
+      isMusicLoading = false;
+      if (musicLoadingTimer) clearTimeout(musicLoadingTimer);
+      btnPlayPause.classList.remove('loading-pulse');
+    }
+    if (currentAudioSource === 'usb' && isPlaying) {
+      isPlaying = false;
+      updatePlayPauseBtnUi(false);
+    }
   };
 
   window.onNativeAndroidReady = function() {
@@ -330,6 +383,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Play / Pausa
   btnPlayPause.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
+      const isRunning = window.AndroidBridge && window.AndroidBridge.isJhMusicRunning
+        ? window.AndroidBridge.isJhMusicRunning()
+        : true;
+
+      if (!isRunning && !isPlaying) {
+        setMusicLoading(true, "Iniciando JH Music en segundo plano...");
+        if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
+          window.AndroidBridge.sendMusicCommand('PLAY_PAUSE');
+        }
+        return;
+      }
+
       isPlaying = !isPlaying;
       updatePlayPauseBtnUi(isPlaying);
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
@@ -349,6 +414,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Anterior canción / video
   btnPrevTrack.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
+      const isRunning = window.AndroidBridge && window.AndroidBridge.isJhMusicRunning
+        ? window.AndroidBridge.isJhMusicRunning()
+        : true;
+
+      if (!isRunning) {
+        setMusicLoading(true, "Iniciando canción anterior...");
+      } else {
+        showToast("JH Music: Canción Anterior");
+      }
+
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
         window.AndroidBridge.sendMusicCommand('PREV');
       } else {
@@ -356,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTrackDisplay();
       }
       progressSec = 0;
-      showToast("JH Music: Canción Anterior");
+      updateProgressUi();
     } else {
       currentBtIdx = (currentBtIdx - 1 + btTracks.length) % btTracks.length;
       if (window.AndroidBridge && window.AndroidBridge.sendMediaKey) {
@@ -365,13 +440,23 @@ document.addEventListener('DOMContentLoaded', () => {
       updateTrackDisplay();
       progressSec = 0;
       showToast("Bluetooth AVRCP: Anterior en teléfono");
+      updateProgressUi();
     }
-    updateProgressUi();
   });
 
   // Siguiente canción / video
   btnNextTrack.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
+      const isRunning = window.AndroidBridge && window.AndroidBridge.isJhMusicRunning
+        ? window.AndroidBridge.isJhMusicRunning()
+        : true;
+
+      if (!isRunning) {
+        setMusicLoading(true, "Iniciando siguiente canción...");
+      } else {
+        showToast("JH Music: Siguiente Canción");
+      }
+
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
         window.AndroidBridge.sendMusicCommand('NEXT');
       } else {
@@ -379,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTrackDisplay();
       }
       progressSec = 0;
-      showToast("JH Music: Siguiente Canción");
+      updateProgressUi();
     } else {
       currentBtIdx = (currentBtIdx + 1) % btTracks.length;
       if (window.AndroidBridge && window.AndroidBridge.sendMediaKey) {
@@ -388,8 +473,8 @@ document.addEventListener('DOMContentLoaded', () => {
       updateTrackDisplay();
       progressSec = 0;
       showToast("Bluetooth AVRCP: Siguiente en teléfono");
+      updateProgressUi();
     }
-    updateProgressUi();
   });
 
   // Avance del tiempo de reproducción
