@@ -287,6 +287,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  let audioStartGracePeriod = 0;
+
   // Callback expuesto a Android para recibir broadcasts en vivo de JH Music
   window.updateLiveJhMusicTrack = function(data) {
     applyJhMusicData(data);
@@ -294,6 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Se activa si la app externa de música fue cerrada o el audio se detuvo en el sistema
   window.onSystemMusicStopped = function() {
+    if (Date.now() < audioStartGracePeriod) return;
     if (isMusicLoading) {
       isMusicLoading = false;
       if (musicLoadingTimer) clearTimeout(musicLoadingTimer);
@@ -383,18 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Play / Pausa
   btnPlayPause.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
-      const isRunning = window.AndroidBridge && window.AndroidBridge.isJhMusicRunning
-        ? window.AndroidBridge.isJhMusicRunning()
-        : true;
-
-      if (!isRunning && !isPlaying) {
-        setMusicLoading(true, "Iniciando JH Music en segundo plano...");
-        if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
-          window.AndroidBridge.sendMusicCommand('PLAY_PAUSE');
-        }
-        return;
-      }
-
+      audioStartGracePeriod = Date.now() + 3500;
       isPlaying = !isPlaying;
       updatePlayPauseBtnUi(isPlaying);
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
@@ -414,16 +406,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Anterior canción / video
   btnPrevTrack.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
-      const isRunning = window.AndroidBridge && window.AndroidBridge.isJhMusicRunning
-        ? window.AndroidBridge.isJhMusicRunning()
-        : true;
-
-      if (!isRunning) {
-        setMusicLoading(true, "Iniciando canción anterior...");
-      } else {
-        showToast("JH Music: Canción Anterior");
-      }
-
+      audioStartGracePeriod = Date.now() + 3500;
+      showToast("JH Music: Canción Anterior");
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
         window.AndroidBridge.sendMusicCommand('PREV');
       } else {
@@ -447,16 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Siguiente canción / video
   btnNextTrack.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
-      const isRunning = window.AndroidBridge && window.AndroidBridge.isJhMusicRunning
-        ? window.AndroidBridge.isJhMusicRunning()
-        : true;
-
-      if (!isRunning) {
-        setMusicLoading(true, "Iniciando siguiente canción...");
-      } else {
-        showToast("JH Music: Siguiente Canción");
-      }
-
+      audioStartGracePeriod = Date.now() + 3500;
+      showToast("JH Music: Siguiente Canción");
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
         window.AndroidBridge.sendMusicCommand('NEXT');
       } else {

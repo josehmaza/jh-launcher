@@ -128,14 +128,13 @@ public class MainActivity extends Activity {
         public void run() {
             try {
                 boolean active = audioManager != null && audioManager.isMusicActive();
-                boolean running = isAppProcessRunning("com.jh.caraudio");
-                if (!active || !running) {
+                if (!active) {
                     if (webView != null) {
                         webView.evaluateJavascript("if (window.onSystemMusicStopped) { window.onSystemMusicStopped(); }", null);
                     }
                 }
             } catch (Exception ignored) {}
-            mainHandler.postDelayed(this, 1200);
+            mainHandler.postDelayed(this, 1500);
         }
     };
 
