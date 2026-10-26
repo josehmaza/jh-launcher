@@ -78,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateCarView(true);
-    showToast(`Color Tucson: ${color === 'black' ? 'Negro Obsidiana' : 'Gris Acero'}`);
   }
 
   btnColorBlack.addEventListener('click', () => setColor('black'));
@@ -357,7 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       btnLaunchJhMusic.querySelector('.open-title').textContent = "ABRIR JH MUSIC";
       btnLaunchJhMusic.querySelector('.open-sub').textContent = "Ver carpetas y listas de reproducción";
-      showToast("Fuente: JH MUSIC (Pendrive USB 1)");
       syncFromNativeJhMusicState();
     } else {
       sourceExtraBadge.textContent = "AVRCP REMOTO";
@@ -373,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       btnLaunchJhMusic.querySelector('.open-title').textContent = "ABRIR MANOS LIBRES";
       btnLaunchJhMusic.querySelector('.open-sub').textContent = "Ver llamadas y teléfono conectado";
-      showToast("Fuente: BLUETOOTH (Controles para YouTube / Spotify en el teléfono)");
     }
 
     updateTrackDisplay();
@@ -392,14 +389,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
         window.AndroidBridge.sendMusicCommand('PLAY_PAUSE');
       }
-      showToast(isPlaying ? "JH Music: Reproduciendo" : "JH Music: En Pausa");
     } else {
       isPlaying = !isPlaying;
       updatePlayPauseBtnUi(isPlaying);
       if (window.AndroidBridge && window.AndroidBridge.sendMediaKey) {
         window.AndroidBridge.sendMediaKey(isPlaying ? 'play' : 'pause');
       }
-      showToast(isPlaying ? "Bluetooth AVRCP: Play en Teléfono (YouTube)" : "Bluetooth AVRCP: Pausa en Teléfono");
     }
   });
 
@@ -407,7 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
   btnPrevTrack.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
       audioStartGracePeriod = Date.now() + 3500;
-      showToast("JH Music: Canción Anterior");
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
         window.AndroidBridge.sendMusicCommand('PREV');
       } else {
@@ -423,7 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       updateTrackDisplay();
       progressSec = 0;
-      showToast("Bluetooth AVRCP: Anterior en teléfono");
       updateProgressUi();
     }
   });
@@ -432,7 +425,6 @@ document.addEventListener('DOMContentLoaded', () => {
   btnNextTrack.addEventListener('click', () => {
     if (currentAudioSource === 'usb') {
       audioStartGracePeriod = Date.now() + 3500;
-      showToast("JH Music: Siguiente Canción");
       if (window.AndroidBridge && window.AndroidBridge.sendMusicCommand) {
         window.AndroidBridge.sendMusicCommand('NEXT');
       } else {
@@ -448,7 +440,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       updateTrackDisplay();
       progressSec = 0;
-      showToast("Bluetooth AVRCP: Siguiente en teléfono");
       updateProgressUi();
     }
   });
@@ -463,6 +454,150 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Sincronización inicial al cargar
   syncFromNativeJhMusicState();
+
+  // --------------------------------------------------------------------------
+  // 3.7. GESTOS TÁCTILES A CIEGAS EN EL AUTO (BLIND TOUCH GESTURES)
+  // Inspiración: Audi MMI Touch / Polestar
+  // - 2 dedos swipe derecha: Siguiente canción / estación
+  // - 2 dedos swipe izquierda: Canción anterior / estación
+  // - 2 dedos doble toque: Play / Pausa
+  // - 1 dedo swipe: Rotación 360° manual del Tucson
+  // --------------------------------------------------------------------------
+  const turntableStage = document.getElementById('turntableStage');
+  const blindGestureHud = document.getElementById('blindGestureHud');
+  const gestureHudIcon = document.getElementById('gestureHudIcon');
+  const gestureHudLabel = document.getElementById('gestureHudLabel');
+  let gestureHudTimeout = null;
+
+  const GESTURE_ICONS_SVG = {
+    next: '<svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>',
+    prev: '<svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>',
+    play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+  };
+
+  function triggerGestureHud(actionKey, labelText) {
+    if (!blindGestureHud || !gestureHudIcon || !gestureHudLabel) return;
+    gestureHudIcon.innerHTML = GESTURE_ICONS_SVG[actionKey] || '';
+    gestureHudLabel.textContent = labelText;
+    blindGestureHud.classList.add('active');
+    clearTimeout(gestureHudTimeout);
+    gestureHudTimeout = setTimeout(() => {
+      blindGestureHud.classList.remove('active');
+    }, 650);
+  }
+
+  function executeGestureAction(actionType) {
+    if (actionType === 'next') {
+      triggerGestureHud('next', 'SIGUIENTE');
+      btnNextTrack.click();
+    } else if (actionType === 'prev') {
+      triggerGestureHud('prev', 'ANTERIOR');
+      btnPrevTrack.click();
+    } else if (actionType === 'toggle') {
+      triggerGestureHud(isPlaying ? 'pause' : 'play', isPlaying ? 'PAUSA' : 'PLAY');
+      btnPlayPause.click();
+    }
+  }
+
+  if (turntableStage) {
+    let touchStartX = 0;
+    let touchCurrentX = 0;
+    let touchStartTime = 0;
+    let isTwoFingerTouch = false;
+    let lastTwoFingerTapTime = 0;
+    let singleTouchStartX = 0;
+
+    turntableStage.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        isTwoFingerTouch = true;
+        touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        touchCurrentX = touchStartX;
+        touchStartTime = Date.now();
+      } else if (e.touches.length === 1) {
+        isTwoFingerTouch = false;
+        singleTouchStartX = e.touches[0].clientX;
+      }
+    }, { passive: true });
+
+    turntableStage.addEventListener('touchmove', (e) => {
+      if (isTwoFingerTouch && e.touches.length >= 2) {
+        touchCurrentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      } else if (isTwoFingerTouch && e.changedTouches.length >= 1) {
+        touchCurrentX = e.changedTouches[0].clientX;
+      }
+    }, { passive: true });
+
+    turntableStage.addEventListener('touchend', (e) => {
+      if (isTwoFingerTouch) {
+        const duration = Date.now() - touchStartTime;
+        const deltaX = touchCurrentX - touchStartX;
+
+        if (Math.abs(deltaX) > 40) {
+          if (deltaX > 0) {
+            executeGestureAction('next');
+          } else {
+            executeGestureAction('prev');
+          }
+        } else if (duration < 380) {
+          const now = Date.now();
+          if (now - lastTwoFingerTapTime < 420) {
+            executeGestureAction('toggle');
+            lastTwoFingerTapTime = 0;
+          } else {
+            lastTwoFingerTapTime = now;
+          }
+        }
+        isTwoFingerTouch = false;
+      } else if (e.changedTouches.length === 1) {
+        const delta1X = e.changedTouches[0].clientX - singleTouchStartX;
+        if (Math.abs(delta1X) > 45) {
+          const angles = vehicleAngles[currentColor];
+          if (delta1X > 0) {
+            currentAngleIndex = (currentAngleIndex - 1 + angles.length) % angles.length;
+          } else {
+            currentAngleIndex = (currentAngleIndex + 1) % angles.length;
+          }
+          updateCarView(true);
+        }
+      }
+    }, { passive: true });
+
+    // Soporte para pruebas en Ratón (PC / Emulador)
+    let mouseStartX = 0;
+    let isMouseDown = false;
+    let lastMouseClickTime = 0;
+
+    turntableStage.addEventListener('mousedown', (e) => {
+      isMouseDown = true;
+      mouseStartX = e.clientX;
+    });
+
+    turntableStage.addEventListener('mouseup', (e) => {
+      if (!isMouseDown) return;
+      isMouseDown = false;
+      const deltaX = e.clientX - mouseStartX;
+      if (Math.abs(deltaX) > 35) {
+        if (deltaX > 0) {
+          executeGestureAction('next');
+        } else {
+          executeGestureAction('prev');
+        }
+      } else {
+        const now = Date.now();
+        if (now - lastMouseClickTime < 350) {
+          executeGestureAction('toggle');
+          lastMouseClickTime = 0;
+        } else {
+          lastMouseClickTime = now;
+        }
+      }
+    });
+
+    turntableStage.addEventListener('mouseleave', () => {
+      isMouseDown = false;
+    });
+  }
 
   // --------------------------------------------------------------------------
   // 4. MODO STEALTH (SIGILO NOCTURNO PORSCHE / TESLA)
