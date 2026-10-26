@@ -206,6 +206,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (vinylDisc) {
       vinylDisc.classList.toggle('spinning', playing);
     }
+    const audioWaveEq = document.getElementById('audioWaveEq');
+    if (audioWaveEq) {
+      audioWaveEq.classList.toggle('playing', playing);
+    }
   }
 
   function updateProgressUi() {

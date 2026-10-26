@@ -176,7 +176,26 @@
           <!-- CONTENIDO MUSICAL EXPANDIDO -->
           <div class="media-now-playing-large">
             <div class="album-art-box-large">
-              <div class="vinyl-disc-large" id="vinylDisc"></div>
+              <div class="vinyl-disc-large" id="vinylDisc">
+                <svg viewBox="0 0 100 100" class="vinyl-svg">
+                  <!-- Base del disco -->
+                  <circle cx="50" cy="50" r="48" fill="#111622" stroke="rgba(0, 210, 255, 0.5)" stroke-width="1.5" />
+                  <!-- Surcos concéntricos con relieve -->
+                  <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.3" stroke-dasharray="10 4 14 5" />
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(0, 210, 255, 0.45)" stroke-width="1.2" stroke-dasharray="16 6 8 4" />
+                  <circle cx="50" cy="50" r="29" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.3" stroke-dasharray="8 3 18 6" />
+                  <circle cx="50" cy="50" r="23" fill="none" stroke="rgba(0, 210, 255, 0.4)" stroke-width="1.2" stroke-dasharray="12 5 6 3" />
+                  <!-- Haces de luz reflectiva en cruz (hacen evidente el giro en 360°) -->
+                  <path d="M50 50 L14 14 A48 48 0 0 1 42 3 Z" fill="rgba(255, 255, 255, 0.28)" />
+                  <path d="M50 50 L86 86 A48 48 0 0 1 58 97 Z" fill="rgba(255, 255, 255, 0.28)" />
+                  <!-- Etiqueta central azul -->
+                  <circle cx="50" cy="50" r="16" fill="#0066ff" stroke="#00d2ff" stroke-width="2" />
+                  <!-- Agujero central -->
+                  <circle cx="50" cy="50" r="4.5" fill="#080b12" stroke="#ffffff" stroke-width="1" />
+                  <!-- Marca reflectiva que rota -->
+                  <circle cx="50" cy="39" r="2.5" fill="#ffffff" />
+                </svg>
+              </div>
               <div class="art-cover-large" id="musicArtCover">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="art-placeholder-icon">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
@@ -185,7 +204,17 @@
             </div>
             
             <div class="media-meta-large">
-              <div class="track-title-large" id="trackTitle">I'm Sorry</div>
+              <div class="track-title-row">
+                <div class="track-title-large" id="trackTitle">I'm Sorry</div>
+                <!-- Ecualizador de Barras Saltarinas de Audio -->
+                <div class="audio-wave-eq" id="audioWaveEq" title="Reproduciendo audio">
+                  <span class="eq-bar"></span>
+                  <span class="eq-bar"></span>
+                  <span class="eq-bar"></span>
+                  <span class="eq-bar"></span>
+                  <span class="eq-bar"></span>
+                </div>
+              </div>
               <div class="track-artist-large" id="trackArtist">Aventura · The Last</div>
               
               <!-- Barra de progreso amplia -->
