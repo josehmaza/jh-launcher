@@ -48,7 +48,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:letterSpacing="0.045"
-                    android:text="TUCSON ix35 · 2013"
+                    android:text="TUCSON ix35"
                     android:textColor="@color/text_primary"
                     android:textSize="11dp"
                     app:jhFont="bold" />
@@ -1236,24 +1236,9 @@
                 android:layout_weight="1" />
 
             <LinearLayout
-                android:id="@+id/btnOpenApps"
-                style="@style/DockButton"
-                android:layout_width="68dp">
-
-                <ImageView
-                    style="@style/DockIcon"
-                    android:src="@drawable/ic_recents" />
-
-                <com.jh.launcher.JhTextView
-                    style="@style/DockLabel"
-                    android:text="ABIERTAS" />
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/btnAllApps"
                 style="@style/DockButton"
-                android:layout_width="68dp"
-                android:layout_marginLeft="8dp">
+                android:layout_width="68dp">
 
                 <ImageView
                     style="@style/DockIcon"

@@ -10,8 +10,8 @@ android {
         applicationId "com.jh.launcher"
         minSdk 21
         targetSdk 28
-        versionCode 13
-        versionName "1.6.3"
+        versionCode 15
+        versionName "1.6.5"
     }
 
     buildFeatures {

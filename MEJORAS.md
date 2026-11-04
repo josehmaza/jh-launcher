@@ -34,7 +34,7 @@ Las pantallas genéricas chinas saturan la vista con colores primarios chillones
 ### 1.3. Gemelo Digital 3D (Tucson ix35 2013)
 * **Visualización de alta fidelidad:** Renderizado de estudio del modelo auténtico **Tucson ix35 generación 2 (LM 2013)** con faros rasgados característicos y parrilla hexagonal de esa época.
 * **Plataforma circular con halo de luz:** Base circular estilo sala de exposición que otorga profundidad tridimensional sin sobrecargar la pantalla.
-* **Rotación automática continua (Turntable 360°):** El auto gira suave y lentamente por sí mismo, aportando una estética viva y futurista al encender el vehículo sin obligar al conductor a manipular controles.
+* **Cambio automático de ángulo (aplicado):** cada 3,6 s el auto pasa al ángulo siguiente (frente, perfil y trasera) deslizándose de lado con un fundido, sin que el conductor toque nada. No es un giro continuo y **no se gira con el dedo**: el arrastre se descartó para no chocar con los gestos a ciegas (§3.7).
 * **Selector sobrio de 2 colores:** Switch minimalista de un toque para alternar entre **Negro Obsidiana** (color del auto) y **Gris Acero** (Steel Grey).
 
 ### 1.4. Tipografía "Zero Jitter" (Sin vibración visual)
@@ -85,11 +85,11 @@ Al no disponer de botones en el volante del Tucson, **la pantalla es el único m
 * **Problema común:** Si estás escuchando música de un pendrive y luego quieres reproducir un video de YouTube o un podcast desde el teléfono por Bluetooth, en los radios chinos debes salirte a otra app fea y buscar botones pequeños.
 * **Mejora implementada:**
   - Pestaña **`JH MUSIC (USB)`**: control total de las canciones locales en los pendrives.
-  - Pestaña **`BLUETOOTH AUDIO`**: activa el canal AVRCP para controlar **YouTube / Spotify directamente en tu teléfono** con los mismos botones gigantes de Play/Pausa, Siguiente y Anterior.
+  - Pestaña **`BLUETOOTH AUDIO`**: controla **YouTube / Spotify en el teléfono** con los mismos botones de Play/Pausa, Siguiente y Anterior, a través del servicio Bluetooth del radio (`com.jancar.btservice`), y muestra la canción si el teléfono la manda. El launcher cambia solo a esta pestaña cuando el teléfono empieza a sonar. Pendiente de confirmar en el Tucson.
 
-### 3.3. Sintonizador directo de Radio FM con saltos rápidos
-* En lugar de obligar a abrir la app completa de radio para cambiar de emisora, la tarjeta incorpora los botones **`◄`** y **`►`** para recorrer las estaciones guardadas al instante.
-* Si se requiere escanear todo el dial, un toque sobre la frecuencia abre la app nativa de la radio de fábrica.
+### 3.3. Emisoras de Radio FM en el inicio (aplicado con JH RADIO)
+* La tarjeta muestra un **carrusel con las emisoras guardadas en [JH RADIO](https://github.com/josehmaza/jh-radio)** (desplazamiento horizontal). Tocar una la sintoniza sin salir del launcher (orden `GOTO`); la que suena queda marcada. Ya no hay botones `◄` / `►`.
+* Para escanear la banda o guardar emisoras, el botón de la tarjeta abre JH RADIO.
 
 ### 3.4. Modo "Stealth" (Sigilo Nocturno tipo Porsche)
 * **Problema:** En carretera oscura o autopista sin iluminación, la pantalla de 10" encandila y cansa la vista.
@@ -99,6 +99,7 @@ Al no disponer de botones en el volante del Tucson, **la pantalla es el único m
 ### 3.5. Botón de MUTE / Silencio de pánico
 * Ubicado en la esquina inferior izquierda (zona de más fácil acceso para la mano derecha del conductor).
 * Silencia instantáneamente el audio al llegar a un peaje, una llamada o una maniobra de estacionamiento difícil.
+* **Cómo silencia (aplicado):** baja el volumen a 0 y lo devuelve al de antes. El silencio de Android (`ADJUST_MUTE`) dejaba mudo el audio Bluetooth de este radio para siempre.
 
 ### 3.6. Botón de Ajustes y Rescate del Sistema
 * Siempre visible en el extremo inferior derecho. Si alguna vez necesitas entrar a los ajustes del auto, emparejar un nuevo Bluetooth o volver al launcher de fábrica, se accede con 1 toque sin riesgo de quedar atrapado.
@@ -106,16 +107,19 @@ Al no disponer de botones en el volante del Tucson, **la pantalla es el único m
 ### 3.7. Gestos Táctiles a Ciegas (Blind Touch Gestures en el área del auto)
 * **Inspiración:** Audi MMI Touch y Polestar.
 * **Problema:** Apuntar con el dedo a un botón distrae la vista del tráfico.
-* **Propuesta:** La zona central del auto 3D actúa como un *touchpad* gigante para gestos a ciegas:
-  - **Deslizar 2 dedos horizontalmente a la derecha ➔** Siguiente canción / estación de radio.
-  - **Deslizar 2 dedos a la izquierda ➔** Canción / estación anterior.
-  - **Doble toque con 2 dedos en cualquier parte ➔** Play / Pausa.
+* **Aplicado (con 1 dedo):** la tarjeta del auto funciona como *touchpad* para gestos a ciegas:
+  - **Deslizar a la derecha ➔** siguiente canción (de JH MUSIC o del teléfono, según la pestaña).
+  - **Deslizar a la izquierda ➔** canción anterior.
+  - **Doble toque ➔** Play / Pausa.
+  - **Arrastrar arriba / abajo ➔** volumen (§3.8).
+  - La propuesta original era con 2 dedos y también para cambiar de emisora; quedó con 1 dedo y solo para música.
 * **Beneficio:** Controlar la música y videos sin desviar los ojos de la carretera.
 
 ### 3.8. Control Rápido de Volumen Gigante (HUD Volume)
 * **Inspiración:** Tesla Model Y / Mercedes MBUX.
 * **Problema:** El marco plástico izquierdo de la pantalla tiene botones `+` y `-` diminutos difíciles de acertar con vibraciones.
 * **Propuesta:** Botones amplios de volumen de 55 px en el dock inferior o gesto de deslizamiento vertical en el borde derecho para regular el volumen de 0 a 100 con indicador numérico grande.
+* **Aplicado:** el gesto vertical va sobre la tarjeta del auto (no en el borde), con un indicador grande; 240 dp de recorrido = 0 a 100 %, igual que en JH MUSIC. No hay botones de volumen en el dock.
 
 ### 3.9. Conmutación Automática Día / Noche por Horario (Smart Ambience)
 * **Inspiración:** Porsche PCM.
@@ -140,13 +144,13 @@ Al no disponer de botones en el volante del Tucson, **la pantalla es el único m
 
 ## 4. Matriz Comparativa: Interfaz Actual vs. JH Launcher
 
-| Característica | Interfaz de Fábrica Actual (Foto) | JH Launcher (Propuesta) |
+| Característica | Interfaz de Fábrica Actual (Foto) | JH Launcher 1.6.5 |
 |---|---|---|
-| **Vehículo mostrado** | Sedán genérico ajeno al auto | **Hyundai Tucson ix35 2013 real en 3D** |
+| **Vehículo mostrado** | Sedán genérico ajeno al auto | **Fotos del Hyundai Tucson ix35 2013 en 3 ángulos** |
 | **Saludo** | *"Hola, Jhon"* (genérico de fábrica) | **"Hola, Hernan"** |
-| **Control de Música** | Obliga a abrir la app de fábrica | **Control Zero Layer directo (Play/Pausa/Skip)** |
-| **Soporte Bluetooth** | App separada y tosca | **Control remoto AVRCP para YouTube/Spotify** |
-| **Sintonizador Radio** | Solo abre la app | **Botones ◄ y ► directos en el inicio** |
+| **Control de Música** | Obliga a abrir la app de fábrica | **Control Zero Layer directo (Play/Pausa/Skip y barra de tiempo)** |
+| **Soporte Bluetooth** | App separada y tosca | **Pestaña BLUETOOTH AUDIO para YouTube/Spotify del teléfono** |
+| **Sintonizador Radio** | Solo abre la app | **Carrusel de emisoras guardadas en el inicio** |
 | **Integración local** | Apps viejas de fábrica | **Acceso directo a JH Music y JH Video** |
 | **Uso Nocturno** | Brillo fijo que encandila | **Modo Stealth (Sigilo antirreflejo)** |
 | **Ergonomía sin volante** | Botones pequeños y rígidos | **Zonas táctiles gigantes (> 56 dp)** |
@@ -166,8 +170,8 @@ Al no disponer de botones en el volante del Tucson, **la pantalla es el único m
 
 3. **Fase 3: Integración de Intents nativos de hardware**
    - Lanzamiento directo de `com.jh.music` y `com.jh.video`.
-   - Control de Radio FM mediante Broadcast Intents del chip AC8227L.
-   - Envío de comandos multimedia estándar (`KEYCODE_MEDIA_PLAY_PAUSE`, `NEXT`, `PREV`) para control de audio por Bluetooth.
+   - Control de Radio FM a través de JH RADIO (que maneja la radio de fábrica `com.jancar.radio`).
+   - Control del audio Bluetooth con el servicio del radio `com.jancar.btservice` (antes se pensó en las teclas multimedia estándar).
    - Detección de montaje/desmontaje de USB mediante `Intent.ACTION_MEDIA_MOUNTED`.
 
 4. **Fase 4: Validación en emulador `radio-tucson` y auto**
@@ -190,12 +194,12 @@ Revisión de la app nativa (código y capturas del emulador). Lo de rendimiento 
   - indicador de 3 puntos del ángulo actual.
 - **Estado "sin canción".** Si JH Music abre sin canción cargada (su última canción era de un pendrive que no está puesto), la tarjeta de música dice "Selecciona una canción" con el progreso en cero, en vez de seguir mostrando la canción vieja. Con ese estado, ▶ y saltar muestran el aviso "Elige una canción en JH Music" en vez de aparentar que funcionaron.
 - **Sin arrastre para girar el auto.** Se descartó para no chocar con los gestos a ciegas (deslizar en el auto = siguiente/anterior).
+- **Frecuencia de radio real (era el 6.2).** La tarjeta ya no usa la lista fija `FM_PRESETS`: muestra las emisoras y la frecuencia que le manda JH RADIO, que la lee del servicio de la radio de fábrica.
 
 ### Pendiente
 
 | # | Hallazgo | Propuesta | Esfuerzo |
 |---|---|---|---|
 | 6.1 | **La tarjeta de música no muestra la carátula.** Usa un ícono de disco aunque la canción tenga carátula: JH Music solo comparte título, artista, ruta y duración. La tarjeta además tiene un hueco vacío arriba de la canción. | JH Music guarda una miniatura de ~200 px junto a `.jh_music_state.json` (propuesta #21 de JH Music) y el launcher la muestra en ese hueco, más grande. Es el cambio más visible de la pantalla principal. | Medio (las dos apps) |
-| 6.2 | **La frecuencia de radio FM puede no ser la real.** El "96.1" sale de una lista fija de 8 frecuencias (`FM_PRESETS`). ◄/► envían `RADIO_NEXT`/`RADIO_PREV` al radio de fábrica, pero el número nunca se lee del sintonizador. | Mirar con `adb logcat` en el radio si la radio de fábrica anuncia su frecuencia y mostrar esa. Si no la anuncia, quitar el número y dejar "Radio FM". | Bajo–medio |
 | 6.3 | **El indicador de CPU puede no servir.** En el emulador siempre marca "--". En el radio, si `/proc/stat` no se puede leer (Android 8 lo restringe a las apps), `HwMonitor` cae a calcularlo con la frecuencia de los núcleos, que no es el uso real: según el gobernador del radio podría marcar siempre lo mismo. Sin comprobar en el radio. | Comprobarlo en el radio. Si no sirve, reemplazarlo por un dato útil o quitarlo y dar más ancho a RAM y ALM. | Bajo |
 | 6.4 | **Los gestos a ciegas no se descubren.** Nada indica que el auto funciona como touchpad (deslizar = cambiar canción, doble toque = play/pausa, vertical = volumen). | Una leyenda tenue bajo el auto las primeras veces, o al tocarlo una vez sin hacer gesto. | Bajo |

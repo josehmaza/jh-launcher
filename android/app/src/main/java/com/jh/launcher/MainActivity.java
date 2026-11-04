@@ -535,8 +535,6 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         findViewById(R.id.dockRadio).setOnClickListener(v -> launchRadio());
         findViewById(R.id.dockBluetooth).setOnClickListener(v -> launchBtCalls());
         findViewById(R.id.btnAllApps).setOnClickListener(v -> launchAllApps());
-        findViewById(R.id.btnOpenApps).setOnClickListener(v ->
-                startSafely(new Intent(this, OpenAppsActivity.class), "No se pudo abrir las apps abiertas"));
         findViewById(R.id.btnSettings).setOnClickListener(v -> launchSettings());
     }
 
@@ -1495,7 +1493,6 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     private boolean startSafely(Intent intent, String errorMsg) {
         try {
             startActivity(intent);
-            OpenedApps.record(this, intent);
             return true;
         } catch (RuntimeException e) {
             if (errorMsg != null) showToast(errorMsg);

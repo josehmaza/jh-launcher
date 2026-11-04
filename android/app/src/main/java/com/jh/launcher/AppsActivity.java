@@ -149,7 +149,6 @@ public class AppsActivity extends Activity {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         try {
             startActivity(intent);
-            OpenedApps.record(this, intent);
         } catch (RuntimeException e) {
             Toast.makeText(this, "No se pudo abrir " + app.label, Toast.LENGTH_SHORT).show();
         }
