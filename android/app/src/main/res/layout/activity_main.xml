@@ -282,14 +282,55 @@
                     android:layout_marginBottom="6dp"
                     android:layout_weight="1">
 
+                    <!-- Resplandor bajo el auto (estático) -->
+                    <com.jh.launcher.CarHaloView
+                        android:layout_width="match_parent"
+                        android:layout_height="110dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="22dp" />
+
+                    <!-- Foto con los bordes fundidos (ver CarTurntable) -->
                     <ImageView
                         android:id="@+id/carImage"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:adjustViewBounds="true"
                         android:maxHeight="290dp"
                         android:scaleType="fitCenter" />
+
+                    <!-- Indicador del ángulo actual -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginBottom="34dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/angleDot0"
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:background="@drawable/bg_dot_angle" />
+
+                        <View
+                            android:id="@+id/angleDot1"
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:background="@drawable/bg_dot_angle" />
+
+                        <View
+                            android:id="@+id/angleDot2"
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:background="@drawable/bg_dot_angle" />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -323,8 +364,8 @@
                     <!-- HUD de gestos a ciegas -->
                     <LinearLayout
                         android:id="@+id/gestureHud"
-                        android:layout_width="108dp"
-                        android:layout_height="108dp"
+                        android:layout_width="114dp"
+                        android:layout_height="114dp"
                         android:layout_gravity="center"
                         android:alpha="0"
                         android:background="@drawable/bg_hud_circle"
@@ -334,8 +375,8 @@
 
                         <ImageView
                             android:id="@+id/gestureHudIcon"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
                             android:tint="@color/accent_cyan" />
 
                         <!-- Ancho fijo: el texto cambia en cada paso de volumen sin re-layout -->
@@ -343,19 +384,19 @@
                             android:id="@+id/gestureHudLabel"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
+                            android:layout_marginTop="2dp"
                             android:gravity="center"
-                            android:letterSpacing="0.12"
+                            android:letterSpacing="0.04"
                             android:textColor="@color/text_primary"
-                            android:textSize="10dp"
-                            app:jhFont="brand" />
+                            android:textSize="22dp"
+                            app:jhFont="mono" />
 
                         <!-- Nivel de volumen (solo en el gesto de volumen) -->
                         <FrameLayout
                             android:id="@+id/gestureHudBar"
-                            android:layout_width="60dp"
+                            android:layout_width="64dp"
                             android:layout_height="4dp"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="5dp"
                             android:background="@drawable/bg_track"
                             android:visibility="gone">
 
@@ -493,10 +534,11 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Tarjeta JH Music (320dp) -->
+                <!-- Tarjeta JH Music (280dp: le sobraba aire; los 40dp pasan a la fila de JH Video y Radio FM) -->
                 <LinearLayout
+                    android:id="@+id/cardMusic"
                     android:layout_width="match_parent"
-                    android:layout_height="320dp"
+                    android:layout_height="280dp"
                     android:background="@drawable/bg_card_music"
                     android:orientation="vertical"
                     android:paddingLeft="16dp"
@@ -542,7 +584,7 @@
                                     android:layout_marginLeft="6dp"
                                     android:duplicateParentState="true"
                                     android:letterSpacing="0.045"
-                                    android:text="JH MUSIC (USB)"
+                                    android:text="JH MUSIC"
                                     android:textColor="@color/text_selected_white"
                                     android:textSize="11dp"
                                     app:jhFont="bold" />
@@ -581,37 +623,75 @@
                             </LinearLayout>
                         </LinearLayout>
 
+                        <!-- Pruebas del audio Bluetooth (pantalla de monitoreo de JH Radio); solo en la pestaña BT.
+                             Va junto a las pestañas, lejos del botón de abrir la app, para no tocarlo por error -->
+                        <com.jh.launcher.JhTextView
+                            android:id="@+id/btnBtMonitor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="14dp"
+                            android:background="@drawable/bg_chip_source"
+                            android:clickable="true"
+                            android:paddingLeft="10dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="10dp"
+                            android:paddingBottom="7dp"
+                            android:text="MONITOREO"
+                            android:textColor="@color/accent_cyan"
+                            android:textSize="10dp"
+                            android:visibility="gone"
+                            app:jhFont="bold" />
+
                         <View
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_weight="1" />
 
-                        <com.jh.launcher.JhTextView
-                            android:id="@+id/sourceExtraBadge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_chip_playlist"
-                            android:paddingLeft="8dp"
-                            android:paddingTop="3dp"
-                            android:paddingRight="8dp"
-                            android:paddingBottom="3dp"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="10dp"
-                            app:jhFont="bold" />
-
+                        <!-- Oculto: repetía lo que ya dice la pestaña seleccionada (USB 1 / BT AUDIO) -->
                         <com.jh.launcher.JhTextView
                             android:id="@+id/sourceStatusChip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="8dp"
-                            android:background="@drawable/bg_chip_source"
-                            android:paddingLeft="8dp"
-                            android:paddingTop="3dp"
-                            android:paddingRight="8dp"
-                            android:paddingBottom="3dp"
+                            android:visibility="gone"
                             android:textColor="@color/accent_cyan"
                             android:textSize="10dp"
                             app:jhFont="bold" />
+
+                        <com.jh.launcher.JhTextView
+                            android:id="@+id/sourceExtraBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone" />
+
+                        <!-- Botón icono para ir a la app: grande para acertarlo con el auto en marcha -->
+                        <FrameLayout
+                            android:id="@+id/btnOpenMusic"
+                            style="@style/HapticButton"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginLeft="8dp"
+                            android:background="@drawable/bg_btn_haptic">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:layout_gravity="center"
+                                android:duplicateParentState="true"
+                                android:src="@drawable/ic_open_in_new"
+                                android:tint="@color/tint_haptic" />
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/openTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone" />
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/openSub"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone" />
+                        </FrameLayout>
                     </LinearLayout>
 
                     <View
@@ -640,7 +720,9 @@
                                 android:layout_marginLeft="6dp"
                                 android:layout_marginTop="4dp" />
 
+                            <!-- Carátula: borde cian mientras suena (estado "activated") -->
                             <FrameLayout
+                                android:id="@+id/artCover"
                                 android:layout_width="86dp"
                                 android:layout_height="86dp"
                                 android:background="@drawable/bg_art_cover">
@@ -683,35 +765,83 @@
                                 android:textSize="13dp"
                                 app:jhFont="semibold" />
 
+                            <!-- ● REPRODUCIENDO / EN PAUSA a la izquierda y el tiempo a la derecha (así la barra de
+                                 abajo usa todo el ancho). El punto late junto con el contador de tiempo -->
                             <LinearLayout
+                                android:id="@+id/playStatus"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
+                                android:layout_marginTop="7dp"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
-                                <FrameLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="6dp"
-                                    android:layout_weight="1"
-                                    android:background="@drawable/bg_progress_track">
+                                <View
+                                    android:id="@+id/playStatusDot"
+                                    android:layout_width="7dp"
+                                    android:layout_height="7dp"
+                                    android:background="@drawable/bg_status_dot" />
 
-                                    <View
-                                        android:id="@+id/musicProgressFill"
-                                        style="@style/HwFill"
-                                        android:background="@drawable/bg_fill_cyan" />
-                                </FrameLayout>
+                                <com.jh.launcher.JhTextView
+                                    android:id="@+id/playStatusText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="7dp"
+                                    android:letterSpacing="0.1"
+                                    android:text="EN PAUSA"
+                                    android:textColor="@color/text_play_status"
+                                    android:textSize="10dp"
+                                    app:jhFont="mono" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
 
                                 <com.jh.launcher.JhTextView
                                     android:id="@+id/timeReadout"
-                                    android:layout_width="92dp"
-                                    android:gravity="end"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="12dp"
                                     android:singleLine="true"
-                                    android:textColor="@color/text_muted"
-                                    android:textSize="11dp"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="15dp"
                                     app:jhFont="mono" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/musicProgressRow"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <!-- Barra de tiempo táctil: tocar o arrastrar y soltar lleva JH Music a ese punto.
+                                     El área de toque es de 36dp de alto para acertarla con el auto en marcha -->
+                                <FrameLayout
+                                    android:id="@+id/musicProgressTouch"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="36dp">
+
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="8dp"
+                                        android:layout_gravity="center_vertical"
+                                        android:background="@drawable/bg_progress_track">
+
+                                        <View
+                                            android:id="@+id/musicProgressFill"
+                                            style="@style/HwFill"
+                                            android:background="@drawable/bg_fill_cyan" />
+                                    </FrameLayout>
+
+                                    <View
+                                        android:id="@+id/musicProgressThumb"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_gravity="center_vertical"
+                                        android:background="@drawable/bg_progress_thumb"
+                                        android:visibility="gone" />
+                                </FrameLayout>
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
@@ -721,111 +851,65 @@
                         android:layout_height="0dp"
                         android:layout_weight="1" />
 
-                    <!-- Controles gigantes -->
+                    <!-- Controles gigantes centrados (Estilo JH Music) -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="64dp"
+                        android:gravity="center"
                         android:orientation="horizontal">
 
+                        <!-- Pista Anterior -->
                         <FrameLayout
                             android:id="@+id/btnPrevTrack"
                             style="@style/HapticButton"
-                            android:layout_width="58dp"
-                            android:layout_height="match_parent"
+                            android:layout_width="72dp"
+                            android:layout_height="56dp"
                             android:background="@drawable/bg_btn_haptic">
 
                             <ImageView
-                                android:layout_width="26dp"
-                                android:layout_height="26dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
                                 android:layout_gravity="center"
                                 android:duplicateParentState="true"
                                 android:src="@drawable/ic_prev"
                                 android:tint="@color/tint_haptic" />
                         </FrameLayout>
 
+                        <!-- Play / Pausa: Más grande, prominente y con radio acentuado (estilo JH Music) -->
                         <FrameLayout
                             android:id="@+id/btnPlayPause"
                             style="@style/HapticButton"
-                            android:layout_width="66dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="10dp"
+                            android:layout_width="106dp"
+                            android:layout_height="64dp"
+                            android:layout_marginLeft="24dp"
+                            android:layout_marginRight="24dp"
                             android:background="@drawable/bg_btn_play">
 
                             <ImageView
                                 android:id="@+id/playPauseIcon"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="34dp"
+                                android:layout_height="34dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_play"
                                 android:tint="#000000" />
                         </FrameLayout>
 
+                        <!-- Pista Siguiente -->
                         <FrameLayout
                             android:id="@+id/btnNextTrack"
                             style="@style/HapticButton"
-                            android:layout_width="58dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="10dp"
+                            android:layout_width="72dp"
+                            android:layout_height="56dp"
                             android:background="@drawable/bg_btn_haptic">
 
                             <ImageView
-                                android:layout_width="26dp"
-                                android:layout_height="26dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
                                 android:layout_gravity="center"
                                 android:duplicateParentState="true"
                                 android:src="@drawable/ic_next"
                                 android:tint="@color/tint_haptic" />
                         </FrameLayout>
-
-                        <LinearLayout
-                            android:id="@+id/btnOpenMusic"
-                            style="@style/HapticButton"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="10dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_btn_open"
-                            android:orientation="horizontal"
-                            android:paddingLeft="16dp"
-                            android:paddingRight="16dp">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <com.jh.launcher.JhTextView
-                                    android:id="@+id/openTitle"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:duplicateParentState="true"
-                                    android:letterSpacing="0.04"
-                                    android:singleLine="true"
-                                    android:textColor="@color/tint_haptic"
-                                    android:textSize="13dp"
-                                    app:jhFont="extrabold" />
-
-                                <com.jh.launcher.JhTextView
-                                    android:id="@+id/openSub"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:duplicateParentState="true"
-                                    android:ellipsize="end"
-                                    android:singleLine="true"
-                                    android:textColor="@color/tint_cyan_pressable"
-                                    android:textSize="10dp"
-                                    app:jhFont="semibold" />
-                            </LinearLayout>
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:duplicateParentState="true"
-                                android:src="@drawable/ic_chevron"
-                                android:tint="@color/tint_cyan_pressable" />
-                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -839,9 +923,11 @@
 
                     <LinearLayout
                         android:layout_width="0dp"
+                        android:id="@+id/cardJhVideo"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
+                        android:layout_weight="0.85"
                         android:background="@drawable/bg_card"
+                        android:clickable="true"
                         android:orientation="vertical"
                         android:paddingLeft="14dp"
                         android:paddingTop="12dp"
@@ -866,9 +952,10 @@
                             </FrameLayout>
 
                             <LinearLayout
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="14dp"
+                                android:layout_weight="1"
                                 android:orientation="vertical">
 
                                 <com.jh.launcher.JhTextView
@@ -884,51 +971,39 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="3dp"
-                                    android:text="Videos USB offline"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="Videos USB"
                                     android:textColor="@color/text_secondary"
                                     android:textSize="12dp"
                                     app:jhFont="semibold" />
                             </LinearLayout>
-                        </LinearLayout>
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
+                            <!-- Mismo botón de abrir que JH Music y Radio: mismo ícono, tamaño y lugar -->
+                            <FrameLayout
+                                android:id="@+id/btnLaunchJhVideo"
+                                style="@style/HapticButton"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/bg_btn_haptic">
 
-                        <LinearLayout
-                            android:id="@+id/btnLaunchJhVideo"
-                            style="@style/HapticButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="44dp"
-                            android:background="@drawable/bg_btn_pill"
-                            android:orientation="horizontal">
-
-                            <com.jh.launcher.JhTextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:duplicateParentState="true"
-                                android:letterSpacing="0.04"
-                                android:text="ABRIR VIDEOS"
-                                android:textColor="@color/tint_haptic"
-                                android:textSize="13dp"
-                                app:jhFont="extrabold" />
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_marginLeft="8dp"
-                                android:duplicateParentState="true"
-                                android:src="@drawable/ic_chevron"
-                                android:tint="@color/tint_haptic" />
+                                <ImageView
+                                    android:layout_width="26dp"
+                                    android:layout_height="26dp"
+                                    android:layout_gravity="center"
+                                    android:duplicateParentState="true"
+                                    android:src="@drawable/ic_open_in_new"
+                                    android:tint="@color/tint_haptic" />
+                            </FrameLayout>
                         </LinearLayout>
                     </LinearLayout>
 
+                    <!-- Radio FM más ancha que JH Video: lleva el carrusel de emisoras -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="12dp"
-                        android:layout_weight="1"
+                        android:layout_weight="1.15"
                         android:background="@drawable/bg_card"
                         android:orientation="vertical"
                         android:paddingLeft="14dp"
@@ -970,10 +1045,13 @@
                                     app:jhFont="extrabold" />
 
                                 <com.jh.launcher.JhTextView
+                                    android:id="@+id/radioSubtitle"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="3dp"
-                                    android:text="Antena de fábrica"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="JH Radio"
                                     android:textColor="@color/text_secondary"
                                     android:textSize="12dp"
                                     app:jhFont="semibold" />
@@ -982,17 +1060,17 @@
                             <FrameLayout
                                 android:id="@+id/btnLaunchRadio"
                                 style="@style/HapticButton"
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:background="@drawable/bg_btn_radio_open">
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/bg_btn_haptic">
 
                                 <ImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
+                                    android:layout_width="26dp"
+                                    android:layout_height="26dp"
                                     android:layout_gravity="center"
                                     android:duplicateParentState="true"
-                                    android:src="@drawable/ic_chevron"
-                                    android:tint="@color/tint_amber_pressable" />
+                                    android:src="@drawable/ic_open_in_new"
+                                    android:tint="@color/tint_haptic" />
                             </FrameLayout>
                         </LinearLayout>
 
@@ -1001,74 +1079,21 @@
                             android:layout_height="0dp"
                             android:layout_weight="1" />
 
-                        <LinearLayout
+                        <!-- Carrusel con las emisoras guardadas en JH Radio (se arma por código): tocar una la
+                             sintoniza; la que suena va resaltada y centrada -->
+                        <HorizontalScrollView
+                            android:id="@+id/radioCarousel"
                             android:layout_width="match_parent"
-                            android:layout_height="44dp"
-                            android:orientation="horizontal">
-
-                            <FrameLayout
-                                android:id="@+id/btnRadioPrev"
-                                style="@style/HapticButton"
-                                android:layout_width="52dp"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/bg_btn_radio_tune">
-
-                                <ImageView
-                                    android:layout_width="22dp"
-                                    android:layout_height="22dp"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    android:src="@drawable/ic_prev"
-                                    android:tint="@color/tint_tune" />
-                            </FrameLayout>
+                            android:layout_height="64dp"
+                            android:overScrollMode="never"
+                            android:scrollbars="none">
 
                             <LinearLayout
-                                android:id="@+id/radioFreqBox"
-                                android:layout_width="0dp"
+                                android:id="@+id/radioChips"
+                                android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:layout_marginLeft="8dp"
-                                android:layout_weight="1"
-                                android:background="@drawable/bg_freq_box"
-                                android:baselineAligned="true"
-                                android:clickable="true"
-                                android:gravity="center"
-                                android:orientation="horizontal">
-
-                                <com.jh.launcher.JhTextView
-                                    android:id="@+id/radioFreqDisplay"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="24dp"
-                                    app:jhFont="mono" />
-
-                                <com.jh.launcher.JhTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginLeft="4dp"
-                                    android:text="MHz"
-                                    android:textColor="@color/accent_amber"
-                                    android:textSize="11dp"
-                                    app:jhFont="bold" />
-                            </LinearLayout>
-
-                            <FrameLayout
-                                android:id="@+id/btnRadioNext"
-                                style="@style/HapticButton"
-                                android:layout_width="52dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginLeft="8dp"
-                                android:background="@drawable/bg_btn_radio_tune">
-
-                                <ImageView
-                                    android:layout_width="22dp"
-                                    android:layout_height="22dp"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    android:src="@drawable/ic_next"
-                                    android:tint="@color/tint_tune" />
-                            </FrameLayout>
-                        </LinearLayout>
+                                android:orientation="horizontal" />
+                        </HorizontalScrollView>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -1211,9 +1236,24 @@
                 android:layout_weight="1" />
 
             <LinearLayout
-                android:id="@+id/btnAllApps"
+                android:id="@+id/btnOpenApps"
                 style="@style/DockButton"
                 android:layout_width="68dp">
+
+                <ImageView
+                    style="@style/DockIcon"
+                    android:src="@drawable/ic_recents" />
+
+                <com.jh.launcher.JhTextView
+                    style="@style/DockLabel"
+                    android:text="ABIERTAS" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnAllApps"
+                style="@style/DockButton"
+                android:layout_width="68dp"
+                android:layout_marginLeft="8dp">
 
                 <ImageView
                     style="@style/DockIcon"

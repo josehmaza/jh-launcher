@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="JhTextView">
+        <attr name="jhFont" format="enum">
+            <enum name="semibold" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="extrabold" value="2" />
+            <enum name="mono" value="3" />
+            <enum name="brand" value="4" />
+        </attr>
+    </declare-styleable>
+</resources>

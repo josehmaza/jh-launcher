@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">JH Launcher</string>
+    <string name="greeting_subtitle">BIENVENIDO AL MANDO</string>
+    <string name="greeting_title">Hola, Hernan</string>
 </resources>

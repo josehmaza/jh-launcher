@@ -4,6 +4,19 @@
    Optimizado para GPU Mali-400 y Chip Autochips AC8227L
    ========================================================================== */
 
+/* Tipografías locales (sin Google Fonts: el radio funciona offline y una
+   petición de red colgada bloqueaba el primer render del launcher) */
+@font-face { font-family: 'Plus Jakarta Sans'; font-weight: 400; font-display: swap; src: url('fonts/plus-jakarta-sans-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Plus Jakarta Sans'; font-weight: 500; font-display: swap; src: url('fonts/plus-jakarta-sans-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Plus Jakarta Sans'; font-weight: 600; font-display: swap; src: url('fonts/plus-jakarta-sans-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-display: swap; src: url('fonts/plus-jakarta-sans-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-display: swap; src: url('fonts/plus-jakarta-sans-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 500; font-display: swap; src: url('fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 700; font-display: swap; src: url('fonts/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 800; font-display: swap; src: url('fonts/jetbrains-mono-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Space Grotesk'; font-weight: 600; font-display: swap; src: url('fonts/space-grotesk-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Space Grotesk'; font-weight: 700; font-display: swap; src: url('fonts/space-grotesk-latin-700-normal.woff2') format('woff2'); }
+
 :root {
   /* Paleta cromática OEM Luxury */
   --bg-deep-space: #06080c;
@@ -589,7 +602,10 @@ body.android-native .screen-frame-wrapper {
   max-width: 98%;
   max-height: 290px;
   object-fit: contain;
-  filter: drop-shadow(0 15px 18px rgba(0,0,0,0.9));
+  /* box-shadow en vez de filter: drop-shadow. Las fotos son JPG opacos, así que
+     el resultado es igual, pero se rasteriza una vez en lugar de aplicar un
+     blur en GPU en cada frame de la transición (muy caro en Mali-400) */
+  box-shadow: 0 15px 18px rgba(0, 0, 0, 0.9);
   transition: opacity 0.35s ease-out, transform 0.35s ease-out;
   pointer-events: none;
 }
@@ -659,7 +675,6 @@ body.android-native .screen-frame-wrapper {
   align-items: center;
   justify-content: center;
   gap: 3px;
-  backdrop-filter: blur(8px);
 }
 
 .gesture-hud-icon {

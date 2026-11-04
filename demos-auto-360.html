@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto 360° del launcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap">
+<style>
+  /* Banco de pruebas de la tarjeta del auto: 6 variantes a escala de la tarjeta real del launcher.
+     Las fotos salen de assets/ (abrir este archivo desde la carpeta jh-launcher). */
+  :root {
+    --bg: #06080c; --surface: #0e131b; --surface-2: #121722; --surface-3: #18202e;
+    --line: rgba(255,255,255,.08); --fg: #fff; --fg-2: #94a3b8; --fg-3: #526077;
+    --cyan: #00d2ff; --cyan-soft: rgba(0,210,255,.12); --cyan-line: rgba(0,210,255,.4);
+    --good: #00e676; --warn: #ffaa00;
+    --accent: 0,210,255;            /* RGB del halo; cambia con la música */
+    --font-ui: "Plus Jakarta Sans", system-ui, "Segoe UI", sans-serif;
+    --font-data: "JetBrains Mono", ui-monospace, Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--font-ui);
+         padding: 28px max(16px, env(safe-area-inset-right)) 110px max(16px, env(safe-area-inset-left)); }
+  .wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 24px; }
+
+  .eyebrow { font: 700 11px/1 var(--font-data); letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+  h1 { margin: 6px 0 8px; font-size: clamp(26px, 4vw, 36px); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+  .lede { margin: 0; color: var(--fg-2); max-width: 70ch; }
+  .lede strong { color: var(--fg); }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; padding: 14px 16px;
+              background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  .ctl { display: flex; align-items: center; gap: 10px; }
+  .ctl > span { font: 700 11px/1 var(--font-data); letter-spacing: .1em; text-transform: uppercase; color: var(--fg-3); }
+  .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; }
+  .seg button { all: unset; cursor: pointer; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--fg-2); }
+  .seg button[aria-pressed="true"] { background: var(--cyan-soft); color: var(--fg); box-shadow: inset 0 0 0 1px var(--cyan-line); }
+  .seg button:focus-visible, .pick:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px; }
+  .variant { display: grid; gap: 12px; align-content: start; }
+  .vhead { display: flex; align-items: baseline; gap: 10px; }
+  .tag { font: 800 12px/1 var(--font-data); color: var(--bg); background: var(--cyan); padding: 4px 7px; border-radius: 6px; }
+  .vname { font-weight: 800; font-size: 16px; }
+  .vdesc { margin: 0; color: var(--fg-2); font-size: 13.5px; min-height: 3.2em; }
+  .cost { font: 700 11px/1 var(--font-data); letter-spacing: .06em; color: var(--fg-3); }
+  .cost b { color: var(--good); }
+  .cost b.mid { color: var(--warn); }
+
+  /* ---------- Réplica de la tarjeta del launcher ---------- */
+  .card { position: relative; aspect-ratio: 485 / 590; border-radius: 18px; padding: 16px 16px 14px;
+          background: linear-gradient(180deg, #0c1017, #0a0e14); border: 1px solid rgba(0,210,255,.14);
+          display: grid; grid-template-rows: auto 1fr auto auto; gap: 8px; overflow: hidden; }
+  .card.night { filter: brightness(.82) saturate(.9); }
+  .hello small { display: block; font: 700 10.5px/1 var(--font-data); letter-spacing: .12em; color: var(--cyan); }
+  .hello b { display: block; font-size: 24px; font-weight: 800; letter-spacing: -.01em; margin-top: 4px; }
+  .pillcolor { position: absolute; top: 14px; right: 14px; display: inline-flex; padding: 3px; gap: 2px;
+               background: rgba(0,0,0,.4); border: 1px solid var(--line); border-radius: 999px; }
+  .pillcolor span { font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; color: var(--fg-3); }
+  .pillcolor span.on { color: #fff; background: var(--cyan-soft); box-shadow: inset 0 0 0 1px var(--cyan-line); }
+
+  .stage { position: relative; min-height: 0; touch-action: pan-y; user-select: none; }
+  .stage .layer { position: absolute; inset: 0; }
+  .stage img { position: absolute; display: block; width: 100%; height: auto; left: 0; top: 50%;
+               transform: translateY(-50%); pointer-events: none; will-change: transform, opacity; }
+  .dots { position: absolute; left: 0; right: 0; bottom: 2px; display: flex; justify-content: center; gap: 6px; }
+  .dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.22); transition: .25s; }
+  .dots i.on { width: 18px; border-radius: 4px; background: var(--cyan); }
+  .hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); font: 700 10px/1 var(--font-data);
+          letter-spacing: .1em; color: var(--fg-3); white-space: nowrap; }
+
+  /* v0 · Actual: caja rectangular con borde duro */
+  .v-actual .stage { margin: 0 -2px; background: #000; border: 1px solid rgba(255,255,255,.06); }
+  /* v1+ · bordes fundidos con el fondo de la tarjeta */
+  .fade .stage img {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 24%, #000 76%, transparent 100%),
+                        linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to bottom, transparent 0, #000 24%, #000 76%, transparent 100%),
+                linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+    mask-composite: intersect; }
+  .fade .stage { margin: 0 -14px; }
+  .fade .stage img { width: 112%; left: -6%; }
+  /* v2+ · piso con halo del color de acento */
+  .floor .stage::before { content: ""; position: absolute; left: 6%; right: 6%; bottom: 10%; height: 26%;
+          background: radial-gradient(ellipse at 50% 50%, rgba(var(--accent), .42), rgba(var(--accent), .10) 55%, transparent 72%);
+          filter: blur(6px); transition: background .6s; }
+  .floor .stage::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 100%; pointer-events: none;
+          background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(var(--accent), .16), transparent 70%); transition: background .6s; }
+  .floor .stage img { z-index: 1; }
+  .floor .stage .dots, .floor .stage .hint { z-index: 3; }
+
+  .badge { justify-self: center; display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; border-radius: 999px;
+           font: 800 11px/1 var(--font-data); letter-spacing: .08em; color: #cfeaff; background: rgba(0,210,255,.1);
+           border: 1px solid var(--cyan-line); }
+  .badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 9px 12px 10px; border-radius: 12px;
+           background: rgba(255,255,255,.03); border: 1px solid var(--line); font: 700 11px/1 var(--font-data); color: var(--fg-2); }
+  .stats div { display: grid; gap: 6px; }
+  .stats p { margin: 0; display: flex; justify-content: space-between; }
+  .stats p b { color: #fff; font-size: 13px; }
+  .stats s { display: block; height: 4px; border-radius: 3px; background: rgba(255,255,255,.1); text-decoration: none; position: relative; overflow: hidden; }
+  .stats s::after { content: ""; position: absolute; inset: 0; width: var(--w); background: var(--c); border-radius: 3px; }
+
+  .pick { all: unset; cursor: pointer; text-align: center; padding: 9px; border-radius: 10px; font-weight: 800; font-size: 13px;
+          color: var(--fg-2); background: var(--surface-2); border: 1px solid var(--line); }
+  .pick:hover { color: #fff; border-color: var(--cyan-line); }
+  .variant.chosen .pick { background: var(--cyan); color: var(--bg); border-color: var(--cyan); }
+  .variant.chosen .card { box-shadow: 0 0 0 2px var(--cyan), 0 0 28px rgba(0,210,255,.25); }
+
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px max(16px, env(safe-area-inset-right)) 14px max(16px, env(safe-area-inset-left));
+         background: rgba(10,14,20,.94); backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+  .bar div { max-width: 1240px; margin: 0 auto; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 14px; color: var(--fg-2); }
+  .bar b { color: #fff; }
+  @media (prefers-reduced-motion: reduce) { .stage img { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">JH Launcher · tarjeta del auto</div>
+    <h1>Seis formas de mostrar el Tucson</h1>
+    <p class="lede">Cada tarjeta añade una idea a la anterior. <strong>Las 1 a 3 son estáticas</strong> (cero CPU extra en el radio);
+      la 4 solo anima medio segundo cada 3,6 s; la 5 y la 6 solo gastan mientras tocas. Prueba los controles de arriba:
+      el color, la noche y la música afectan a todas.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Controles globales">
+    <div class="ctl"><span>Color</span>
+      <div class="seg" id="segColor"><button data-v="0" aria-pressed="true">Negro</button><button data-v="1" aria-pressed="false">Gris acero</button></div></div>
+    <div class="ctl"><span>Giro automático</span>
+      <div class="seg" id="segSpin"><button data-v="1" aria-pressed="true">Sí</button><button data-v="0" aria-pressed="false">No</button></div></div>
+    <div class="ctl"><span>Ambiente</span>
+      <div class="seg" id="segNight"><button data-v="0" aria-pressed="true">Día</button><button data-v="1" aria-pressed="false">Noche</button></div></div>
+    <div class="ctl"><span>Música</span>
+      <div class="seg" id="segMusic"><button data-v="0" aria-pressed="true">Sin música</button><button data-v="1" aria-pressed="false">Suena una canción</button></div></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="bar"><div>Elegida: <b id="chosen">ninguna todavía</b><span id="chosenNote"></span></div></div>
+
+<script>
+(() => {
+  const SETS = [
+    ["assets/tucson2013_black_front.jpg", "assets/tucson2013_black_side.jpg", "assets/tucson2013_black_rear.jpg"],
+    ["assets/tucson_angle_front_right.jpg", "assets/tucson_angle_side.jpg", "assets/tucson_angle_rear.jpg"]
+  ];
+  const SPIN_MS = 3600;
+  const VARIANTS = [
+    { id: "0", tag: "0", name: "Actual", cls: "v-actual", mode: "fade", drag: false,
+      desc: "Como está hoy: la foto es una caja con su fondo de estudio y bordes duros; el cambio es un fundido.",
+      cost: ["Costo: <b>actual</b>", false] },
+    { id: "A", tag: "A", name: "Bordes fundidos", cls: "fade v-a", mode: "fade", drag: false,
+      desc: "La foto se disuelve en el fondo de la tarjeta y el auto ocupa más espacio. Quita la sensación de caja.",
+      cost: ["Costo: <b>0</b> (degradado fijo)", false] },
+    { id: "B", tag: "B", name: "A + piso con halo", cls: "fade floor", mode: "fade", drag: false,
+      desc: "Añade un resplandor bajo el auto que lo asienta en la tarjeta. El color del halo sigue al acento.",
+      cost: ["Costo: <b>0</b> (dibujado una vez)", false] },
+    { id: "C", tag: "C", name: "B + giro deslizante", cls: "fade floor", mode: "slide", drag: false,
+      desc: "El cambio de ángulo desliza el auto de lado con un leve desenfoque: se siente que gira, no que cambia de foto.",
+      cost: ["Costo: <b class='mid'>bajo</b> (0,5 s cada 3,6 s)", true] },
+    { id: "D", tag: "D", name: "C + girar con el dedo", cls: "fade floor", mode: "slide", drag: true,
+      desc: "Además, arrastrar a izquierda o derecha cambia de ángulo. Útil con el auto detenido. Prueba arrastrando.",
+      cost: ["Costo: <b>solo al tocar</b>", true] },
+    { id: "E", tag: "E", name: "D + ambiente vivo", cls: "fade floor", mode: "slide", drag: true, ambient: true,
+      desc: "De noche baja el brillo; con música el halo toma el color de la canción. Usa los controles de arriba.",
+      cost: ["Costo: <b>casi 0</b>", true] }
+  ];
+
+  const state = { color: 0, spin: 1, night: 0, music: 0 };
+  const grid = document.getElementById("grid");
+  const cards = [];
+
+  function build(v) {
+    const el = document.createElement("section");
+    el.className = "variant";
+    el.innerHTML = `
+      <div class="vhead"><span class="tag">${v.tag}</span><span class="vname">${v.name}</span></div>
+      <p class="vdesc">${v.desc}</p>
+      <div class="cost">${v.cost[0]}</div>
+      <article class="card ${v.cls}">
+        <div class="hello"><small>BIENVENIDO AL MANDO</small><b>Hola, Hernan</b></div>
+        <div class="pillcolor"><span class="on">Negro</span><span>Gris Acero</span></div>
+        <div class="stage"><div class="layer"></div>
+          <div class="dots">${[0,1,2].map(() => "<i></i>").join("")}</div>
+          ${v.drag ? '<div class="hint">← ARRASTRA →</div>' : ""}</div>
+        <div class="badge"><i></i>360° ACTIVO</div>
+        <div class="stats">
+          <div><p>CPU <b>--</b></p><s style="--w:0%;--c:#00e676"></s></div>
+          <div><p>RAM <b>18%</b></p><s style="--w:18%;--c:#00e676"></s></div>
+          <div><p>ALM <b>21%</b></p><s style="--w:21%;--c:#ffaa00"></s></div>
+        </div>
+      </article>
+      <button class="pick" type="button">Elegir ${v.tag === "0" ? "dejar como está" : "la " + v.tag}</button>`;
+    grid.appendChild(el);
+
+    const c = { v, el, angle: 0, timer: null, busy: false,
+      card: el.querySelector(".card"), layer: el.querySelector(".layer"),
+      dots: [...el.querySelectorAll(".dots i")], pill: [...el.querySelectorAll(".pillcolor span")],
+      stage: el.querySelector(".stage") };
+    show(c, c.angle, 0, false);
+
+    el.querySelector(".pick").addEventListener("click", () => {
+      cards.forEach(o => o.el.classList.remove("chosen"));
+      el.classList.add("chosen");
+      document.getElementById("chosen").textContent = v.tag + " · " + v.name;
+      document.getElementById("chosenNote").textContent = v.cost[1] ? "  (incluye animación puntual)" : "  (estática: sin costo extra)";
+    });
+    if (v.drag) attachDrag(c);
+    cards.push(c);
+  }
+
+  function mkImg(src) { const i = new Image(); i.src = src; i.alt = ""; i.draggable = false; return i; }
+
+  function show(c, idx, dir, animate) {
+    const src = SETS[state.color][idx];
+    const old = c.layer.querySelector("img");
+    const img = mkImg(src);
+    c.dots.forEach((d, k) => d.classList.toggle("on", k === idx));
+    if (!animate || !old) { c.layer.replaceChildren(img); c.angle = idx; return; }
+    c.layer.appendChild(img);
+    const slide = c.v.mode === "slide";
+    const move = slide ? 16 * dir : 0;
+    const base = "translateY(-50%)";
+    img.animate([
+      { opacity: 0, transform: `${base} translateX(${move}%)`, filter: slide ? "blur(5px)" : "none" },
+      { opacity: 1, transform: `${base} translateX(0)`, filter: "blur(0)" }
+    ], { duration: slide ? 520 : 450, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both" });
+    old.animate([
+      { opacity: 1, transform: `${base} translateX(0)`, filter: "blur(0)" },
+      { opacity: 0, transform: `${base} translateX(${-move}%)`, filter: slide ? "blur(5px)" : "none" }
+    ], { duration: slide ? 420 : 350, easing: "ease-in", fill: "both" }).onfinish = () => old.remove();
+    c.angle = idx;
+  }
+
+  function go(c, step) {
+    const n = SETS[state.color].length;
+    show(c, (c.angle + step + n) % n, step, true);
+  }
+
+  function attachDrag(c) {
+    let x0 = null, fired = false;
+    c.stage.addEventListener("pointerdown", e => { x0 = e.clientX; fired = false; c.stage.setPointerCapture(e.pointerId); stopSpin(c); });
+    c.stage.addEventListener("pointermove", e => {
+      if (x0 === null || fired) return;
+      const dx = e.clientX - x0;
+      if (Math.abs(dx) > 40) { fired = true; go(c, dx < 0 ? 1 : -1); }
+    });
+    const end = () => { x0 = null; startSpin(c); };
+    c.stage.addEventListener("pointerup", end);
+    c.stage.addEventListener("pointercancel", end);
+  }
+
+  function startSpin(c) { stopSpin(c); if (state.spin) c.timer = setInterval(() => go(c, 1), SPIN_MS); }
+  function stopSpin(c) { clearInterval(c.timer); c.timer = null; }
+
+  function applyAmbient() {
+    cards.forEach(c => {
+      c.card.classList.toggle("night", !!state.night && !!c.v.ambient);
+      const rgb = (c.v.ambient && state.music) ? "255,92,170" : "0,210,255";
+      c.card.style.setProperty("--accent", rgb);
+    });
+  }
+
+  function applyColor() {
+    cards.forEach(c => { c.pill.forEach((p, k) => p.classList.toggle("on", k === state.color)); show(c, c.angle, 0, false); });
+  }
+
+  function seg(id, key, after) {
+    const root = document.getElementById(id);
+    root.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      state[key] = +b.dataset.v;
+      root.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+      after();
+    });
+  }
+  seg("segColor", "color", applyColor);
+  seg("segSpin", "spin", () => cards.forEach(c => state.spin ? startSpin(c) : stopSpin(c)));
+  seg("segNight", "night", applyAmbient);
+  seg("segMusic", "music", applyAmbient);
+
+  VARIANTS.forEach(build);
+  // precarga de todas las fotos para que los giros no parpadeen
+  SETS.flat().forEach(s => mkImg(s));
+  cards.forEach(startSpin);
+  applyAmbient();
+})();
+</script>
+</body>
+</html>

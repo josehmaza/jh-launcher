@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Indicador de reproducción</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap">
+<style>
+  /* Layout: banco de pruebas — cabecera con el control global, rejilla de réplicas
+     a escala real de la tarjeta de música del launcher, barra fija con la elección.
+     Un solo tema oscuro a propósito: es la paleta real de la pantalla del auto. */
+  :root {
+    --bg: #06080c;
+    --surface: #0e131b;
+    --surface-2: #121722;
+    --surface-3: #18202e;
+    --line: rgba(255, 255, 255, 0.08);
+    --fg: #ffffff;
+    --fg-2: #94a3b8;
+    --fg-3: #526077;
+    --cyan: #00d2ff;
+    --cyan-soft: rgba(0, 210, 255, 0.12);
+    --cyan-line: rgba(0, 210, 255, 0.35);
+    --good: #00e676;
+    --warn: #ffaa00;
+    --bad: #ff3366;
+    --font-ui: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-data: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 28px 120px;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 28px; }
+
+  /* ---------- Cabecera ---------- */
+  header { display: grid; gap: 18px; }
+  .eyebrow {
+    font: 700 11px/1 var(--font-data);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .lede { margin: 0; color: var(--fg-2); max-width: 68ch; }
+  .lede strong { color: var(--fg); font-weight: 700; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .btn-play {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--cyan);
+    color: #000;
+    font: 800 14px var(--font-ui);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .btn-play svg { width: 20px; height: 20px; }
+  .btn-play:focus-visible, .choose:focus-visible, .copy:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+  .clock { font: 700 14px var(--font-data); color: var(--fg-2); font-variant-numeric: tabular-nums; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--fg-2); font-size: 13px; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* ---------- LED de repintado ---------- */
+  .led {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #2a1018;
+    box-shadow: inset 0 0 0 1px rgba(255, 51, 102, 0.35);
+    transition: background-color 140ms linear, box-shadow 140ms linear;
+    flex: none;
+  }
+  .led.on { background: var(--bad); box-shadow: 0 0 8px rgba(255, 51, 102, 0.8); transition: none; }
+  .led.layer { background: #0a1f26; box-shadow: inset 0 0 0 1px var(--cyan-line); }
+  .led.layer.on { background: var(--cyan); box-shadow: 0 0 8px rgba(0, 210, 255, 0.8); }
+
+  /* ---------- Rejilla de opciones ---------- */
+  .grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 1100px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+  .option {
+    display: grid;
+    gap: 16px;
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    min-width: 0;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  .option.chosen { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+
+  .opt-head { display: flex; align-items: flex-start; gap: 14px; }
+  .letter {
+    flex: none;
+    width: 38px; height: 38px;
+    display: grid; place-items: center;
+    border-radius: 10px;
+    background: var(--surface-3);
+    border: 1px solid var(--line);
+    font: 800 17px var(--font-data);
+  }
+  .opt-title { display: grid; gap: 2px; min-width: 0; flex: 1; }
+  .opt-title h2 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+  .opt-title p { margin: 0; color: var(--fg-2); font-size: 13.5px; }
+  .tag {
+    flex: none;
+    font: 700 10.5px/1 var(--font-data);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--fg-2);
+  }
+  .tag.rec { color: var(--good); border-color: rgba(0, 230, 118, 0.35); background: rgba(0, 230, 118, 0.08); }
+  .tag.ref { color: var(--bad); border-color: rgba(255, 51, 102, 0.35); background: rgba(255, 51, 102, 0.08); }
+
+  /* ---------- Réplica de la tarjeta de música (medidas reales del launcher) ---------- */
+  .stage {
+    background: linear-gradient(135deg, #141a26 0%, #0c1017 100%);
+    border: 1px solid rgba(0, 210, 255, 0.25);
+    border-radius: 14px;
+    padding: 22px 16px;
+    overflow: hidden;
+  }
+  .now { display: flex; align-items: center; gap: 44px; min-width: 0; }
+  .art { position: relative; width: 86px; height: 86px; flex: none; }
+  .vinyl-slide {
+    position: absolute; top: 4px; left: 6px; width: 78px; height: 78px;
+    transition: transform 500ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .playing .vinyl-slide { transform: translateX(20px); }
+  .vinyl { width: 100%; height: 100%; display: block; border-radius: 50%; }
+  .cover {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    background: #1b2333;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+  .cover svg { width: 40px; height: 40px; color: var(--cyan); }
+  .lit.playing .cover { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+
+  .meta { min-width: 0; flex: 1; display: grid; gap: 4px; }
+  .track {
+    font-size: 21px; font-weight: 800; letter-spacing: -0.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .artist { font-size: 13px; font-weight: 600; color: var(--fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .status {
+    display: inline-flex; align-items: center; gap: 7px;
+    font: 700 10.5px/1 var(--font-data); letter-spacing: 0.1em;
+    color: var(--fg-3);
+    margin-top: 2px;
+  }
+  .status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--fg-3); }
+  .playing .status { color: var(--cyan); }
+  .playing .status .dot { background: var(--cyan); }
+  .status .dot.dim { opacity: 0.25; }
+  .progress-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+  .bar { flex: 1; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+  .fill { height: 100%; width: 100%; background: var(--cyan); transform-origin: left; transform: scaleX(0.3); }
+  .time { font: 700 11px var(--font-data); color: var(--fg-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Costo ---------- */
+  .cost { display: grid; gap: 10px; }
+  .meter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--fg-2); }
+  .meter-row b { font: 800 13px var(--font-data); color: var(--fg); font-variant-numeric: tabular-nums; min-width: 4.5ch; display: inline-block; }
+  .cpu { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-2); }
+  .cpu-bar { height: 8px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+  .cpu-fill { height: 100%; border-radius: 4px; }
+  .cpu-val { font: 800 13px var(--font-data); color: var(--fg); white-space: nowrap; }
+
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .notes { grid-template-columns: 1fr; } }
+  .notes ul { margin: 0; padding-left: 18px; color: var(--fg-2); font-size: 13.5px; display: grid; gap: 4px; }
+  .notes h3 { margin: 0 0 6px; font: 700 10.5px/1 var(--font-data); letter-spacing: 0.12em; text-transform: uppercase; }
+  .notes .pro h3 { color: var(--good); }
+  .notes .con h3 { color: var(--warn); }
+
+  .choose {
+    justify-self: start;
+    height: 42px; padding: 0 18px;
+    border-radius: 10px;
+    border: 1px solid var(--cyan-line);
+    background: var(--cyan-soft);
+    color: var(--cyan);
+    font: 800 13px var(--font-ui);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .chosen .choose { background: var(--cyan); color: #000; border-color: var(--cyan); }
+
+  /* ---------- Barra de elección ---------- */
+  .pick {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: rgba(8, 11, 17, 0.96);
+    border-top: 1px solid var(--line);
+  }
+  .pick-inner { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; }
+  .pick-text { flex: 1; min-width: 0; color: var(--fg-2); font-size: 14px; }
+  .pick-text strong { color: var(--fg); }
+  .copy {
+    height: 40px; padding: 0 16px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface-3); color: var(--fg);
+    font: 700 13px var(--font-ui); cursor: pointer;
+  }
+  .copy[disabled] { opacity: 0.4; cursor: default; }
+
+  @media (max-width: 520px) {
+    .now { gap: 34px; }
+    .track { font-size: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vinyl-slide, .cover, .led { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">JH Launcher · Tucson ix35 · AC8227L / Mali-400</div>
+    <h1>¿Cómo mostrar que está sonando música?</h1>
+    <p class="lede">
+      En el radio, <strong>cada vez que algo se mueve se repinta la pantalla entera</strong> (1024×600, 170 elementos),
+      aunque lo que cambie sea un disco de 78&nbsp;px. El contador de tiempo ya repinta <strong>1 vez por segundo</strong>:
+      lo que cambie en ese mismo instante es gratis. El LED rojo de cada opción se enciende en cada repintado extra.
+    </p>
+    <div class="controls">
+      <button class="btn-play" id="btnPlay" type="button" aria-pressed="true">
+        <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        <span id="playLabel">PAUSAR TODO</span>
+      </button>
+      <span class="clock" id="clock">00:00 / 03:22</span>
+      <div class="legend">
+        <span><i class="led on" aria-hidden="true"></i> Repintado de pantalla completa</span>
+        <span><i class="led layer on" aria-hidden="true"></i> Repintado solo de la capa del vinilo</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="grid" id="grid"></main>
+</div>
+
+<div class="pick">
+  <div class="pick-inner">
+    <div class="pick-text" id="pickText">Toca <strong>Elegir esta</strong> en la opción que prefieras.</div>
+    <button class="copy" id="btnCopy" type="button" disabled>Copiar para el chat</button>
+  </div>
+</div>
+
+<template id="vinylTpl">
+  <svg class="vinyl" viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="50" r="48" fill="#111622" stroke="rgba(0,210,255,0.5)" stroke-width="1.5"/>
+    <circle cx="50" cy="50" r="41" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.3" stroke-dasharray="10 4 14 5"/>
+    <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(0,210,255,0.45)" stroke-width="1.2" stroke-dasharray="16 6 8 4"/>
+    <circle cx="50" cy="50" r="29" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.3" stroke-dasharray="8 3 18 6"/>
+    <circle cx="50" cy="50" r="23" fill="none" stroke="rgba(0,210,255,0.4)" stroke-width="1.2" stroke-dasharray="12 5 6 3"/>
+    <path d="M50 50 L14 14 A48 48 0 0 1 42 3 Z" fill="rgba(255,255,255,0.28)"/>
+    <path d="M50 50 L86 86 A48 48 0 0 1 58 97 Z" fill="rgba(255,255,255,0.28)"/>
+    <circle cx="50" cy="50" r="16" fill="#0066ff" stroke="#00d2ff" stroke-width="2"/>
+    <circle cx="50" cy="50" r="4.5" fill="#080b12" stroke="#ffffff" stroke-width="1"/>
+    <circle cx="50" cy="39" r="2.5" fill="#ffffff"/>
+  </svg>
+</template>
+
+<script>
+(function () {
+  // Costos medidos en el emulador radio-tucson (con música: 56 cuadros/s, 25–33 % de un núcleo).
+  // "extra" = repintados de pantalla completa por segundo además del contador de tiempo.
+  var OPTIONS = [
+    {
+      id: 'hoy', letter: '—', name: 'Como está hoy', tag: 'Referencia', tagClass: 'ref',
+      summary: 'El vinilo sale de la carátula y gira suave, a 60 cuadros por segundo.',
+      spin: 'smooth', extra: 56, layer: 0, cpu: 100, cpuText: '25–33 % (medido)',
+      pros: ['Es lo más vistoso', 'Giro totalmente fluido'],
+      cons: ['Repinta la pantalla entera ~56 veces por segundo', 'En la Mali-400 podría verse a tirones']
+    },
+    {
+      id: 'E', letter: 'E', name: 'Vinilo a 20 cuadros/s', tag: '', tagClass: '',
+      summary: 'El mismo giro, pero se actualiza 20 veces por segundo.',
+      spin: 'step20', extra: 20, layer: 0, cpu: 36, cpuText: '~1/3 de hoy',
+      pros: ['Sigue girando continuo', 'Cambio de código mínimo'],
+      cons: ['Se nota algo escalonado', 'Sigue repintando la pantalla 20 veces por segundo']
+    },
+    {
+      id: 'D', letter: 'D', name: 'Vinilo en capa propia', tag: 'Por medir', tagClass: '',
+      summary: 'Giro fluido como hoy, pero el disco se dibuja en una capa aparte (SurfaceView): el resto de la pantalla no se repinta.',
+      spin: 'smooth', extra: 0, layer: 60, cpu: 25, cpuText: '~20–30 % (estimado)',
+      pros: ['Se ve igual que hoy', 'La pantalla completa queda quieta'],
+      cons: ['Más complejo de programar', 'Hay que probarlo en el radio: en algunas ROMs puede parpadear']
+    },
+    {
+      id: 'C', letter: 'C', name: 'Vinilo tic-tac', tag: '', tagClass: '',
+      summary: 'El vinilo salta 30° cada segundo, junto con el contador, como la aguja de un reloj.',
+      spin: 'tick', extra: 0, layer: 0, cpu: 1, cpuText: '~0 % extra',
+      pros: ['Costo cero extra', 'Se sigue viendo que el disco “avanza”'],
+      cons: ['El movimiento es mecánico, a saltos']
+    },
+    {
+      id: 'B', letter: 'B', name: 'Latido con el segundero', tag: 'Recomendada', tagClass: 'rec',
+      summary: 'Vinilo afuera y quieto, carátula iluminada y un punto que late cada segundo junto con el contador.',
+      spin: 'none', lit: true, blink: true, extra: 0, layer: 0, cpu: 1, cpuText: '~0 % extra',
+      pros: ['Costo cero extra', 'De reojo transmite que está vivo'],
+      cons: ['El vinilo deja de girar']
+    },
+    {
+      id: 'A', letter: 'A', name: 'Indicadores fijos', tag: '', tagClass: '',
+      summary: 'Vinilo afuera y quieto, carátula iluminada y la etiqueta REPRODUCIENDO.',
+      spin: 'none', lit: true, blink: false, extra: 0, layer: 0, cpu: 0, cpuText: '0 % extra',
+      pros: ['Lo más liviano posible', 'Muy claro y sobrio'],
+      cons: ['Nada se mueve: menos “vivo”']
+    }
+  ];
+
+  var TOTAL = 202; // 03:22, "Rompe Zapatos (REMIX DJ HOT MUSIC)"
+  var grid = document.getElementById('grid');
+  var vinylTpl = document.getElementById('vinylTpl');
+  var cards = [];
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function cpuColor(v) { return v >= 60 ? 'var(--bad)' : v >= 20 ? 'var(--warn)' : 'var(--good)'; }
+
+  OPTIONS.forEach(function (o) {
+    var card = el('section', 'option');
+    card.id = 'opcion-' + o.id;
+
+    var head = el('div', 'opt-head');
+    head.appendChild(el('div', 'letter', o.letter));
+    var t = el('div', 'opt-title');
+    t.appendChild(el('h2', '', o.name));
+    t.appendChild(el('p', '', o.summary));
+    head.appendChild(t);
+    if (o.tag) head.appendChild(el('span', 'tag ' + o.tagClass, o.tag));
+    card.appendChild(head);
+
+    // Réplica
+    var stage = el('div', 'stage' + (o.lit ? ' lit' : ''));
+    var now = el('div', 'now');
+    var art = el('div', 'art');
+    var slide = el('div', 'vinyl-slide');
+    var disc = vinylTpl.content.firstElementChild.cloneNode(true);
+    slide.appendChild(disc);
+    art.appendChild(slide);
+    var cover = el('div', 'cover');
+    cover.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg>';
+    art.appendChild(cover);
+    now.appendChild(art);
+
+    var meta = el('div', 'meta');
+    meta.appendChild(el('div', 'track', 'Rompe Zapatos (REMIX DJ HOT MUSIC)'));
+    meta.appendChild(el('div', 'artist', 'John Valverde (Muñecazo)'));
+    var status = null, dot = null;
+    if (o.lit) {
+      status = el('div', 'status');
+      dot = el('i', 'dot');
+      status.appendChild(dot);
+      status.appendChild(el('span', 'status-text', 'REPRODUCIENDO'));
+      meta.appendChild(status);
+    }
+    var row = el('div', 'progress-row');
+    var bar = el('div', 'bar');
+    var fill = el('div', 'fill');
+    bar.appendChild(fill);
+    row.appendChild(bar);
+    var time = el('span', 'time', '00:00 / 03:22');
+    row.appendChild(time);
+    meta.appendChild(row);
+    now.appendChild(meta);
+    stage.appendChild(now);
+    card.appendChild(stage);
+
+    // Costo
+    var cost = el('div', 'cost');
+    var m1 = el('div', 'meter-row');
+    var led = el('i', 'led');
+    m1.appendChild(led);
+    m1.appendChild(document.createTextNode('Repintados extra de pantalla completa: '));
+    var rate = el('b', '', '0/s');
+    m1.appendChild(rate);
+    cost.appendChild(m1);
+    var ledLayer = null, rateLayer = null;
+    if (o.layer) {
+      var m2 = el('div', 'meter-row');
+      ledLayer = el('i', 'led layer');
+      m2.appendChild(ledLayer);
+      m2.appendChild(document.createTextNode('Repintados de la capa del vinilo (78×78 px): '));
+      rateLayer = el('b', '', '0/s');
+      m2.appendChild(rateLayer);
+      cost.appendChild(m2);
+    }
+    var cpu = el('div', 'cpu');
+    cpu.appendChild(el('span', '', 'CPU vs. hoy'));
+    var cb = el('div', 'cpu-bar');
+    var cf = el('div', 'cpu-fill');
+    cf.style.width = Math.max(o.cpu, 2) + '%';
+    cf.style.background = cpuColor(o.cpu);
+    cb.appendChild(cf);
+    cpu.appendChild(cb);
+    cpu.appendChild(el('span', 'cpu-val', o.cpuText));
+    cost.appendChild(cpu);
+    card.appendChild(cost);
+
+    // Pros / contras
+    var notes = el('div', 'notes');
+    [['pro', 'A favor', o.pros], ['con', 'En contra', o.cons]].forEach(function (n) {
+      var box = el('div', n[0]);
+      box.appendChild(el('h3', '', n[1]));
+      var ul = el('ul');
+      n[2].forEach(function (s) { ul.appendChild(el('li', '', s)); });
+      box.appendChild(ul);
+      notes.appendChild(box);
+    });
+    card.appendChild(notes);
+
+    var choose = el('button', 'choose', 'Elegir esta');
+    choose.type = 'button';
+    choose.id = 'elegir-' + o.id;
+    choose.addEventListener('click', function () { pick(o.id); });
+    card.appendChild(choose);
+
+    grid.appendChild(card);
+    cards.push({
+      o: o, card: card, stage: stage, disc: disc, fill: fill, time: time,
+      dot: dot, led: led, ledLayer: ledLayer, rate: rate, rateLayer: rateLayer,
+      angle: 0, lastStep: -1, events: [], layerEvents: []
+    });
+  });
+
+  // ---------- Simulación ----------
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var playing = !reduce;
+  var elapsed = 61;
+  var playStart = performance.now();
+  var lastTick = performance.now();
+
+  function fmt(s) { var m = Math.floor(s / 60), r = s % 60; return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r; }
+
+  function flash(ledEl) {
+    ledEl.classList.add('on');
+    clearTimeout(ledEl._t);
+    ledEl._t = setTimeout(function () { ledEl.classList.remove('on'); }, 30);
+  }
+
+  function setAngle(c, a) { c.angle = a; c.disc.style.transform = 'rotate(' + a + 'deg)'; }
+
+  function renderTime() {
+    var txt = fmt(elapsed) + ' / 03:22';
+    document.getElementById('clock').textContent = txt;
+    cards.forEach(function (c) {
+      c.time.textContent = txt;
+      c.fill.style.transform = 'scaleX(' + (elapsed / TOTAL) + ')';
+    });
+  }
+
+  function applyPlaying() {
+    document.getElementById('playLabel').textContent = playing ? 'PAUSAR TODO' : 'REPRODUCIR TODO';
+    document.getElementById('btnPlay').setAttribute('aria-pressed', String(playing));
+    document.getElementById('playIcon').innerHTML = playing
+      ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
+      : '<path d="M8 5v14l11-7z"/>';
+    cards.forEach(function (c) {
+      c.stage.classList.toggle('playing', playing);
+      var label = c.stage.querySelector('.status-text');
+      if (label) label.textContent = playing ? 'REPRODUCIENDO' : 'EN PAUSA';
+      if (c.dot) c.dot.classList.remove('dim');
+      if (!playing) setAngle(c, 0); // igual que el launcher: al pausar el disco vuelve a 0°
+    });
+    playStart = performance.now();
+    lastTick = performance.now();
+  }
+
+  // El "segundero": el repintado que el contador ya hace hoy (no cuenta como extra)
+  function tick() {
+    elapsed = elapsed >= TOTAL ? 0 : elapsed + 1;
+    renderTime();
+    cards.forEach(function (c) {
+      if (c.o.spin === 'tick') setAngle(c, (c.angle + 30) % 360);
+      if (c.o.blink && c.dot) c.dot.classList.toggle('dim');
+    });
+  }
+
+  function frame(now) {
+    if (playing) {
+      if (now - lastTick >= 1000) { lastTick += 1000; tick(); }
+      var t = now - playStart;
+      cards.forEach(function (c) {
+        if (c.o.spin === 'smooth') {
+          setAngle(c, (t / 2800) * 360 % 360);
+          if (c.o.layer) { c.layerEvents.push(now); flash(c.ledLayer); }
+          else { c.events.push(now); flash(c.led); }
+        } else if (c.o.spin === 'step20') {
+          var step = Math.floor(t / 50);
+          if (step !== c.lastStep) {
+            c.lastStep = step;
+            setAngle(c, (step * 50 / 2800) * 360 % 360);
+            c.events.push(now); flash(c.led);
+          }
+        }
+      });
+    }
+    // Contadores por segundo
+    cards.forEach(function (c) {
+      while (c.events.length && now - c.events[0] > 1000) c.events.shift();
+      c.rate.textContent = c.events.length + '/s';
+      if (c.rateLayer) {
+        while (c.layerEvents.length && now - c.layerEvents[0] > 1000) c.layerEvents.shift();
+        c.rateLayer.textContent = c.layerEvents.length + '/s';
+      }
+    });
+    requestAnimationFrame(frame);
+  }
+
+  document.getElementById('btnPlay').addEventListener('click', function () {
+    playing = !playing;
+    applyPlaying();
+  });
+
+  // ---------- Elección ----------
+  var chosen = null;
+  try { chosen = localStorage.getItem('jh-indicador-eleccion'); } catch (e) { chosen = null; }
+
+  function pick(id) {
+    chosen = id;
+    try { localStorage.setItem('jh-indicador-eleccion', id); } catch (e) { /* sin almacenamiento */ }
+    renderPick();
+  }
+
+  function chosenOption() {
+    for (var i = 0; i < OPTIONS.length; i++) if (OPTIONS[i].id === chosen) return OPTIONS[i];
+    return null;
+  }
+
+  function chatText(o) {
+    return o.id === 'hoy'
+      ? 'Prefiero dejar el vinilo como está hoy (60 cuadros/s).'
+      : 'Elijo la opción ' + o.letter + ': ' + o.name + '.';
+  }
+
+  function renderPick() {
+    var o = chosenOption();
+    cards.forEach(function (c) {
+      var on = o && c.o.id === o.id;
+      c.card.classList.toggle('chosen', !!on);
+      c.card.querySelector('.choose').textContent = on ? 'Elegida' : 'Elegir esta';
+    });
+    var txt = document.getElementById('pickText');
+    var btn = document.getElementById('btnCopy');
+    if (!o) {
+      txt.innerHTML = 'Toca <strong>Elegir esta</strong> en la opción que prefieras.';
+      btn.disabled = true;
+      return;
+    }
+    txt.innerHTML = '';
+    txt.appendChild(document.createTextNode('Elegiste: '));
+    var s = el('strong', '', (o.id === 'hoy' ? '' : o.letter + ' · ') + o.name);
+    txt.appendChild(s);
+    txt.appendChild(document.createTextNode('. Copia el texto y pégalo en el chat para que lo aplique.'));
+    btn.disabled = false;
+    btn.textContent = 'Copiar para el chat';
+  }
+
+  document.getElementById('btnCopy').addEventListener('click', function () {
+    var o = chosenOption();
+    if (!o) return;
+    var btn = this;
+    var text = chatText(o);
+    var done = function () { btn.textContent = 'Copiado'; };
+    var fail = function () {
+      var t = document.getElementById('pickText');
+      t.textContent = text;
+      var r = document.createRange();
+      r.selectNodeContents(t);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      btn.textContent = 'Seleccionado: cópialo';
+    };
+    try {
+      navigator.clipboard.writeText(text).then(done, fail);
+    } catch (e) { fail(); }
+  });
+
+  renderTime();
+  applyPlaying();
+  renderPick();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Icono para Android 7 o anterior (en Android 8+ se usa drawable-v26/ic_launcher.xml adaptativo) -->
-<!-- Letra H con barra central de ecualizador; el contenido se copia de ic_launcher_foreground.xml -->
+<!-- Hyundai Tucson de costado; el contenido se copia de ic_launcher_foreground.xml -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="128dp"
     android:height="128dp"
@@ -32,67 +32,95 @@
         android:scaleY="1.42"
         android:translateX="-12.68"
         android:translateY="-12.68">
-        <!-- Halo suave detrás de la H -->
-        <path
-            android:fillColor="#38bdf8"
-            android:fillAlpha="0.07"
-            android:pathData="M 54,28 A 26,26 0 1,1 54,80 A 26,26 0 1,1 54,28 Z" />
 
-        <!-- Anillo exterior de acento neón -->
-        <path
-            android:strokeColor="#38bdf8"
-            android:strokeAlpha="0.5"
-            android:strokeWidth="1.4"
-            android:fillColor="#00000000"
-            android:pathData="M 54,21.5 A 32.5,32.5 0 1,1 54,86.5 A 32.5,32.5 0 1,1 54,21.5 Z" />
+    <!-- Halo suave detrás del auto -->
+    <path
+        android:fillColor="#38bdf8"
+        android:fillAlpha="0.07"
+        android:pathData="M 54,28 A 26,26 0 1,1 54,80 A 26,26 0 1,1 54,28 Z" />
 
-        <!-- Sombra de la H (profundidad) -->
-        <path
-            android:fillColor="#0b3954"
-            android:pathData="M 39.5,35.5 H 43.5 A 3,3 0 0 1 46.5,38.5 V 72.5 A 3,3 0 0 1 43.5,75.5 H 39.5 A 3,3 0 0 1 36.5,72.5 V 38.5 A 3,3 0 0 1 39.5,35.5 Z" />
-        <path
-            android:fillColor="#0b3954"
-            android:pathData="M 67.5,35.5 H 71.5 A 3,3 0 0 1 74.5,38.5 V 72.5 A 3,3 0 0 1 71.5,75.5 H 67.5 A 3,3 0 0 1 64.5,72.5 V 38.5 A 3,3 0 0 1 67.5,35.5 Z" />
-        <path
-            android:fillColor="#0b3954"
-            android:pathData="M 46.01,52.5 H 63.99 A 0.01,0.01 0 0 1 64,52.51 V 58.49 A 0.01,0.01 0 0 1 63.99,58.5 H 46.01 A 0.01,0.01 0 0 1 46,58.49 V 52.51 A 0.01,0.01 0 0 1 46.01,52.5 Z" />
+    <!-- Línea de suelo -->
+    <path
+        android:fillColor="#38bdf8"
+        android:fillAlpha="0.35"
+        android:pathData="M 24,73.5 H 86 V 74.5 H 24 Z" />
 
-        <!-- Columnas y barra central de la H -->
-        <path
-            android:fillColor="#38bdf8"
-            android:pathData="M 38,34 H 42 A 3,3 0 0 1 45,37 V 71 A 3,3 0 0 1 42,74 H 38 A 3,3 0 0 1 35,71 V 37 A 3,3 0 0 1 38,34 Z" />
-        <path
-            android:fillColor="#38bdf8"
-            android:pathData="M 66,34 H 70 A 3,3 0 0 1 73,37 V 71 A 3,3 0 0 1 70,74 H 66 A 3,3 0 0 1 63,71 V 37 A 3,3 0 0 1 66,34 Z" />
-        <path
-            android:fillColor="#38bdf8"
-            android:pathData="M 44.01,51 H 63.99 A 0.01,0.01 0 0 1 64,51.01 V 56.99 A 0.01,0.01 0 0 1 63.99,57 H 44.01 A 0.01,0.01 0 0 1 44,56.99 V 51.01 A 0.01,0.01 0 0 1 44.01,51 Z" />
+    <!-- Carrocería: cola casi vertical, techo largo y capó corto (el frente va a la derecha) -->
+    <path
+        android:fillColor="#38bdf8"
+        android:pathData="M 22,61 L 22,50 Q 22,47.5 24.5,47 L 27,39.5 Q 28,37 31,37 L 58,37 Q 62,37 64.5,39.5 L 72,47.5 L 82,50.5 Q 87,51.5 87,55.5 L 87,61 Z" />
 
-        <!-- Brillo lateral de las columnas -->
-        <path
-            android:fillColor="#e0f2fe"
-            android:fillAlpha="0.55"
-            android:pathData="M 37.5,36.5 H 37.5 A 0.9,0.9 0 0 1 38.4,37.4 V 70.6 A 0.9,0.9 0 0 1 37.5,71.5 H 37.5 A 0.9,0.9 0 0 1 36.6,70.6 V 37.4 A 0.9,0.9 0 0 1 37.5,36.5 Z" />
-        <path
-            android:fillColor="#e0f2fe"
-            android:fillAlpha="0.55"
-            android:pathData="M 65.5,36.5 H 65.5 A 0.9,0.9 0 0 1 66.4,37.4 V 70.6 A 0.9,0.9 0 0 1 65.5,71.5 H 65.5 A 0.9,0.9 0 0 1 64.6,70.6 V 37.4 A 0.9,0.9 0 0 1 65.5,36.5 Z" />
+    <!-- Faldón inferior oscuro (profundidad) -->
+    <path
+        android:fillColor="#0b3954"
+        android:pathData="M 22,57.5 H 87 V 61 H 22 Z" />
 
-        <!-- Ecualizador sobre la barra central -->
-        <path
-            android:fillColor="#7dd3fc"
-            android:pathData="M 47.6,49 H 47.6 A 1.1,1.1 0 0 1 48.7,50.1 V 57.9 A 1.1,1.1 0 0 1 47.6,59 H 47.6 A 1.1,1.1 0 0 1 46.5,57.9 V 50.1 A 1.1,1.1 0 0 1 47.6,49 Z" />
-        <path
-            android:fillColor="#7dd3fc"
-            android:pathData="M 50.8,45 H 50.8 A 1.1,1.1 0 0 1 51.9,46.1 V 61.9 A 1.1,1.1 0 0 1 50.8,63 H 50.8 A 1.1,1.1 0 0 1 49.7,61.9 V 46.1 A 1.1,1.1 0 0 1 50.8,45 Z" />
-        <path
-            android:fillColor="#f0f9ff"
-            android:pathData="M 54,41 H 54 A 1.1,1.1 0 0 1 55.1,42.1 V 65.9 A 1.1,1.1 0 0 1 54,67 H 54 A 1.1,1.1 0 0 1 52.9,65.9 V 42.1 A 1.1,1.1 0 0 1 54,41 Z" />
-        <path
-            android:fillColor="#7dd3fc"
-            android:pathData="M 57.2,45 H 57.2 A 1.1,1.1 0 0 1 58.3,46.1 V 61.9 A 1.1,1.1 0 0 1 57.2,63 H 57.2 A 1.1,1.1 0 0 1 56.1,61.9 V 46.1 A 1.1,1.1 0 0 1 57.2,45 Z" />
-        <path
-            android:fillColor="#7dd3fc"
-            android:pathData="M 60.4,49 H 60.4 A 1.1,1.1 0 0 1 61.5,50.1 V 57.9 A 1.1,1.1 0 0 1 60.4,59 H 60.4 A 1.1,1.1 0 0 1 59.3,57.9 V 50.1 A 1.1,1.1 0 0 1 60.4,49 Z" />
+    <!-- Rieles del techo -->
+    <path
+        android:fillColor="#7dd3fc"
+        android:pathData="M 32,35.2 H 58 V 36.4 H 32 Z" />
+
+    <!-- Ventanas -->
+    <path
+        android:fillColor="#0b3954"
+        android:pathData="M 29.5,46.5 L 31,40 Q 31.6,38.8 33,38.8 L 46.5,38.8 L 46.5,46.5 Z" />
+    <path
+        android:fillColor="#0b3954"
+        android:pathData="M 49.5,38.8 L 58,38.8 Q 60.5,38.8 62,40.5 L 68,46.5 L 49.5,46.5 Z" />
+
+    <!-- Brillo de la línea de cintura y divisoria de puertas -->
+    <path
+        android:fillColor="#e0f2fe"
+        android:fillAlpha="0.6"
+        android:pathData="M 28,48 H 74 V 49 H 28 Z" />
+    <path
+        android:fillColor="#0b3954"
+        android:pathData="M 47.8,39 H 48.6 V 57 H 47.8 Z" />
+
+    <!-- Luz trasera y faro delantero -->
+    <path
+        android:fillColor="#f43f5e"
+        android:pathData="M 22,50 H 24.6 V 53.5 H 22 Z" />
+    <path
+        android:fillColor="#fef9c3"
+        android:pathData="M 83.4,51.6 Q 87,52.4 87,54.4 V 56.4 H 83.4 Z" />
+
+    <!-- Rueda trasera: cubre-llanta de plástico, hueco, llanta y rin -->
+    <path
+        android:fillColor="#0b3954"
+        android:pathData="M 24.2,62 a 10.8,10.8 0 1,0 21.6,0 a 10.8,10.8 0 1,0 -21.6,0 Z" />
+    <path
+        android:fillColor="#111a26"
+        android:pathData="M 25.2,62 a 9.8,9.8 0 1,0 19.6,0 a 9.8,9.8 0 1,0 -19.6,0 Z" />
+    <path
+        android:fillColor="#06090e"
+        android:pathData="M 27,62 a 8,8 0 1,0 16,0 a 8,8 0 1,0 -16,0 Z" />
+    <path
+        android:strokeColor="#7dd3fc"
+        android:strokeWidth="1.4"
+        android:fillColor="#00000000"
+        android:pathData="M 30,62 a 5,5 0 1,0 10,0 a 5,5 0 1,0 -10,0 Z" />
+    <path
+        android:fillColor="#e0f2fe"
+        android:pathData="M 33.2,62 a 1.8,1.8 0 1,0 3.6,0 a 1.8,1.8 0 1,0 -3.6,0 Z" />
+
+    <!-- Rueda delantera -->
+    <path
+        android:fillColor="#0b3954"
+        android:pathData="M 63.2,62 a 10.8,10.8 0 1,0 21.6,0 a 10.8,10.8 0 1,0 -21.6,0 Z" />
+    <path
+        android:fillColor="#111a26"
+        android:pathData="M 64.2,62 a 9.8,9.8 0 1,0 19.6,0 a 9.8,9.8 0 1,0 -19.6,0 Z" />
+    <path
+        android:fillColor="#06090e"
+        android:pathData="M 66,62 a 8,8 0 1,0 16,0 a 8,8 0 1,0 -16,0 Z" />
+    <path
+        android:strokeColor="#7dd3fc"
+        android:strokeWidth="1.4"
+        android:fillColor="#00000000"
+        android:pathData="M 69,62 a 5,5 0 1,0 10,0 a 5,5 0 1,0 -10,0 Z" />
+    <path
+        android:fillColor="#e0f2fe"
+        android:pathData="M 72.2,62 a 1.8,1.8 0 1,0 3.6,0 a 1.8,1.8 0 1,0 -3.6,0 Z" />
     </group>
 </vector>

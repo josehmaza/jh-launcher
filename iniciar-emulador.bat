@@ -1,7 +1,8 @@
 @echo off
 title Emulador Radio Tucson ix35
-echo Iniciando Emulador radio-tucson...
+echo Iniciando ADB y Emulador radio-tucson...
 set "PATH=D:\JH-PROGRAMAS\android-sdk\emulator;D:\JH-PROGRAMAS\android-sdk\platform-tools;%PATH%"
-start "" "D:\JH-PROGRAMAS\android-sdk\emulator\emulator.exe" -avd radio-tucson -gpu host -no-snapshot
-echo Emulador lanzado en tu escritorio.
+adb start-server
+start "" "D:\JH-PROGRAMAS\android-sdk\emulator\emulator.exe" -avd radio-tucson -gpu swiftshader -no-skin -no-snapshot -no-boot-anim
+echo Emulador lanzado en tu escritorio sin fallos de ventana.
 exit /b 0

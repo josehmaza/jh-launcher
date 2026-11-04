@@ -1,6 +1,69 @@
 <resources>
+    <!-- El fondo de la ventana hace de fondo de la pantalla: así el layout raíz no
+         pinta otra capa a pantalla completa encima (menos sobre-dibujado) -->
     <style name="Theme.JHLauncher" parent="android:Theme.Black.NoTitleBar.Fullscreen">
-        <item name="android:windowBackground">@android:color/black</item>
-        <item name="android:colorBackground">@android:color/black</item>
+        <item name="android:windowBackground">@color/bg_window</item>
+        <item name="android:colorBackground">@color/bg_window</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <!-- Botón táctil con efecto de presión (haptic-btn de la maqueta) -->
+    <style name="HapticButton">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:stateListAnimator">@animator/press_scale</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Botones del dock inferior (50dp de alto, ícono + etiqueta) -->
+    <style name="DockButton" parent="HapticButton">
+        <item name="android:layout_height">50dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@drawable/bg_dock_btn</item>
+    </style>
+
+    <style name="DockIcon">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:tint">@color/tint_dock</item>
+    </style>
+
+    <style name="DockLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:textSize">11dp</item>
+        <item name="android:letterSpacing">0.055</item>
+        <item name="android:textColor">@color/tint_dock</item>
+        <item name="jhFont">extrabold</item>
+    </style>
+
+    <!-- Indicadores CPU / RAM / ALM bajo el auto -->
+    <style name="HwLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">11dp</item>
+        <item name="android:letterSpacing">0.07</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="jhFont">extrabold</item>
+    </style>
+
+    <style name="HwValue">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:gravity">end</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">13dp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="jhFont">mono</item>
+    </style>
+
+    <style name="HwFill">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:transformPivotX">0dp</item>
+        <item name="android:scaleX">0</item>
     </style>
 </resources>

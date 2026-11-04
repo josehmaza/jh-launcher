@@ -1,17 +1,18 @@
 package com.jh.launcher;
 
-import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,12 +22,17 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -34,6 +40,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -49,6 +56,7 @@ import java.util.Locale;
 public class MainActivity extends Activity implements BlindGestureListener.Callback {
 
     private static final String JH_MUSIC_PKG = "com.jh.caraudio";
+    private static final String[] BT_KEYWORDS = {"bluetooth", "btphone"};
     private static final String ACTION_TRACK_CHANGED = "com.jh.music.action.TRACK_CHANGED";
     private static final String ACTION_REQUEST_STATE = "com.jh.music.action.REQUEST_STATE";
 
@@ -72,13 +80,16 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
             new Track("Dile al Amor", "Aventura · The Last", "", "03:49", 229),
             new Track("Obsesión", "Aventura · We Broke The Rules", "", "04:12", 252)
     };
-    private static final Track[] BT_DEMO = {
-            new Track("Video en YouTube (Teléfono)", "YouTube Music / App · Transmisión Bluetooth", "", "03:45", 225),
-            new Track("Canción en Spotify", "Spotify Móvil · Audio A2DP / AVRCP", "", "04:10", 250),
-            new Track("Podcast / Audio en Vivo", "Celular Conectado · Manos Libres", "", "12:00", 720)
-    };
+    // JH Music abierta sin canción cargada (su última canción era de un pendrive que no está puesto)
+    private static final Track NO_TRACK = new Track("Selecciona una canción", "JH Music · elige en Librería", "", "00:00", 0);
+    // Audio Bluetooth sin teléfono conectado, o con teléfono pero sin datos de la canción
+    private static final Track BT_NO_PHONE = new Track("Sin teléfono conectado", "Conecta tu celular por Bluetooth", "", "00:00", 0);
+    private static final Track BT_NO_INFO = new Track("Teléfono conectado", "Reproduce música en tu celular", "", "00:00", 0);
 
-    private static final float[] FM_PRESETS = {88.5f, 91.3f, 93.7f, 96.1f, 98.9f, 101.7f, 104.5f, 107.9f};
+    private static final String JH_RADIO_PKG = "com.jh.radio";
+    private static final String ACTION_RADIO_STATE = "com.jh.radio.action.STATE";
+    private static final String ACTION_RADIO_REQUEST_STATE = "com.jh.radio.action.REQUEST_STATE";
+    private static final String ACTION_RADIO_GOTO = "com.jh.radio.action.GOTO";
 
     private static final TimeInterpolator EASE = new AccelerateDecelerateInterpolator();
 
@@ -100,13 +111,43 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     private View hwCpuFill, hwRamFill, hwStorageFill;
     private View btnSourceUsb, btnSourceBt;
     private TextView sourceExtraBadge, sourceStatusChip, trackTitle, trackArtist, timeReadout;
-    private TextView openTitle, openSub, radioFreqDisplay, muteLabel, launchToast;
+    private TextView openTitle, openSub, radioSubtitle, muteLabel, launchToast, btnBtMonitor;
+    // Carrusel de emisoras guardadas en JH Radio
+    private HorizontalScrollView radioCarousel;
+    private LinearLayout radioChips;
+    private String radioChipsKey = "";
     private ImageView vinylDisc, artCoverIcon, playPauseIcon, muteIcon;
-    private View musicProgressFill, stealthOverlay;
+    private View musicProgressFill, musicProgressThumb, musicProgressTouch, stealthOverlay;
+    private boolean seekDragging;
     private View usb1Badge, usb2Badge;
     private ImageView usb1Icon, usb2Icon;
     private TextView usb1Text, usb2Text;
-    private ObjectAnimator vinylSpin;
+    private View artCover, playStatus, playStatusDot;
+    private TextView playStatusText;
+
+    // Zonas táctiles gigantes de música (Estilo JH Music para manejo a ciegas)
+    private static final int PLAY_ZONE_EXTRA_DP = 12;
+    private View cardMusic;
+    private View musicProgressRow;
+    private View btnPrevTrack;
+    private View btnPlayPause;
+    private View btnNextTrack;
+    private View navZoneTarget;
+
+    private final Runnable navZoneUnflash = () -> {
+        if (btnPrevTrack != null) {
+            btnPrevTrack.setActivated(false);
+            btnPrevTrack.setPressed(false);
+        }
+        if (btnPlayPause != null) {
+            btnPlayPause.setActivated(false);
+            btnPlayPause.setPressed(false);
+        }
+        if (btnNextTrack != null) {
+            btnNextTrack.setActivated(false);
+            btnNextTrack.setPressed(false);
+        }
+    };
 
     // Estado
     private boolean resumed;
@@ -114,14 +155,16 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     private long stealthSince;
     private boolean sourceBt;
     private int usbIdx;
-    private int btIdx;
+    // Audio Bluetooth: lo que informa el módulo Bluetooth de fábrica
+    private BtMusicLink btLink;
+    private boolean btLinked;
+    private String btPhone;   // null = sin teléfono conectado
+    private Track btTrack;    // null = sin datos de la canción
     private boolean isPlaying;
-    private boolean vinylOut;
     private int progressSec;
     private long progressTickAt;
     private Track jhTrack;
     private long audioGraceUntil;
-    private int fmIdx = 3; // 96.1 MHz
     private boolean muted;
     private int lastClockMinute = -1;
     private int volumeMax = 1;
@@ -145,7 +188,19 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
                     duration != null ? duration : "00:00",
                     intent.getIntExtra("extra_total_sec", 0));
             t.isPlaying = intent.getBooleanExtra("extra_is_playing", false);
+            // JH Music 2.9.9+ manda la posición real; antes no la mandaba (-1: se sigue estimando)
+            t.positionSec = intent.getIntExtra("extra_position_sec", -1);
             applyJhMusicData(t);
+        }
+    };
+
+    // JH Radio avisa de la emisora que suena (frecuencia en kHz y nombre; 0 si aún no se sabe)
+    private final BroadcastReceiver jhRadioReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || !ACTION_RADIO_STATE.equals(intent.getAction())) return;
+            showRadioState(intent.getIntExtra("extra_khz", 0), nonNull(intent.getStringExtra("extra_name")),
+                    nonNull(intent.getStringExtra("extra_list")));
         }
     };
 
@@ -183,6 +238,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         @Override
         public void run() {
             advanceProgress();
+            beatPlayStatus();
             mainHandler.postDelayed(this, 1000);
         }
     };
@@ -235,11 +291,8 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        long tPROF = System.nanoTime(); // PROF
         setImmersiveMode();
         setContentView(R.layout.activity_main);
-        android.util.Log.i("JH-PROF", "  de eso, JhTextView (fuentes+atributos) " + JhTextView.FONT_NS / 1000000 + " ms"); // PROF
-        android.util.Log.i("JH-PROF", "setContentView " + (System.nanoTime() - tPROF) / 1000000 + " ms"); tPROF = System.nanoTime(); // PROF
 
         density = getResources().getDisplayMetrics().density;
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -252,25 +305,25 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         bindActions();
 
         turntable = new CarTurntable((ImageView) findViewById(R.id.carImage), mainHandler);
+        turntable.setIndicator(new View[]{
+                findViewById(R.id.angleDot0), findViewById(R.id.angleDot1), findViewById(R.id.angleDot2)});
         turntable.preload(getAssets(), ioHandler);
 
         int vinylPx = Math.round(78 * density);
-        android.util.Log.i("JH-PROF", "init+bind " + (System.nanoTime() - tPROF) / 1000000 + " ms"); tPROF = System.nanoTime(); // PROF
         vinylDisc.setImageBitmap(VinylArt.create(vinylPx));
-        android.util.Log.i("JH-PROF", "vinilo " + (System.nanoTime() - tPROF) / 1000000 + " ms"); tPROF = System.nanoTime(); // PROF
-        vinylSpin = ObjectAnimator.ofFloat(vinylDisc, View.ROTATION, 0f, 360f);
-        vinylSpin.setDuration(2800);
-        vinylSpin.setRepeatCount(ValueAnimator.INFINITE);
-        vinylSpin.setInterpolator(new LinearInterpolator());
 
         btnColorBlack.setSelected(true);
         findViewById(R.id.dockMusic).setActivated(true);
-        radioFreqDisplay.setText(formatFreq(FM_PRESETS[fmIdx]));
+        showRadioState(0, "", "");
         setAudioSource(false);
 
-        // Mantener el estado de JH Music al día aunque el launcher esté en segundo plano
+        // Mantener el estado de JH Music y de JH Radio al día aunque el launcher esté en segundo plano
         registerReceiver(jhMusicReceiver, new IntentFilter(ACTION_TRACK_CHANGED));
-        android.util.Log.i("JH-PROF", "resto onCreate " + (System.nanoTime() - tPROF) / 1000000 + " ms"); // PROF
+        registerReceiver(jhRadioReceiver, new IntentFilter(ACTION_RADIO_STATE));
+
+        // Audio Bluetooth del teléfono: se escucha al módulo Bluetooth de fábrica mientras el launcher viva
+        btLink = new BtMusicLink(this, btListener);
+        btLink.start();
     }
 
     @Override
@@ -302,9 +355,14 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
 
         // Pide a JH Music su estado actual por si cambió mientras no estábamos visibles
         try {
-            sendBroadcast(new Intent(ACTION_REQUEST_STATE));
+            Intent req = new Intent(ACTION_REQUEST_STATE);
+            req.setPackage(JH_MUSIC_PKG);
+            req.setComponent(new ComponentName(JH_MUSIC_PKG, JH_MUSIC_PKG + ".MusicRemoteReceiver"));
+            req.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES | Intent.FLAG_RECEIVER_FOREGROUND);
+            sendBroadcast(req);
         } catch (RuntimeException ignored) {
         }
+        sendRadioCommand(ACTION_RADIO_REQUEST_STATE);
     }
 
     @Override
@@ -328,11 +386,15 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     protected void onDestroy() {
         super.onDestroy();
         mainHandler.removeCallbacksAndMessages(null);
-        vinylSpin.cancel();
         try {
             unregisterReceiver(jhMusicReceiver);
         } catch (IllegalArgumentException ignored) {
         }
+        try {
+            unregisterReceiver(jhRadioReceiver);
+        } catch (IllegalArgumentException ignored) {
+        }
+        if (btLink != null) btLink.stop();
         ioThread.quitSafely();
     }
 
@@ -370,7 +432,6 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         } else {
             turntable.stop();
         }
-        updateVinyl();
     }
 
     // ------------------------------------------------------------------
@@ -405,14 +466,27 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         sourceStatusChip = findViewById(R.id.sourceStatusChip);
         vinylDisc = findViewById(R.id.vinylDisc);
         artCoverIcon = findViewById(R.id.artCoverIcon);
+        artCover = findViewById(R.id.artCover);
+        playStatus = findViewById(R.id.playStatus);
+        playStatusDot = findViewById(R.id.playStatusDot);
+        playStatusText = findViewById(R.id.playStatusText);
         trackTitle = findViewById(R.id.trackTitle);
         trackArtist = findViewById(R.id.trackArtist);
         musicProgressFill = findViewById(R.id.musicProgressFill);
+        musicProgressThumb = findViewById(R.id.musicProgressThumb);
+        musicProgressTouch = findViewById(R.id.musicProgressTouch);
+        musicProgressTouch.setOnTouchListener(this::onProgressTouch);
+        // la perilla se ubica cuando ya se conoce el ancho de la barra
+        musicProgressTouch.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+            if (r - l != or - ol) updateProgressUi();
+        });
         timeReadout = findViewById(R.id.timeReadout);
         playPauseIcon = findViewById(R.id.playPauseIcon);
         openTitle = findViewById(R.id.openTitle);
         openSub = findViewById(R.id.openSub);
-        radioFreqDisplay = findViewById(R.id.radioFreqDisplay);
+        radioCarousel = findViewById(R.id.radioCarousel);
+        radioChips = findViewById(R.id.radioChips);
+        radioSubtitle = findViewById(R.id.radioSubtitle);
         muteIcon = findViewById(R.id.muteIcon);
         muteLabel = findViewById(R.id.muteLabel);
         launchToast = findViewById(R.id.launchToast);
@@ -422,6 +496,11 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         usb2Badge = findViewById(R.id.usb2Badge);
         usb2Icon = findViewById(R.id.usb2Icon);
         usb2Text = findViewById(R.id.usb2Text);
+        cardMusic = findViewById(R.id.cardMusic);
+        musicProgressRow = findViewById(R.id.musicProgressRow);
+        btnPlayPause = findViewById(R.id.btnPlayPause);
+        btnPrevTrack = findViewById(R.id.btnPrevTrack);
+        btnNextTrack = findViewById(R.id.btnNextTrack);
     }
 
     private void bindActions() {
@@ -431,19 +510,22 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
 
         btnSourceUsb.setOnClickListener(v -> setAudioSource(false));
         btnSourceBt.setOnClickListener(v -> setAudioSource(true));
-        findViewById(R.id.btnPlayPause).setOnClickListener(v -> onPlayPause());
-        findViewById(R.id.btnPrevTrack).setOnClickListener(v -> onSkip(false));
-        findViewById(R.id.btnNextTrack).setOnClickListener(v -> onSkip(true));
-        findViewById(R.id.btnOpenMusic).setOnClickListener(v -> {
-            if (sourceBt) launchBluetooth();
+        btnBtMonitor = findViewById(R.id.btnBtMonitor);
+        btnBtMonitor.setOnClickListener(v -> openBtMonitor());
+        btnPlayPause.setOnClickListener(v -> onPlayPause());
+        btnPrevTrack.setOnClickListener(v -> onSkip(false));
+        btnNextTrack.setOnClickListener(v -> onSkip(true));
+        View.OnClickListener openMusicListener = v -> {
+            if (sourceBt) launchBtMusic();
             else launchJhMusic("tracks");
-        });
+        };
+        findViewById(R.id.btnOpenMusic).setOnClickListener(openMusicListener);
+        View artCover = findViewById(R.id.artCover);
+        if (artCover != null) artCover.setOnClickListener(openMusicListener);
 
         findViewById(R.id.btnLaunchJhVideo).setOnClickListener(v -> launchJhVideo());
+        findViewById(R.id.cardJhVideo).setOnClickListener(v -> launchJhVideo());
         findViewById(R.id.btnLaunchRadio).setOnClickListener(v -> launchRadio());
-        findViewById(R.id.radioFreqBox).setOnClickListener(v -> launchRadio());
-        findViewById(R.id.btnRadioPrev).setOnClickListener(v -> tuneRadio(false));
-        findViewById(R.id.btnRadioNext).setOnClickListener(v -> tuneRadio(true));
 
         findViewById(R.id.btnMute).setOnClickListener(v -> toggleMute());
         findViewById(R.id.btnStealth).setOnClickListener(v -> enterStealth());
@@ -451,8 +533,10 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         findViewById(R.id.dockMusic).setOnClickListener(v -> launchJhMusic(null));
         findViewById(R.id.dockVideo).setOnClickListener(v -> launchJhVideo());
         findViewById(R.id.dockRadio).setOnClickListener(v -> launchRadio());
-        findViewById(R.id.dockBluetooth).setOnClickListener(v -> launchBluetooth());
+        findViewById(R.id.dockBluetooth).setOnClickListener(v -> launchBtCalls());
         findViewById(R.id.btnAllApps).setOnClickListener(v -> launchAllApps());
+        findViewById(R.id.btnOpenApps).setOnClickListener(v ->
+                startSafely(new Intent(this, OpenAppsActivity.class), "No se pudo abrir las apps abiertas"));
         findViewById(R.id.btnSettings).setOnClickListener(v -> launchSettings());
     }
 
@@ -517,6 +601,87 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     }
 
     // ------------------------------------------------------------------
+    // Zonas táctiles gigantes de control de música (Estilo JH Music)
+    // Al manejar no hace falta acertarle al botón: toda la franja debajo de la barra se divide en tres:
+    // izquierda = Anterior, centro = Play/Pausa, derecha = Siguiente
+    // ------------------------------------------------------------------
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (!stealthActive && handleNavZoneTouch(ev)) return true;
+        return super.dispatchTouchEvent(ev);
+    }
+
+    private boolean handleNavZoneTouch(MotionEvent ev) {
+        int action = ev.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN) {
+            navZoneTarget = navZoneAt(ev.getRawX(), ev.getRawY());
+            if (navZoneTarget == null) return false;
+            mainHandler.removeCallbacks(navZoneUnflash);
+            navZoneUnflash.run();
+            navZoneTarget.setActivated(true);
+            navZoneTarget.setPressed(true);
+            return true;
+        }
+        if (navZoneTarget == null) return false;
+        if (action == MotionEvent.ACTION_MOVE) {
+            View current = navZoneAt(ev.getRawX(), ev.getRawY());
+            if (current != navZoneTarget) {
+                if (navZoneTarget != null) {
+                    navZoneTarget.setActivated(false);
+                    navZoneTarget.setPressed(false);
+                }
+                navZoneTarget = current;
+                if (navZoneTarget != null) {
+                    navZoneTarget.setActivated(true);
+                    navZoneTarget.setPressed(true);
+                }
+            }
+            return true;
+        }
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+            View target = navZoneTarget;
+            navZoneTarget = null;
+            mainHandler.postDelayed(navZoneUnflash, 180);
+            if (action == MotionEvent.ACTION_UP && target != null) {
+                target.performClick();
+            }
+            return true;
+        }
+        return true;
+    }
+
+    private View navZoneAt(float x, float y) {
+        if (cardMusic == null) cardMusic = findViewById(R.id.cardMusic);
+        if (musicProgressRow == null) musicProgressRow = findViewById(R.id.musicProgressRow);
+        if (btnPlayPause == null) btnPlayPause = findViewById(R.id.btnPlayPause);
+        if (btnPrevTrack == null) btnPrevTrack = findViewById(R.id.btnPrevTrack);
+        if (btnNextTrack == null) btnNextTrack = findViewById(R.id.btnNextTrack);
+
+        if (cardMusic == null || musicProgressRow == null || btnPlayPause == null
+                || btnPrevTrack == null || btnNextTrack == null) return null;
+
+        Rect cardRect = new Rect();
+        Rect progRect = new Rect();
+        Rect playRect = new Rect();
+        if (!cardMusic.getGlobalVisibleRect(cardRect)
+                || !musicProgressRow.getGlobalVisibleRect(progRect)
+                || !btnPlayPause.getGlobalVisibleRect(playRect)) {
+            return null;
+        }
+
+        // El toque debe estar dentro de la tarjeta de música y debajo de la barra de progreso
+        if (!cardRect.contains((int) x, (int) y) || y < progRect.bottom) {
+            return null;
+        }
+
+        int extra = (int) (PLAY_ZONE_EXTRA_DP * density);
+        if (x < playRect.left - extra) return btnPrevTrack;
+        if (x > playRect.right + extra) return btnNextTrack;
+        return btnPlayPause;
+    }
+
+    // ------------------------------------------------------------------
     // Gestos a ciegas
     // ------------------------------------------------------------------
 
@@ -567,7 +732,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
             }
         }
         showGestureHud(percent == 0 || muted ? R.drawable.ic_volume_off : R.drawable.ic_volume,
-                "VOLUMEN " + percent + "%", percent / 100f, 0);
+                percent + "%", percent / 100f, 0);
     }
 
     @Override
@@ -584,9 +749,15 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         gestureHudIcon.setImageResource(iconRes);
         gestureHudLabel.setText(label);
         if (level >= 0f) {
+            // Gesto de volumen: solo el número en tamaño grande para legibilidad al conducir
+            gestureHudLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22f);
+            gestureHudLabel.setLetterSpacing(0.04f);
             gestureHudBarFill.setScaleX(Math.min(1f, level));
             gestureHudBar.setVisibility(View.VISIBLE);
         } else {
+            // Acciones de pista (SIGUIENTE, ANTERIOR, PLAY, PAUSA)
+            gestureHudLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11f);
+            gestureHudLabel.setLetterSpacing(0.12f);
             gestureHudBar.setVisibility(View.GONE);
         }
         mainHandler.removeCallbacks(hideHud);
@@ -608,28 +779,91 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         sourceBt = bt;
         btnSourceUsb.setSelected(!bt);
         btnSourceBt.setSelected(bt);
+        btnBtMonitor.setVisibility(bt ? View.VISIBLE : View.GONE);
 
         if (!bt) {
-            sourceExtraBadge.setText(jhTrack != null && !jhTrack.path.isEmpty() ? "USB 1" : "MI MIX (109)");
+            sourceExtraBadge.setText(jhTrack == NO_TRACK ? "SIN CANCIÓN"
+                    : jhTrack != null && !jhTrack.path.isEmpty() ? "USB 1" : "MI MIX (109)");
             sourceStatusChip.setText("USB 1");
             artCoverIcon.setImageResource(R.drawable.ic_disc);
-            openTitle.setText("ABRIR JH MUSIC");
-            openSub.setText("Ver carpetas y listas de reproducción");
+            if (openTitle != null) openTitle.setText("ABRIR JH MUSIC");
+            if (openSub != null) openSub.setText("Ver carpetas y listas de reproducción");
+            sendMusicCommand("REQUEST_STATE");
             syncFromStateFile();
         } else {
-            sourceExtraBadge.setText("AVRCP REMOTO");
             sourceStatusChip.setText("BT AUDIO");
             artCoverIcon.setImageResource(R.drawable.ic_bluetooth);
-            openTitle.setText("ABRIR MANOS LIBRES");
-            openSub.setText("Ver llamadas y teléfono conectado");
+            if (openTitle != null) openTitle.setText("ABRIR MANOS LIBRES");
+            if (openSub != null) openSub.setText("Ver llamadas y teléfono conectado");
+            if (btLink != null) {
+                btLink.refresh();
+                // por si el módulo quedó callado de antes: si aquí no hay silencio, el módulo tampoco debe tenerlo
+                if (!muted) btLink.muteMusic(false);
+            }
+            refreshBtUi();
         }
         updateTrackDisplay();
         updateProgressUi();
     }
 
     private Track currentTrack() {
-        if (sourceBt) return BT_DEMO[btIdx];
+        if (sourceBt) return btTrack != null ? btTrack : btPhone != null ? BT_NO_INFO : BT_NO_PHONE;
         return jhTrack != null ? jhTrack : USB_DEMO[usbIdx];
+    }
+
+    // ------------------------------------------------------------------
+    // Audio Bluetooth (módulo Bluetooth de fábrica)
+    // ------------------------------------------------------------------
+
+    private final BtMusicLink.Listener btListener = new BtMusicLink.Listener() {
+        @Override
+        public void onLink(boolean linked) {
+            btLinked = linked;
+            refreshBtUi();
+        }
+
+        @Override
+        public void onPhone(boolean connected, String name) {
+            btPhone = connected ? name : null;
+            if (!connected) {
+                btTrack = null;
+                if (sourceBt) setPlaying(false);
+            }
+            refreshBtUi();
+        }
+
+        @Override
+        public void onStreaming(boolean streaming) {
+            // Si el teléfono empieza a sonar, la tarjeta pasa a Bluetooth: así los botones y los gestos sobre el
+            // Tucson (deslizar = siguiente / anterior) mandan al teléfono y no a JH Music
+            if (streaming && !sourceBt) setAudioSource(true);
+            if (sourceBt) setPlaying(streaming);
+        }
+
+        @Override
+        public void onTrack(String title, String artist, String album, long durationMs) {
+            if (title.isEmpty()) return;
+            int sec = (int) (durationMs >= 10000 ? durationMs / 1000 : durationMs);
+            String detail = !artist.isEmpty() ? artist : "Teléfono";
+            if (!album.isEmpty() && !album.equals(artist)) detail += " · " + album;
+            boolean changed = btTrack == null || !btTrack.title.equals(title) || !btTrack.artist.equals(detail);
+            btTrack = new Track(title, detail, "", String.format(Locale.US, "%02d:%02d", sec / 60, sec % 60), sec);
+            if (btPhone == null) btPhone = "";
+            if (changed) resetProgress();
+            refreshBtUi();
+        }
+    };
+
+    /** Pone al día la tarjeta de música con lo último que dijo el módulo Bluetooth (solo se ve en la pestaña BT). */
+    private void refreshBtUi() {
+        if (!sourceBt) return;
+        String badge;
+        if (!btLinked) badge = "SIN MÓDULO BT";
+        else if (btPhone == null) badge = "SIN TELÉFONO";
+        else badge = btPhone.isEmpty() ? "TELÉFONO" : btPhone.toUpperCase(Locale.ROOT);
+        sourceExtraBadge.setText(badge);
+        updateTrackDisplay();
+        updateProgressUi();
     }
 
     private void updateTrackDisplay() {
@@ -639,9 +873,24 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         stealthTrackName.setText(t.title + " — " + t.artist);
     }
 
+    /** JH Music avisa que no tiene canción cargada: se deja de mostrar la que había. */
+    private void showNoTrack() {
+        jhTrack = NO_TRACK;
+        if (sourceBt) return;
+        updateTrackDisplay();
+        sourceExtraBadge.setText("SIN CANCIÓN");
+        resetProgress();
+        setPlaying(false);
+        updateProgressUi();
+    }
+
     private void applyJhMusicData(Track t) {
-        if (t == null || t.title.isEmpty()) return;
-        // JH Music no envía la posición: al cambiar de canción el progreso vuelve a cero
+        if (t == null) return;
+        if (t.title.isEmpty()) {
+            showNoTrack();
+            return;
+        }
+        // Al cambiar de canción el progreso vuelve a cero; si JH Music manda la posición real, manda esa
         boolean trackChanged = jhTrack == null || !jhTrack.path.equals(t.path) || !jhTrack.title.equals(t.title);
         jhTrack = t;
         if (sourceBt) return;
@@ -653,6 +902,10 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         }
         if (trackChanged) resetProgress();
         setPlaying(t.isPlaying);
+        if (t.positionSec >= 0 && !seekDragging) {
+            progressSec = t.positionSec;
+            progressTickAt = SystemClock.elapsedRealtime();
+        }
         updateProgressUi();
     }
 
@@ -675,6 +928,12 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
             Track t = new Track(json.optString("title"), json.optString("artist"), json.optString("path"),
                     json.optString("duration", "00:00"), json.optInt("totalSec"));
             t.isPlaying = json.optBoolean("isPlaying");
+            // Posición al escribir el archivo, más lo que siguió sonando desde entonces
+            t.positionSec = json.optInt("positionSec", -1);
+            long writtenAt = json.optLong("timestamp", 0);
+            if (t.positionSec >= 0 && t.isPlaying && writtenAt > 0) {
+                t.positionSec += (int) Math.max(0, (System.currentTimeMillis() - writtenAt) / 1000);
+            }
             return t;
         } catch (Exception e) {
             return null;
@@ -682,23 +941,41 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     }
 
     private void onPlayPause() {
+        if (needsSongChoice()) return;
         setPlaying(!isPlaying);
         if (!sourceBt) {
             audioGraceUntil = SystemClock.elapsedRealtime() + AUDIO_GRACE_MS;
             sendMusicCommand("PLAY_PAUSE");
+        } else if (btLink != null && btLink.isLinked()) {
+            btLink.playPause();
         } else {
             sendMediaKey(isPlaying ? KeyEvent.KEYCODE_MEDIA_PLAY : KeyEvent.KEYCODE_MEDIA_PAUSE);
         }
     }
 
+    /** Sin canción cargada en JH Music play y saltar no hacen nada: avisa en vez de aparentar que funcionó. */
+    private boolean needsSongChoice() {
+        if (sourceBt || jhTrack != NO_TRACK) return false;
+        showToast("Elige una canción en JH Music");
+        return true;
+    }
+
     private void onSkip(boolean next) {
+        if (needsSongChoice()) return;
         if (!sourceBt) {
             audioGraceUntil = SystemClock.elapsedRealtime() + AUDIO_GRACE_MS;
             sendMusicCommand(next ? "NEXT" : "PREV");
-        } else {
-            btIdx = (btIdx + (next ? 1 : BT_DEMO.length - 1)) % BT_DEMO.length;
             sendMediaKey(next ? KeyEvent.KEYCODE_MEDIA_NEXT : KeyEvent.KEYCODE_MEDIA_PREVIOUS);
-            updateTrackDisplay();
+            usbIdx = (usbIdx + (next ? 1 : USB_DEMO.length - 1)) % USB_DEMO.length;
+            if (jhTrack == null) {
+                updateTrackDisplay();
+            }
+        } else if (btLink != null && btLink.isLinked()) {
+            // la canción nueva la anuncia el teléfono por Bluetooth: aquí solo se pide el salto
+            if (next) btLink.next();
+            else btLink.prev();
+        } else {
+            sendMediaKey(next ? KeyEvent.KEYCODE_MEDIA_NEXT : KeyEvent.KEYCODE_MEDIA_PREVIOUS);
         }
         resetProgress();
         updateProgressUi();
@@ -712,30 +989,29 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
 
     private void setPlaying(boolean playing) {
         if (playing && !isPlaying) progressTickAt = SystemClock.elapsedRealtime();
+        boolean changed = playing != isPlaying;
         isPlaying = playing;
         playPauseIcon.setImageResource(playing ? R.drawable.ic_pause : R.drawable.ic_play);
-        updateVinyl();
+        if (!changed) return;
+
+        // Indicador de reproducción sin animaciones continuas (opción B "latido con el segundero"):
+        // vinilo fuera de la carátula pero quieto, carátula iluminada y "● REPRODUCIENDO".
+        // Un vinilo girando obligaba a repintar la pantalla entera ~56 veces por segundo
+        artCover.setActivated(playing);
+        playStatus.setActivated(playing);
+        playStatusText.setText(playing ? "REPRODUCIENDO" : "EN PAUSA");
+        playStatusDot.setAlpha(1f);
+        vinylDisc.animate().translationX(playing ? 20 * density : 0f).setDuration(500)
+                .setInterpolator(new OvershootInterpolator(1.4f));
     }
 
-    /** El vinilo sale de la carátula al reproducir y solo gira si el launcher está a la vista. */
-    private void updateVinyl() {
-        if (isPlaying != vinylOut) {
-            vinylOut = isPlaying;
-            vinylDisc.animate().translationX(isPlaying ? 20 * density : 0f).setDuration(500)
-                    .setInterpolator(new OvershootInterpolator(1.4f));
-        }
-        boolean spin = isPlaying && resumed && !stealthActive;
-        if (spin) {
-            if (!vinylSpin.isStarted()) vinylSpin.start();
-            else if (vinylSpin.isPaused()) vinylSpin.resume();
-        } else if (vinylSpin.isStarted()) {
-            if (isPlaying) {
-                vinylSpin.pause();
-            } else {
-                vinylSpin.cancel();
-                vinylDisc.setRotation(0f);
-            }
-        }
+    /**
+     * El punto de "REPRODUCIENDO" late una vez por segundo dentro del mismo tick que actualiza
+     * el contador de tiempo: cambia en el repintado que ya ocurría, así que no agrega ninguno.
+     */
+    private void beatPlayStatus() {
+        if (!isPlaying || stealthActive) return;
+        playStatusDot.setAlpha(playStatusDot.getAlpha() > 0.5f ? 0.25f : 1f);
     }
 
     private void resetProgress() {
@@ -759,18 +1035,85 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     }
 
     private void updateProgressUi() {
+        if (seekDragging) return; // mientras se arrastra manda el dedo, no el reloj
         Track t = currentTrack();
+        musicProgressThumb.setVisibility(canSeek(t) ? View.VISIBLE : View.GONE);
+        if (t == NO_TRACK) {
+            setProgressFraction(0f);
+            timeReadout.setText("00:00 / 00:00");
+            return;
+        }
         if (t.totalSec <= 0) return;
         progressSec = Math.min(progressSec, t.totalSec);
-        musicProgressFill.setScaleX(progressSec / (float) t.totalSec);
-        timeReadout.setText(String.format(Locale.US, "%02d:%02d / %s", progressSec / 60, progressSec % 60, t.duration));
+        setProgressFraction(progressSec / (float) t.totalSec);
+        timeReadout.setText(formatClock(progressSec) + " / " + t.duration);
+    }
+
+    private static String formatClock(int sec) {
+        return String.format(Locale.US, "%02d:%02d", sec / 60, sec % 60);
+    }
+
+    /** Solo se puede adelantar una canción de JH Music con duración conocida (el audio Bluetooth no lo permite). */
+    private boolean canSeek(Track t) {
+        return !sourceBt && t != NO_TRACK && t != null && t.totalSec > 0;
+    }
+
+    private void setProgressFraction(float f) {
+        musicProgressFill.setScaleX(f);
+        int w = musicProgressTouch.getWidth();
+        int tw = musicProgressThumb.getWidth();
+        musicProgressThumb.setTranslationX(Math.max(0f, Math.min(w - tw, f * w - tw / 2f)));
+    }
+
+    /** Barra de tiempo: tocar o arrastrar muestra el tiempo de destino; al soltar, JH Music salta ahí. */
+    private boolean onProgressTouch(View v, MotionEvent e) {
+        Track t = currentTrack();
+        if (!canSeek(t)) return false;
+        float f = Math.max(0f, Math.min(1f, e.getX() / Math.max(1, v.getWidth())));
+        int sec = Math.round(f * t.totalSec);
+        switch (e.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                // fall through
+            case MotionEvent.ACTION_MOVE:
+                seekDragging = true;
+                setProgressFraction(f);
+                timeReadout.setText(formatClock(sec) + " / " + t.duration);
+                return true;
+            case MotionEvent.ACTION_UP:
+                seekDragging = false;
+                progressSec = sec;
+                progressTickAt = SystemClock.elapsedRealtime();
+                audioGraceUntil = SystemClock.elapsedRealtime() + AUDIO_GRACE_MS;
+                sendMusicSeek(sec);
+                updateProgressUi();
+                return true;
+            case MotionEvent.ACTION_CANCEL:
+                seekDragging = false;
+                updateProgressUi();
+                return true;
+            default:
+                return true;
+        }
+    }
+
+    private void sendMusicSeek(int sec) {
+        try {
+            Intent cmd = new Intent("com.jh.music.action.SEEK");
+            cmd.setComponent(new ComponentName(JH_MUSIC_PKG, JH_MUSIC_PKG + ".MusicRemoteReceiver"));
+            cmd.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES | Intent.FLAG_RECEIVER_FOREGROUND);
+            cmd.putExtra("extra_position_sec", sec);
+            sendBroadcast(cmd);
+        } catch (RuntimeException ignored) {
+        }
     }
 
     private void sendMusicCommand(String action) {
         try {
             Intent cmd = new Intent("com.jh.music.action." + action);
+            cmd.setPackage(JH_MUSIC_PKG);
             cmd.setComponent(new ComponentName(JH_MUSIC_PKG, JH_MUSIC_PKG + ".MusicRemoteReceiver"));
-            cmd.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+            cmd.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES | Intent.FLAG_RECEIVER_FOREGROUND);
             sendBroadcast(cmd);
         } catch (RuntimeException ignored) {
         }
@@ -787,9 +1130,15 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     // Silencio (real, sobre el volumen multimedia del sistema)
     // ------------------------------------------------------------------
 
+    /**
+     * Silenciado = volumen de música en 0 (o, si quedó pegado de antes, el silencio de Android). El silencio de
+     * Android (ADJUST_MUTE) en este radio dejó al audio Bluetooth mudo para siempre; el volumen sí funciona con
+     * todo (JH Music, FM y Bluetooth), así que MUTE baja el volumen a 0 y al activar lo devuelve al de antes.
+     */
     private void refreshMuteState() {
-        if (audioManager != null && Build.VERSION.SDK_INT >= 23) {
-            muted = audioManager.isStreamMute(AudioManager.STREAM_MUSIC);
+        if (audioManager != null) {
+            boolean stuck = Build.VERSION.SDK_INT >= 23 && audioManager.isStreamMute(AudioManager.STREAM_MUSIC);
+            muted = stuck || audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0;
         }
         updateMuteUi();
     }
@@ -798,21 +1147,37 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         setMuted(!muted, true);
     }
 
+    private static final String PREF_VOLUME_BEFORE_MUTE = "volume_before_mute";
+
     @SuppressWarnings("deprecation")
     private void setMuted(boolean target, boolean notify) {
         if (audioManager == null) return;
+        android.content.SharedPreferences prefs = getSharedPreferences("jh_launcher", MODE_PRIVATE);
+        int max = Math.max(1, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                        target ? AudioManager.ADJUST_MUTE : AudioManager.ADJUST_UNMUTE, 0);
+            if (target) {
+                int now = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                // se recuerda en disco por si el launcher se cierra estando en silencio
+                if (now > 0) prefs.edit().putInt(PREF_VOLUME_BEFORE_MUTE, now).apply();
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
             } else {
-                audioManager.setStreamMute(AudioManager.STREAM_MUSIC, target);
+                // limpia un silencio de Android que haya quedado pegado y devuelve el volumen de antes
+                if (Build.VERSION.SDK_INT >= 23) {
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE, 0);
+                } else {
+                    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+                }
+                int back = prefs.getInt(PREF_VOLUME_BEFORE_MUTE, Math.round(max / 2f));
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, Math.max(1, Math.min(max, back)), 0);
+                // el módulo Bluetooth tampoco debe tener silencio (de pruebas o de antes)
+                if (btLink != null && btLink.isLinked()) btLink.muteMusic(false);
             }
         } catch (RuntimeException e) {
             if (notify) showToast("No se pudo cambiar el audio");
             return;
         }
         muted = target;
+        volumeIndex = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         updateMuteUi();
         if (notify) showToast(muted ? "Audio Silenciado (MUTE)" : "Audio Activado");
     }
@@ -861,20 +1226,128 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     // Radio FM
     // ------------------------------------------------------------------
 
-    private void tuneRadio(boolean next) {
-        fmIdx = (fmIdx + (next ? 1 : FM_PRESETS.length - 1)) % FM_PRESETS.length;
-        String freq = formatFreq(FM_PRESETS[fmIdx]);
-        radioFreqDisplay.setText(freq);
-        showToast("Radio FM: " + freq + " MHz");
+    /** Pide a JH Radio que sintonice una emisora guardada; la tarjeta se actualiza cuando JH Radio avisa. */
+    private void tuneRadioTo(int khz) {
+        if (!isPackageInstalled(JH_RADIO_PKG)) {
+            showToast("JH Radio no está instalada");
+            return;
+        }
+        radioSubtitle.setText("Sintonizando " + String.format(Locale.US, "%.1f", khz / 1000.0) + "…");
+        Intent cmd = radioCommand(ACTION_RADIO_GOTO);
+        cmd.putExtra("extra_khz", khz);
+        sendRadioBroadcast(cmd);
+    }
+
+    /** Orden directa al receptor de JH Radio (llega aunque la app no esté abierta). */
+    private void sendRadioCommand(String action) {
+        sendRadioBroadcast(radioCommand(action));
+    }
+
+    private Intent radioCommand(String action) {
+        Intent cmd = new Intent(action);
+        cmd.setComponent(new ComponentName(JH_RADIO_PKG, JH_RADIO_PKG + ".RadioRemoteReceiver"));
+        cmd.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES | Intent.FLAG_RECEIVER_FOREGROUND);
+        return cmd;
+    }
+
+    private void sendRadioBroadcast(Intent cmd) {
         try {
-            sendBroadcast(new Intent(next ? "com.autochips.radio.action.RADIO_NEXT"
-                    : "com.autochips.radio.action.RADIO_PREV"));
+            sendBroadcast(cmd);
         } catch (RuntimeException ignored) {
         }
     }
 
-    private static String formatFreq(float freq) {
-        return String.format(Locale.US, "%.1f", freq);
+    /** Pantalla de pruebas del audio Bluetooth: vive en JH Radio (consola y copia a pendrive). */
+    private void openBtMonitor() {
+        if (!isPackageInstalled(JH_RADIO_PKG)) {
+            showToast("Instala JH Radio para usar el monitoreo");
+            return;
+        }
+        Intent monitor = new Intent().setComponent(new ComponentName(JH_RADIO_PKG, JH_RADIO_PKG + ".BtDiagActivity"));
+        startSafely(monitor, "No se pudo abrir el monitoreo (¿JH Radio es la versión 0.7 o más nueva?)");
+    }
+
+    private boolean isPackageInstalled(String pkg) {
+        try {
+            getPackageManager().getPackageInfo(pkg, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Tarjeta RADIO FM: arriba la emisora que suena («104.7 MHz · nombre») y abajo el carrusel con las guardadas en
+     * JH Radio («khz|nombre;…»), con la que suena resaltada.
+     */
+    private void showRadioState(int khz, String name, String list) {
+        String mhz = khz > 0 ? String.format(Locale.US, "%.1f MHz", khz / 1000.0) : "";
+        radioSubtitle.setText(khz <= 0 ? "JH Radio" : name.isEmpty() ? mhz : mhz + " · " + name);
+        String key = khz + "#" + list;
+        if (key.equals(radioChipsKey)) return;
+        radioChipsKey = key;
+        rebuildRadioChips(khz, list);
+    }
+
+    private void rebuildRadioChips(int currentKhz, String list) {
+        radioChips.removeAllViews();
+        View current = null;
+        for (String part : list.split(";")) {
+            if (part.isEmpty()) continue;
+            int bar = part.indexOf('|');
+            final int khz;
+            try {
+                khz = Integer.parseInt(bar < 0 ? part : part.substring(0, bar));
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            View chip = radioChip(String.format(Locale.US, "%.1f", khz / 1000.0),
+                    bar < 0 ? "" : part.substring(bar + 1), khz == currentKhz);
+            chip.setOnClickListener(v -> tuneRadioTo(khz));
+            if (khz == currentKhz) current = chip;
+        }
+        if (radioChips.getChildCount() == 0) {
+            // Sin emisoras guardadas (o JH Radio aún no avisó): abrir JH Radio para agregarlas
+            radioChip("AGREGAR", "emisoras", false).setOnClickListener(v -> launchRadio());
+        }
+        if (current != null) {
+            final View c = current;
+            radioCarousel.post(() -> radioCarousel.smoothScrollTo(
+                    Math.max(0, c.getLeft() - (radioCarousel.getWidth() - c.getWidth()) / 2), 0));
+        }
+    }
+
+    /** Botón del carrusel: frecuencia grande y nombre chico debajo; la que suena, con el borde ámbar. */
+    private View radioChip(String freq, String name, boolean playing) {
+        LinearLayout chip = new LinearLayout(this);
+        chip.setOrientation(LinearLayout.VERTICAL);
+        chip.setGravity(Gravity.CENTER);
+        chip.setClickable(true);
+        chip.setBackgroundResource(playing ? R.drawable.bg_freq_box : R.drawable.bg_btn_radio_tune);
+        JhTextView f = new JhTextView(this);
+        f.setJhFont(3);
+        f.setText(freq);
+        f.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
+        f.setTextColor(getResources().getColor(playing ? R.color.accent_amber : R.color.text_primary));
+        f.setGravity(Gravity.CENTER);
+        chip.addView(f);
+        if (!name.isEmpty()) {
+            JhTextView n = new JhTextView(this);
+            n.setJhFont(0);
+            n.setText(name);
+            n.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+            n.setTextColor(getResources().getColor(R.color.text_secondary));
+            n.setSingleLine(true);
+            n.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            n.setGravity(Gravity.CENTER);
+            n.setPadding(Math.round(4 * density), Math.round(2 * density), Math.round(4 * density), 0);
+            chip.addView(n);
+        }
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Math.round(88 * density),
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        if (radioChips.getChildCount() > 0) lp.leftMargin = Math.round(10 * density);
+        radioChips.addView(chip, lp);
+        return chip;
     }
 
     // ------------------------------------------------------------------
@@ -896,24 +1369,67 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     }
 
     private void launchRadio() {
-        launchCandidates(new String[]{"com.autochips.radio", "com.xyauto.radio", "com.android.fmradio",
-                "com.microntek.radio", "com.syu.radio"}, "Radio FM");
+        launchCandidates(new String[]{JH_RADIO_PKG, "com.autochips.radio", "com.xyauto.radio", "com.android.fmradio",
+                "com.microntek.radio", "com.syu.radio"}, "Radio FM", null, "radio");
+    }
+
+    /** «BT música» de fábrica: la app que ves en el menú con ese nombre (no la de llamadas). */
+    private void launchBtMusic() {
+        Intent intent = findLaunchIntentByLabel("bt musica", "bt music", "btmusic", "musica bt", "musica bluetooth");
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startSafely(intent, "No se pudo abrir BT música");
+        } else {
+            showToast("No encuentro «BT música»: abro Llamadas BT");
+            launchBluetooth();
+        }
+    }
+
+    /** Teléfono / manos libres de fábrica: la app que ves en el menú como «Llamada BT». */
+    private void launchBtCalls() {
+        Intent intent = findLaunchIntentByLabel("llamada", "manos libres", "telefono");
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startSafely(intent, "No se pudo abrir Llamada BT");
+        } else {
+            launchBluetooth();
+        }
+    }
+
+    /**
+     * Busca una app por el nombre que muestra el menú (la etiqueta de su ícono), sin tildes ni mayúsculas.
+     * El nombre del paquete no sirve: «BT música» y «Llamada BT» pueden compartir la palabra «bluetooth».
+     */
+    private Intent findLaunchIntentByLabel(String... words) {
+        PackageManager pm = getPackageManager();
+        Intent main = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+        for (ResolveInfo ri : pm.queryIntentActivities(main, 0)) {
+            if (ri.activityInfo.packageName.startsWith("com.jh.")) continue;
+            String label = Normalizer.normalize(String.valueOf(ri.loadLabel(pm)), Normalizer.Form.NFD)
+                    .replaceAll("\\p{M}+", "").toLowerCase(Locale.ROOT);
+            for (String w : words) {
+                if (label.contains(w)) {
+                    return new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+                            .setComponent(new ComponentName(ri.activityInfo.packageName, ri.activityInfo.name));
+                }
+            }
+        }
+        return null;
     }
 
     private void launchBluetooth() {
         String[] candidates = {"com.autochips.bluetooth", "com.xyauto.bluetooth", "com.ts.bluetooth",
                 "com.microntek.bluetooth"};
-        if (findLaunchIntent(candidates) != null) {
-            launchCandidates(candidates, "Bluetooth Manos Libres");
+        if (findLaunchIntent(candidates) != null || findLaunchIntentByKeyword(BT_KEYWORDS) != null) {
+            launchCandidates(candidates, "Bluetooth Manos Libres", null, BT_KEYWORDS);
         } else {
             startSafely(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS), "No se pudo abrir Bluetooth");
         }
     }
 
+    /** Cajón de apps propio: ACTION_ALL_APPS solo lo atiende un launcher con cajón, y este no lo tiene. */
     private void launchAllApps() {
-        if (!startSafely(new Intent(Intent.ACTION_ALL_APPS), null)) {
-            startSafely(new Intent(Settings.ACTION_APPLICATION_SETTINGS), "No se pudo abrir el cajón de apps");
-        }
+        startSafely(new Intent(this, AppsActivity.class), "No se pudo abrir el cajón de apps");
     }
 
     private void launchSettings() {
@@ -929,14 +1445,45 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         return null;
     }
 
+    /**
+     * Respaldo cuando ningún paquete conocido está instalado: busca entre las apps con ícono
+     * una cuyo nombre o paquete contenga alguna palabra clave, prefiriendo las del sistema
+     * (la app de radio o de Bluetooth de fábrica) y sin tocar las propias de JH.
+     */
+    private Intent findLaunchIntentByKeyword(String[] keywords) {
+        PackageManager pm = getPackageManager();
+        Intent main = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+        ResolveInfo best = null;
+        boolean bestIsSystem = false;
+        for (ResolveInfo ri : pm.queryIntentActivities(main, 0)) {
+            String pkg = ri.activityInfo.packageName;
+            if (pkg.startsWith("com.jh.")) continue;
+            String haystack = (pkg + " " + ri.loadLabel(pm)).toLowerCase(Locale.ROOT);
+            boolean match = false;
+            for (String k : keywords) {
+                if (haystack.contains(k)) { match = true; break; }
+            }
+            if (!match) continue;
+            boolean system = (ri.activityInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+            if (best == null || (system && !bestIsSystem)) {
+                best = ri;
+                bestIsSystem = system;
+            }
+        }
+        if (best == null) return null;
+        return new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+                .setComponent(new ComponentName(best.activityInfo.packageName, best.activityInfo.name));
+    }
+
     private void launchCandidates(String[] packages, String label) {
         launchCandidates(packages, label, null);
     }
 
-    private void launchCandidates(String[] packages, String label, Bundle extras) {
+    private void launchCandidates(String[] packages, String label, Bundle extras, String... keywords) {
         Intent intent = findLaunchIntent(packages);
+        if (intent == null && keywords.length > 0) intent = findLaunchIntentByKeyword(keywords);
         if (intent == null) {
-            showToast("App " + label + " no encontrada en este radio");
+            showToast("App " + label + " no encontrada: ábrela desde APPS");
             return;
         }
         if (extras != null) intent.putExtras(extras);
@@ -948,6 +1495,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     private boolean startSafely(Intent intent, String errorMsg) {
         try {
             startActivity(intent);
+            OpenedApps.record(this, intent);
             return true;
         } catch (RuntimeException e) {
             if (errorMsg != null) showToast(errorMsg);
@@ -980,6 +1528,8 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         final String duration;
         final int totalSec;
         boolean isPlaying;
+        /** Posición real que informó JH Music, o -1 si no la mandó (versiones viejas). */
+        int positionSec = -1;
 
         Track(String title, String artist, String path, String duration, int totalSec) {
             this.title = title;

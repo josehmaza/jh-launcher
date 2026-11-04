@@ -174,3 +174,28 @@ Al no disponer de botones en el volante del Tucson, **la pantalla es el único m
    - Compilación con `build.sh`.
    - Prueba en el emulador de PC configurado para 1024 × 600 px (Android 8.1 API 27).
    - Instalación vía pendrive USB en el Tucson ix35 2013 y activación como Launcher predeterminado.
+
+---
+
+## 6. Revisión de diseño e interacción (31-oct-2026)
+
+Revisión de la app nativa (código y capturas del emulador). Lo de rendimiento está en [ANALISIS-RENDIMIENTO.md](ANALISIS-RENDIMIENTO.md).
+
+### Ya aplicado
+
+- **Tarjeta del auto, variante D** (elegida entre 6 en [demos-auto-360.html](demos-auto-360.html)):
+  - bordes de la foto fundidos con la tarjeta, horneados una vez al cargarla;
+  - halo cian estático bajo el auto (`CarHaloView`);
+  - cambio de ángulo deslizando el auto de lado;
+  - indicador de 3 puntos del ángulo actual.
+- **Estado "sin canción".** Si JH Music abre sin canción cargada (su última canción era de un pendrive que no está puesto), la tarjeta de música dice "Selecciona una canción" con el progreso en cero, en vez de seguir mostrando la canción vieja. Con ese estado, ▶ y saltar muestran el aviso "Elige una canción en JH Music" en vez de aparentar que funcionaron.
+- **Sin arrastre para girar el auto.** Se descartó para no chocar con los gestos a ciegas (deslizar en el auto = siguiente/anterior).
+
+### Pendiente
+
+| # | Hallazgo | Propuesta | Esfuerzo |
+|---|---|---|---|
+| 6.1 | **La tarjeta de música no muestra la carátula.** Usa un ícono de disco aunque la canción tenga carátula: JH Music solo comparte título, artista, ruta y duración. La tarjeta además tiene un hueco vacío arriba de la canción. | JH Music guarda una miniatura de ~200 px junto a `.jh_music_state.json` (propuesta #21 de JH Music) y el launcher la muestra en ese hueco, más grande. Es el cambio más visible de la pantalla principal. | Medio (las dos apps) |
+| 6.2 | **La frecuencia de radio FM puede no ser la real.** El "96.1" sale de una lista fija de 8 frecuencias (`FM_PRESETS`). ◄/► envían `RADIO_NEXT`/`RADIO_PREV` al radio de fábrica, pero el número nunca se lee del sintonizador. | Mirar con `adb logcat` en el radio si la radio de fábrica anuncia su frecuencia y mostrar esa. Si no la anuncia, quitar el número y dejar "Radio FM". | Bajo–medio |
+| 6.3 | **El indicador de CPU puede no servir.** En el emulador siempre marca "--". En el radio, si `/proc/stat` no se puede leer (Android 8 lo restringe a las apps), `HwMonitor` cae a calcularlo con la frecuencia de los núcleos, que no es el uso real: según el gobernador del radio podría marcar siempre lo mismo. Sin comprobar en el radio. | Comprobarlo en el radio. Si no sirve, reemplazarlo por un dato útil o quitarlo y dar más ancho a RAM y ALM. | Bajo |
+| 6.4 | **Los gestos a ciegas no se descubren.** Nada indica que el auto funciona como touchpad (deslizar = cambiar canción, doble toque = play/pausa, vertical = volumen). | Una leyenda tenue bajo el auto las primeras veces, o al tocarlo una vez sin hacer gesto. | Bajo |

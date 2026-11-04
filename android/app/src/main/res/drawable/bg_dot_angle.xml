@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Punto indicador del ángulo del auto: cian cuando está activo, blanco tenue si no -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <shape android:shape="oval"><solid android:color="@color/accent_cyan" /></shape>
+    </item>
+    <item>
+        <shape android:shape="oval"><solid android:color="#38ffffff" /></shape>
+    </item>
+</selector>

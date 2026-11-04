@@ -12,3 +12,7 @@ Thumbs.db
 
 # Capturas temporales
 capturas/
+
+# Capturas de depuración y volcados de pantalla (adb)
+captura_*.png
+dump.xml

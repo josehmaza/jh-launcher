@@ -224,7 +224,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (total > 0) {
-      const pct = Math.min((progressSec / total) * 100, 100);
+      // Tras un rato en segundo plano la estimación puede pasarse de la duración
+      progressSec = Math.min(progressSec, total);
+      const pct = (progressSec / total) * 100;
       musicProgressFill.style.width = `${pct}%`;
       const mins = String(Math.floor(progressSec / 60)).padStart(2, '0');
       const secs = String(progressSec % 60).padStart(2, '0');
@@ -444,10 +446,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Avance del tiempo de reproducción
+  // Avance del tiempo de reproducción. Se mide con el reloj real (no contando ticks)
+  // porque Android pausa los timers del WebView mientras el launcher está oculto;
+  // así, al volver, el progreso se pone al día con el tiempo transcurrido
+  let progressTickAt = Date.now();
   setInterval(() => {
-    if (isPlaying) {
-      progressSec += 1;
+    const now = Date.now();
+    if (!isPlaying) {
+      progressTickAt = now;
+      return;
+    }
+    const elapsedSec = Math.floor((now - progressTickAt) / 1000);
+    if (elapsedSec > 0) {
+      progressSec += elapsedSec;
+      progressTickAt += elapsedSec * 1000;
       updateProgressUi();
     }
   }, 1000);
@@ -508,31 +520,41 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastTapTime = 0;
 
     turntableStage.addEventListener('touchstart', (e) => {
-      touchStartTime = Date.now();
       if (e.touches.length >= 2) {
+        // Llega el segundo dedo: el gesto pasa a ser de 2 dedos desde el punto medio
         isTwoFingerTouch = true;
         touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
         touchCurrentX = touchStartX;
       } else if (e.touches.length === 1) {
+        // Primer dedo: comienza un gesto nuevo
+        touchStartTime = Date.now();
         isTwoFingerTouch = false;
-        singleTouchStartX = e.touches[0].clientX;
-        touchCurrentX = singleTouchStartX;
+        touchStartX = e.touches[0].clientX;
+        touchCurrentX = touchStartX;
       }
     }, { passive: true });
 
     turntableStage.addEventListener('touchmove', (e) => {
-      if (isTwoFingerTouch && e.touches.length >= 2) {
-        touchCurrentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      if (isTwoFingerTouch) {
+        if (e.touches.length >= 2) {
+          touchCurrentX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        }
       } else if (e.touches.length === 1) {
         touchCurrentX = e.touches[0].clientX;
-      } else if (e.changedTouches.length >= 1) {
-        touchCurrentX = e.changedTouches[0].clientX;
       }
     }, { passive: true });
 
+    turntableStage.addEventListener('touchcancel', () => {
+      isTwoFingerTouch = false;
+    }, { passive: true });
+
     turntableStage.addEventListener('touchend', (e) => {
+      // touchend se dispara una vez por cada dedo que se levanta: evaluar el gesto
+      // solo cuando ya no queda ninguno, para no ejecutar la acción dos veces
+      if (e.touches.length > 0) return;
+
       const duration = Date.now() - touchStartTime;
-      const deltaX = isTwoFingerTouch ? (touchCurrentX - touchStartX) : (touchCurrentX - singleTouchStartX);
+      const deltaX = touchCurrentX - touchStartX;
 
       if (Math.abs(deltaX) > 40) {
         // Deslizar horizontalmente (1 dedo o 2 dedos) ➔ Siguiente o Anterior

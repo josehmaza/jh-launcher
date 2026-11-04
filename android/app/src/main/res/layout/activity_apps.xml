@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@color/bg_bar"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="20dp">
+
+        <LinearLayout
+            android:id="@+id/appsBack"
+            style="@style/HapticButton"
+            android:layout_width="64dp"
+            android:layout_height="46dp"
+            android:background="@drawable/bg_dock_btn">
+
+            <ImageView
+                style="@style/DockIcon"
+                android:src="@drawable/ic_back" />
+        </LinearLayout>
+
+        <com.jh.launcher.JhTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:letterSpacing="0.08"
+            android:text="APPS"
+            android:textColor="@color/text_primary"
+            android:textSize="20dp"
+            app:jhFont="extrabold" />
+
+        <!-- Abre el launcher de fábrica del radio (Launcher3); se oculta si no hay otro launcher instalado -->
+        <com.jh.launcher.JhTextView
+            android:id="@+id/btnFactoryLauncher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/bg_chip_source"
+            android:clickable="true"
+            android:paddingLeft="14dp"
+            android:paddingTop="10dp"
+            android:paddingRight="14dp"
+            android:paddingBottom="10dp"
+            android:text="LAUNCHER DE FÁBRICA"
+            android:textColor="@color/accent_cyan"
+            android:textSize="12dp"
+            android:visibility="gone"
+            app:jhFont="bold" />
+
+        <com.jh.launcher.JhTextView
+            android:id="@+id/appsCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="13dp"
+            app:jhFont="mono" />
+    </LinearLayout>
+
+    <GridView
+        android:id="@+id/appsGrid"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:cacheColorHint="@android:color/transparent"
+        android:clipToPadding="false"
+        android:horizontalSpacing="8dp"
+        android:listSelector="@drawable/bg_app_item"
+        android:numColumns="6"
+        android:overScrollMode="never"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="12dp"
+        android:scrollbars="none"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="8dp" />
+</LinearLayout>
