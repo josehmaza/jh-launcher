@@ -361,51 +361,6 @@
                             app:jhFont="bold" />
                     </LinearLayout>
 
-                    <!-- HUD de gestos a ciegas -->
-                    <LinearLayout
-                        android:id="@+id/gestureHud"
-                        android:layout_width="114dp"
-                        android:layout_height="114dp"
-                        android:layout_gravity="center"
-                        android:alpha="0"
-                        android:background="@drawable/bg_hud_circle"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:visibility="invisible">
-
-                        <ImageView
-                            android:id="@+id/gestureHudIcon"
-                            android:layout_width="34dp"
-                            android:layout_height="34dp"
-                            android:tint="@color/accent_cyan" />
-
-                        <!-- Ancho fijo: el texto cambia en cada paso de volumen sin re-layout -->
-                        <com.jh.launcher.JhTextView
-                            android:id="@+id/gestureHudLabel"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:gravity="center"
-                            android:letterSpacing="0.04"
-                            android:textColor="@color/text_primary"
-                            android:textSize="22dp"
-                            app:jhFont="mono" />
-
-                        <!-- Nivel de volumen (solo en el gesto de volumen) -->
-                        <FrameLayout
-                            android:id="@+id/gestureHudBar"
-                            android:layout_width="64dp"
-                            android:layout_height="4dp"
-                            android:layout_marginTop="5dp"
-                            android:background="@drawable/bg_track"
-                            android:visibility="gone">
-
-                            <View
-                                android:id="@+id/gestureHudBarFill"
-                                style="@style/HwFill"
-                                android:background="@drawable/bg_fill_cyan" />
-                        </FrameLayout>
-                    </LinearLayout>
                 </FrameLayout>
 
                 <!-- Telemetría real de hardware (solo informativa) -->
@@ -622,25 +577,6 @@
                                     app:jhFont="bold" />
                             </LinearLayout>
                         </LinearLayout>
-
-                        <!-- Pruebas del audio Bluetooth (pantalla de monitoreo de JH Radio); solo en la pestaña BT.
-                             Va junto a las pestañas, lejos del botón de abrir la app, para no tocarlo por error -->
-                        <com.jh.launcher.JhTextView
-                            android:id="@+id/btnBtMonitor"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="14dp"
-                            android:background="@drawable/bg_chip_source"
-                            android:clickable="true"
-                            android:paddingLeft="10dp"
-                            android:paddingTop="7dp"
-                            android:paddingRight="10dp"
-                            android:paddingBottom="7dp"
-                            android:text="MONITOREO"
-                            android:textColor="@color/accent_cyan"
-                            android:textSize="10dp"
-                            android:visibility="gone"
-                            app:jhFont="bold" />
 
                         <View
                             android:layout_width="0dp"
@@ -998,103 +934,12 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Radio FM más ancha que JH Video: lleva el carrusel de emisoras -->
-                    <LinearLayout
+                    <!-- Hueco libre (antes Radio FM): se reserva con el mismo ancho para poner ahí la mascota -->
+                    <View
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="12dp"
-                        android:layout_weight="1.15"
-                        android:background="@drawable/bg_card"
-                        android:orientation="vertical"
-                        android:paddingLeft="14dp"
-                        android:paddingTop="12dp"
-                        android:paddingRight="14dp"
-                        android:paddingBottom="12dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical">
-
-                            <FrameLayout
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:background="@drawable/bg_badge_radio">
-
-                                <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_radio" />
-                            </FrameLayout>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="14dp"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <com.jh.launcher.JhTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:letterSpacing="0.02"
-                                    android:text="RADIO FM"
-                                    android:textColor="@color/text_primary"
-                                    android:textSize="16dp"
-                                    app:jhFont="extrabold" />
-
-                                <com.jh.launcher.JhTextView
-                                    android:id="@+id/radioSubtitle"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="3dp"
-                                    android:ellipsize="end"
-                                    android:maxLines="1"
-                                    android:text="JH Radio"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="12dp"
-                                    app:jhFont="semibold" />
-                            </LinearLayout>
-
-                            <FrameLayout
-                                android:id="@+id/btnLaunchRadio"
-                                style="@style/HapticButton"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:background="@drawable/bg_btn_haptic">
-
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:layout_gravity="center"
-                                    android:duplicateParentState="true"
-                                    android:src="@drawable/ic_open_in_new"
-                                    android:tint="@color/tint_haptic" />
-                            </FrameLayout>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
-
-                        <!-- Carrusel con las emisoras guardadas en JH Radio (se arma por código): tocar una la
-                             sintoniza; la que suena va resaltada y centrada -->
-                        <HorizontalScrollView
-                            android:id="@+id/radioCarousel"
-                            android:layout_width="match_parent"
-                            android:layout_height="64dp"
-                            android:overScrollMode="never"
-                            android:scrollbars="none">
-
-                            <LinearLayout
-                                android:id="@+id/radioChips"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:orientation="horizontal" />
-                        </HorizontalScrollView>
-                    </LinearLayout>
+                        android:layout_weight="1.15" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
@@ -1283,6 +1128,52 @@
         android:textSize="13dp"
         android:visibility="invisible"
         app:jhFont="bold" />
+
+    <!-- HUD de gestos a ciegas: centrado en TODA la pantalla, encima de todo, para que el dedo no lo tape -->
+    <LinearLayout
+        android:id="@+id/gestureHud"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_gravity="center"
+        android:alpha="0"
+        android:background="@drawable/bg_hud_circle"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/gestureHudIcon"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:tint="@color/accent_cyan" />
+
+        <!-- Ancho fijo: el texto cambia en cada paso de volumen sin re-layout -->
+        <com.jh.launcher.JhTextView
+            android:id="@+id/gestureHudLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:letterSpacing="0.04"
+            android:textColor="@color/text_primary"
+            android:textSize="60dp"
+            app:jhFont="mono" />
+
+        <!-- Nivel de volumen (solo en el gesto de volumen) -->
+        <FrameLayout
+            android:id="@+id/gestureHudBar"
+            android:layout_width="130dp"
+            android:layout_height="6dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_track"
+            android:visibility="gone">
+
+            <View
+                android:id="@+id/gestureHudBarFill"
+                style="@style/HwFill"
+                android:background="@drawable/bg_fill_cyan" />
+        </FrameLayout>
+    </LinearLayout>
 
     <!-- ============ MODO STEALTH (sigilo nocturno) ============ -->
     <LinearLayout

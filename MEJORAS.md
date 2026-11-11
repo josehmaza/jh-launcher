@@ -144,7 +144,7 @@ Al no disponer de botones en el volante del Tucson, **la pantalla es el único m
 
 ## 4. Matriz Comparativa: Interfaz Actual vs. JH Launcher
 
-| Característica | Interfaz de Fábrica Actual (Foto) | JH Launcher 1.6.5 |
+| Característica | Interfaz de Fábrica Actual (Foto) | JH Launcher 1.7.0 |
 |---|---|---|
 | **Vehículo mostrado** | Sedán genérico ajeno al auto | **Fotos del Hyundai Tucson ix35 2013 en 3 ángulos** |
 | **Saludo** | *"Hola, Jhon"* (genérico de fábrica) | **"Hola, Hernan"** |
