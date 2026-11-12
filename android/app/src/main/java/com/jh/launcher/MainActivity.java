@@ -240,6 +240,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
                         setHwStat(hwRamVal, hwRamFill, ram);
                         setHwStat(hwStorageVal, hwStorageFill, storage);
                         updateUsbIndicators(usb1, usb2);
+                        refreshUsbBadgeIfNeeded();
                     });
                 } catch (Throwable t) {
                     android.util.Log.e("JH-LAUNCHER", "Error en hwPoll", t);
@@ -749,8 +750,11 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         btnSourceBt.setSelected(bt);
 
         if (!bt) {
+            boolean usbAvailable = isTrackStorageAvailable(jhTrack);
             sourceExtraBadge.setText(jhTrack == NO_TRACK ? "SIN CANCIÓN"
-                    : jhTrack != null && !jhTrack.path.isEmpty() ? "USB 1" : "MI MIX (109)");
+                    : jhTrack != null && !jhTrack.path.isEmpty()
+                    ? (isUsbTrack(jhTrack) && !usbAvailable ? "USB DESCONECTADO" : "USB 1")
+                    : "MI MIX (109)");
             sourceStatusChip.setText("USB 1");
             artCoverIcon.setImageResource(R.drawable.ic_disc);
             if (openTitle != null) openTitle.setText("ABRIR JH MUSIC");
@@ -863,13 +867,23 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         if (sourceBt) return;
 
         updateTrackDisplay();
-        if (!t.path.isEmpty()) {
-            String[] parts = t.path.split("/");
-            if (parts.length >= 2) sourceExtraBadge.setText(parts[parts.length - 2].toUpperCase(Locale.ROOT));
+
+        boolean usbTrack = isUsbTrack(t);
+        boolean available = !usbTrack || isTrackStorageAvailable(t);
+
+        if (!available) {
+            sourceExtraBadge.setText("USB DESCONECTADO");
+            setPlaying(false);
+        } else {
+            if (!t.path.isEmpty()) {
+                String[] parts = t.path.split("/");
+                if (parts.length >= 2) sourceExtraBadge.setText(parts[parts.length - 2].toUpperCase(Locale.ROOT));
+            }
+            setPlaying(t.isPlaying);
         }
+
         if (trackChanged) resetProgress();
-        setPlaying(t.isPlaying);
-        if (t.positionSec >= 0 && !seekDragging) {
+        if (available && t.positionSec >= 0 && !seekDragging) {
             progressSec = t.positionSec;
             progressTickAt = SystemClock.elapsedRealtime();
         }
@@ -908,8 +922,96 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         }
     }
 
+    private boolean isUsbTrack(Track track) {
+        if (track == null || track.path == null || track.path.isEmpty()) return false;
+        String p = track.path.toLowerCase(Locale.ROOT);
+        return p.contains("udisk") || p.contains("usb") || p.contains("media_rw") || p.contains("otg");
+    }
+
+    /** Comprueba si el archivo físico o pendrive de la pista está conectado y accesible. */
+    private boolean isTrackStorageAvailable(Track track) {
+        if (track == null || track.path == null || track.path.isEmpty()) {
+            return false;
+        }
+        File f = new File(track.path);
+        if (f.exists()) {
+            return true;
+        }
+
+        // Si f.exists() es falso y es pista USB, validamos con HwMonitor
+        if (isUsbTrack(track)) {
+            String p = track.path.toLowerCase(Locale.ROOT);
+            boolean isUsb1 = p.contains("udisk1") || p.contains("usb0") || p.contains("media_rw/udisk1");
+            boolean isUsb2 = p.contains("udisk2") || p.contains("usb1") || p.contains("media_rw/udisk2");
+            if (isUsb1 && hwMonitor != null && !hwMonitor.isUsb1Connected()) {
+                return false;
+            }
+            if (isUsb2 && hwMonitor != null && !hwMonitor.isUsb2Connected()) {
+                return false;
+            }
+            if (hwMonitor != null && !hwMonitor.isUsb1Connected() && !hwMonitor.isUsb2Connected()) {
+                return false;
+            }
+        }
+        return f.exists();
+    }
+
+    /**
+     * Valida que el medio esté disponible antes de enviar acciones de reproducción:
+     * si se retiró el pendrive avisa con un Toast ("Pendrive no conectado") y cancela
+     * en vez de aparentar que funcionó.
+     */
+    private boolean checkPlaybackReady() {
+        if (sourceBt) return true;
+
+        boolean anyUsb = hwMonitor != null && (hwMonitor.isUsb1Connected() || hwMonitor.isUsb2Connected());
+
+        if (!anyUsb) {
+            android.util.Log.i("JH-LAUNCHER", "checkPlaybackReady: ningún USB conectado");
+            showToast("Pendrive no conectado");
+            setPlaying(false);
+            return false;
+        }
+
+        if (jhTrack != null && jhTrack != NO_TRACK) {
+            if (!isTrackStorageAvailable(jhTrack)) {
+                android.util.Log.i("JH-LAUNCHER", "checkPlaybackReady: pendrive/archivo no disponible: " + jhTrack.path);
+                showToast("Pendrive no conectado");
+                setPlaying(false);
+                return false;
+            }
+            return true;
+        }
+
+        android.util.Log.i("JH-LAUNCHER", "checkPlaybackReady: sin canción cargada");
+        showToast("Elige una canción en JH Music");
+        setPlaying(false);
+        return false;
+    }
+
+    private void refreshUsbBadgeIfNeeded() {
+        if (sourceBt || jhTrack == null || jhTrack == NO_TRACK) return;
+        if (isUsbTrack(jhTrack)) {
+            if (isTrackStorageAvailable(jhTrack)) {
+                if ("USB DESCONECTADO".contentEquals(sourceExtraBadge.getText())) {
+                    String[] parts = jhTrack.path.split("/");
+                    if (parts.length >= 2) {
+                        sourceExtraBadge.setText(parts[parts.length - 2].toUpperCase(Locale.ROOT));
+                    } else {
+                        sourceExtraBadge.setText("USB 1");
+                    }
+                }
+            } else {
+                if (!"USB DESCONECTADO".contentEquals(sourceExtraBadge.getText())) {
+                    sourceExtraBadge.setText("USB DESCONECTADO");
+                }
+                if (isPlaying) setPlaying(false);
+            }
+        }
+    }
+
     private void onPlayPause() {
-        if (needsSongChoice()) return;
+        if (!checkPlaybackReady()) return;
         setPlaying(!isPlaying);
         if (!sourceBt) {
             audioGraceUntil = SystemClock.elapsedRealtime() + AUDIO_GRACE_MS;
@@ -921,15 +1023,8 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         }
     }
 
-    /** Sin canción cargada en JH Music play y saltar no hacen nada: avisa en vez de aparentar que funcionó. */
-    private boolean needsSongChoice() {
-        if (sourceBt || jhTrack != NO_TRACK) return false;
-        showToast("Elige una canción en JH Music");
-        return true;
-    }
-
     private void onSkip(boolean next) {
-        if (needsSongChoice()) return;
+        if (!checkPlaybackReady()) return;
         if (!sourceBt) {
             audioGraceUntil = SystemClock.elapsedRealtime() + AUDIO_GRACE_MS;
             sendMusicCommand(next ? "NEXT" : "PREV");
@@ -1021,9 +1116,9 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         return String.format(Locale.US, "%02d:%02d", sec / 60, sec % 60);
     }
 
-    /** Solo se puede adelantar una canción de JH Music con duración conocida (el audio Bluetooth no lo permite). */
+    /** Solo se puede adelantar una canción de JH Music con duración conocida y medio accesible. */
     private boolean canSeek(Track t) {
-        return !sourceBt && t != NO_TRACK && t != null && t.totalSec > 0;
+        return !sourceBt && t != NO_TRACK && t != null && t.totalSec > 0 && isTrackStorageAvailable(t);
     }
 
     private void setProgressFraction(float f) {
@@ -1344,6 +1439,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
 
     /** Aviso flotante propio (sin emojis: cargar la fuente de emojis cuesta varios MB). */
     private void showToast(String msg) {
+        android.util.Log.i("JH-LAUNCHER", "showToast: " + msg);
         launchToast.setText(msg);
         mainHandler.removeCallbacks(hideToast);
         if (launchToast.getVisibility() != View.VISIBLE) {
