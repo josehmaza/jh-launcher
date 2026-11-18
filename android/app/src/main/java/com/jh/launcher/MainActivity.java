@@ -168,6 +168,9 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     private int progressSec;
     private long progressTickAt;
     private Track jhTrack;
+    private boolean musicShuffle;
+    private View btnShuffleMusic;
+    private ImageView iconShuffleMusic;
     private long audioGraceUntil;
     private boolean muted;
     private int lastClockMinute = -1;
@@ -193,6 +196,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
                     intent.getIntExtra("extra_total_sec", 0));
             t.isPlaying = intent.getBooleanExtra("extra_is_playing", false);
             t.fromMix = intent.getBooleanExtra("extra_from_mix", false);
+            t.shuffle = intent.getBooleanExtra("extra_shuffle", musicShuffle);
             // JH Music 2.9.9+ manda la posición real; antes no la mandaba (-1: se sigue estimando)
             t.positionSec = intent.getIntExtra("extra_position_sec", -1);
             applyJhMusicData(t);
@@ -357,6 +361,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         registerReceiver(usbReceiver, usbFilter);
 
         refreshMuteState();
+        readSharedThemeIfChanged();
         progressTickAt = SystemClock.elapsedRealtime();
         mainHandler.postDelayed(audioCheck, 1000);
         mainHandler.postDelayed(progressTick, 1000);
@@ -528,6 +533,16 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
             else launchJhMusic(jhTrack != null && jhTrack != NO_TRACK && jhTrack.fromMix ? "mix" : "tracks");
         };
         findViewById(R.id.btnOpenMusic).setOnClickListener(openMusicListener);
+        btnShuffleMusic = findViewById(R.id.btnShuffleMusic);
+        iconShuffleMusic = findViewById(R.id.iconShuffleMusic);
+        if (btnShuffleMusic != null) {
+            btnShuffleMusic.setOnClickListener(v -> {
+                if (sourceBt) return;
+                musicShuffle = !musicShuffle;
+                updateShuffleButton();
+                sendMusicCommand("TOGGLE_SHUFFLE");
+            });
+        }
         if (vinylStage != null) vinylStage.setOnClickListener(openMusicListener);
         View artCover = findViewById(R.id.artCover);
         if (artCover != null) artCover.setOnClickListener(openMusicListener);
@@ -571,7 +586,47 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     // ------------------------------------------------------------------
 
     private void toggleTheme() {
-        applyTheme(!isLightTheme);
+        boolean nextLight = !isLightTheme;
+        applyTheme(nextLight);
+        syncSharedTheme(nextLight);
+    }
+
+    private void syncSharedTheme(boolean light) {
+        ioHandler.post(() -> {
+            try {
+                File f = new File(Environment.getExternalStorageDirectory(), ".jh_theme_state");
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(f)) {
+                    fos.write((light ? "light" : "dark").getBytes(StandardCharsets.UTF_8));
+                }
+            } catch (Throwable ignored) {}
+        });
+        try {
+            Intent intent = new Intent("com.jh.action.THEME_CHANGED");
+            intent.setPackage(JH_MUSIC_PKG);
+            intent.putExtra("extra_light_theme", light);
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+            sendBroadcast(intent);
+        } catch (Throwable ignored) {}
+    }
+
+    private void readSharedThemeIfChanged() {
+        ioHandler.post(() -> {
+            try {
+                File f = new File(Environment.getExternalStorageDirectory(), ".jh_theme_state");
+                if (!f.exists() || f.length() == 0 || f.length() > 64) return;
+                try (FileInputStream fis = new FileInputStream(f)) {
+                    byte[] buf = new byte[(int) f.length()];
+                    int n = fis.read(buf);
+                    if (n <= 0) return;
+                    String val = new String(buf, 0, n, StandardCharsets.UTF_8).trim();
+                    if ("light".equalsIgnoreCase(val) && !isLightTheme) {
+                        mainHandler.post(() -> applyTheme(true));
+                    } else if ("dark".equalsIgnoreCase(val) && isLightTheme) {
+                        mainHandler.post(() -> applyTheme(false));
+                    }
+                }
+            } catch (Throwable ignored) {}
+        });
     }
 
     private void applyTheme(boolean light) {
@@ -638,6 +693,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
 
         findViewById(R.id.btnOpenMusic).setBackground(palette.openButtonBg());
         ((ImageView) findViewById(R.id.iconOpenMusic)).setImageTintList(palette.openIconTint());
+        updateShuffleButton();
 
         if (vinylDisc != null) {
             vinylDisc.setImageBitmap(light ? vinylBitmapLight : vinylBitmapDark);
@@ -945,6 +1001,9 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         sourceBt = bt;
         btnSourceUsb.setSelected(!bt);
         btnSourceBt.setSelected(bt);
+        if (btnShuffleMusic != null) {
+            btnShuffleMusic.setVisibility(bt ? View.GONE : View.VISIBLE);
+        }
 
         if (!bt) {
             boolean usbAvailable = isTrackStorageAvailable(jhTrack);
@@ -1052,8 +1111,16 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         updateProgressUi();
     }
 
+    private void updateShuffleButton() {
+        if (btnShuffleMusic == null || iconShuffleMusic == null || palette == null) return;
+        btnShuffleMusic.setBackground(palette.shuffleButtonBg(musicShuffle));
+        iconShuffleMusic.setImageTintList(palette.shuffleIconTint(musicShuffle));
+    }
+
     private void applyJhMusicData(Track t) {
         if (t == null) return;
+        musicShuffle = t.shuffle;
+        updateShuffleButton();
         if (t.title.isEmpty()) {
             showNoTrack();
             return;
@@ -1107,6 +1174,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
                     json.optString("duration", "00:00"), json.optInt("totalSec"));
             t.isPlaying = json.optBoolean("isPlaying");
             t.fromMix = json.optBoolean("fromMix");
+            t.shuffle = json.optBoolean("shuffle");
             // Posición al escribir el archivo, más lo que siguió sonando desde entonces
             t.positionSec = json.optInt("positionSec", -1);
             long writtenAt = json.optLong("timestamp", 0);
@@ -1680,6 +1748,8 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         boolean isPlaying;
         /** La canción viene de Mi Mix (JH Music lo avisa en extra_from_mix y fromMix); false si no lo dice. */
         boolean fromMix;
+        /** Modo aleatorio activo en JH Music. */
+        boolean shuffle;
         /** Posición real que informó JH Music, o -1 si no la mandó (versiones viejas). */
         int positionSec = -1;
 

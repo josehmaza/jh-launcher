@@ -622,6 +622,26 @@
                             android:layout_height="wrap_content"
                             android:visibility="gone" />
 
+                        <!-- Botón Aleatorio (muestra estado actual de JH Music y lo alterna con un toque) -->
+                        <FrameLayout
+                            android:id="@+id/btnShuffleMusic"
+                            style="@style/HapticButton"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:layout_marginLeft="8dp"
+                            android:background="@drawable/bg_btn_haptic"
+                            android:contentDescription="Modo aleatorio">
+
+                            <ImageView
+                                android:id="@+id/iconShuffleMusic"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:duplicateParentState="true"
+                                android:src="@drawable/ic_shuffle"
+                                android:tint="@color/tint_haptic" />
+                        </FrameLayout>
+
                         <!-- Botón icono para ir a la app: grande para acertarlo con el auto en marcha -->
                         <FrameLayout
                             android:id="@+id/btnOpenMusic"

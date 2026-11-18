@@ -218,6 +218,28 @@ final class ThemePalette {
                 new int[]{pressedIcon, pressedIcon, text1});
     }
 
+    Drawable shuffleButtonBg(boolean active) {
+        StateListDrawable sld = new StateListDrawable();
+        if (active) {
+            int fill = light ? 0xFFDBEAFE : accentSoft;
+            int stroke = light ? 0xFF93C5FD : accentBorder;
+            sld.addState(new int[]{android.R.attr.state_pressed}, box(accent, accent, 12f));
+            sld.addState(new int[]{}, box(fill, stroke, 12f));
+        } else {
+            sld.addState(new int[]{android.R.attr.state_pressed}, box(accentSoft, accentBorder, 12f));
+            sld.addState(new int[]{}, box(surface2, border, 12f));
+        }
+        return sld;
+    }
+
+    ColorStateList shuffleIconTint(boolean active) {
+        int pressedIcon = light ? 0xFFFFFFFF : 0xFF06090F;
+        int normalIcon = active ? (light ? 0xFF1D4ED8 : accent) : textMuted;
+        return new ColorStateList(
+                new int[][]{{android.R.attr.state_pressed}, {}},
+                new int[]{pressedIcon, normalIcon});
+    }
+
     ColorStateList dockContentTint(boolean accentDefault) {
         int pressedColor = light ? 0xFFFFFFFF : 0xFF06090F;
         int normalColor = accentDefault ? accent : text2;
