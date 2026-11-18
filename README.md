@@ -2,7 +2,7 @@
 
 Launcher nativo, 100 % offline, para la pantalla de **1024 × 600** del radio Android (Autochips AC8227L, Android 8.1 aunque Ajustes diga 10) de la **Hyundai Tucson ix35 2013**. Reemplaza la pantalla de inicio de fábrica y reúne música, video y Bluetooth en una sola pantalla (la radio FM se abre con la app de fábrica), con botones grandes para usar manejando (el auto no tiene mandos en el volante).
 
-Versión actual: **1.7.0** · [Releases](https://github.com/josehmaza/jh-launcher/releases)
+Versión actual: **1.8.0** · [Releases](https://github.com/josehmaza/jh-launcher/releases)
 
 Va con [JH MUSIC](https://github.com/josehmaza/jh-music) (2.10.0 o superior) y [JH VIDEO](https://github.com/josehmaza/jh-video). JH RADIO ya no se usa.
 
@@ -41,6 +41,7 @@ Al lado de JH VIDEO queda un espacio vacío reservado para lo que se ponga ahí 
 |---|---|
 | **AUDIO / MUTED** | Silencio: baja el volumen a 0 y lo devuelve al de antes. No usa el silencio de Android, porque en este radio dejaba mudo el audio Bluetooth para siempre. |
 | **STEALTH** | Apaga la pantalla casi entera y deja la hora y la canción en tono tenue. Se sale tocando cualquier parte o con Atrás. |
+| **DÍA / NOCHE** | Alterna en 1 toque entre el **Tema Claro (Showroom)** y el **Tema Oscuro (Obsidian)**, además del cambio automático por horario (`06:30` Día / `18:30` Noche). |
 | **MÚSICA · VIDEOS · RADIO** | Abren JH MUSIC, JH VIDEO y la radio nativa de fábrica (`com.jancar.radio`). |
 | **LLAMADAS** | Abre la app de llamadas Bluetooth de fábrica (la busca por nombre: «llamada», «manos libres», «teléfono»). |
 | **APPS** | Cajón de apps propio. Arriba a la derecha, **LAUNCHER DE FÁBRICA** abre el launcher original (Launcher3). |
@@ -135,6 +136,17 @@ adb shell dumpsys gfxinfo com.jh.launcher
 adb shell dumpsys meminfo com.jh.launcher
 ```
 Anotar los resultados en «Resultados en el radio» de [ANALISIS-RENDIMIENTO.md](ANALISIS-RENDIMIENTO.md). Referencia del emulador: ~19 cuadros/s en reposo y 6 ms en el percentil 90.
+
+## Novedades de la 1.8.0
+
+- **Nuevo Tema Claro (Light Mode · Showroom Claro) y mejoras al Tema Dark:**
+  - **Tucson 2013 recortado sin fondo** en sus 6 vistas (3 ángulos en Negro Obsidiana y 3 en Gris Acero), posado sobre plataforma elíptica y cielo suave en Día o halo cian en Noche (`CarHaloView`).
+  - **Botón selector `DÍA / NOCHE`** en el dock inferior junto a `STEALTH` para cambiar de tema en 1 toque sin reiniciar la actividad, con conmutación automática a las `06:30` (Día) y `18:30` (Noche).
+  - **Cajón APPS** adaptado automáticamente al tema Claro u Oscuro activo.
+- **Vinilo Protagonista (`102 dp`) + Aguja y Controles Limpios:**
+  - Se eliminó el recuadro gris `artCover` que tapaba el disco: ahora el vinilo con reflejos y su aguja minimalista (`VinylArt`) son el centro de la tarjeta. En **Play** la aguja entra sobre el disco y se enciende el aro exterior; en **Pausa** se retira (0 % de gasto continuo de GPU).
+  - **Botones de transporte Limpios** (`⏮`, círculo suave `▶ / ⏸` y `⏭`) conservando intacta la franja táctil gigante invisible en toda la base de la tarjeta.
+- **Tarjeta JH VIDEO mejorada:** Incluye barra inferior de estado (`Reproductor MP4 local` + `USB 1 LISTO`).
 
 ## Novedades de la 1.7.0
 

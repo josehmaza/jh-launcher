@@ -16,6 +16,7 @@
 
         <!-- ============ 1. BARRA SUPERIOR (48dp) ============ -->
         <FrameLayout
+            android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="47dp"
             android:background="@color/bg_bar"
@@ -23,6 +24,7 @@
             android:paddingRight="20dp">
 
             <LinearLayout
+                android:id="@+id/brandPill"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
@@ -35,6 +37,7 @@
                 android:paddingBottom="5dp">
 
                 <com.jh.launcher.JhTextView
+                    android:id="@+id/brandHyundai"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:letterSpacing="0.136"
@@ -44,6 +47,7 @@
                     app:jhFont="brand" />
 
                 <com.jh.launcher.JhTextView
+                    android:id="@+id/brandModel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
@@ -149,6 +153,7 @@
         </FrameLayout>
 
         <View
+            android:id="@+id/topDivider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/border_subtle" />
@@ -166,6 +171,7 @@
 
             <!-- ===== COLUMNA IZQUIERDA: TUCSON 2013 ===== -->
             <LinearLayout
+                android:id="@+id/cardVehicle"
                 android:layout_width="420dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_card_vehicle"
@@ -187,6 +193,7 @@
                         android:orientation="vertical">
 
                         <com.jh.launcher.JhTextView
+                            android:id="@+id/greetingSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:letterSpacing="0.12"
@@ -196,6 +203,7 @@
                             app:jhFont="bold" />
 
                         <com.jh.launcher.JhTextView
+                            android:id="@+id/greetingTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -208,6 +216,7 @@
 
                     <!-- Selector de color Negro / Gris Acero -->
                     <LinearLayout
+                        android:id="@+id/colorSwitchBox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_color_switch"
@@ -232,6 +241,7 @@
                                 android:background="@drawable/bg_dot_black" />
 
                             <com.jh.launcher.JhTextView
+                                android:id="@+id/txtColorBlack"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="5dp"
@@ -261,6 +271,7 @@
                                 android:background="@drawable/bg_dot_grey" />
 
                             <com.jh.launcher.JhTextView
+                                android:id="@+id/txtColorGrey"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="5dp"
@@ -282,14 +293,13 @@
                     android:layout_marginBottom="6dp"
                     android:layout_weight="1">
 
-                    <!-- Resplandor bajo el auto (estático) -->
+                    <!-- Escenario Showroom / Halo bajo el auto (estático) -->
                     <com.jh.launcher.CarHaloView
+                        android:id="@+id/carHalo"
                         android:layout_width="match_parent"
-                        android:layout_height="110dp"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="22dp" />
+                        android:layout_height="match_parent" />
 
-                    <!-- Foto con los bordes fundidos (ver CarTurntable) -->
+                    <!-- Foto real recortada del Tucson (ver CarTurntable) -->
                     <ImageView
                         android:id="@+id/carImage"
                         android:layout_width="match_parent"
@@ -333,6 +343,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/spinBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|center_horizontal"
@@ -351,6 +362,7 @@
                             android:background="@drawable/bg_dot_cyan" />
 
                         <com.jh.launcher.JhTextView
+                            android:id="@+id/spinText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="6dp"
@@ -387,6 +399,7 @@
                             android:gravity="center_vertical">
 
                             <com.jh.launcher.JhTextView
+                                android:id="@+id/hwCpuLabel"
                                 style="@style/HwLabel"
                                 android:text="CPU" />
 
@@ -397,6 +410,7 @@
                         </LinearLayout>
 
                         <FrameLayout
+                            android:id="@+id/hwCpuTrack"
                             android:layout_width="match_parent"
                             android:layout_height="5dp"
                             android:layout_marginTop="5dp"
@@ -422,6 +436,7 @@
                             android:gravity="center_vertical">
 
                             <com.jh.launcher.JhTextView
+                                android:id="@+id/hwRamLabel"
                                 style="@style/HwLabel"
                                 android:text="RAM" />
 
@@ -432,6 +447,7 @@
                         </LinearLayout>
 
                         <FrameLayout
+                            android:id="@+id/hwRamTrack"
                             android:layout_width="match_parent"
                             android:layout_height="5dp"
                             android:layout_marginTop="5dp"
@@ -457,6 +473,7 @@
                             android:gravity="center_vertical">
 
                             <com.jh.launcher.JhTextView
+                                android:id="@+id/hwStorageLabel"
                                 style="@style/HwLabel"
                                 android:text="ALM" />
 
@@ -467,6 +484,7 @@
                         </LinearLayout>
 
                         <FrameLayout
+                            android:id="@+id/hwStorageTrack"
                             android:layout_width="match_parent"
                             android:layout_height="5dp"
                             android:layout_marginTop="5dp"
@@ -508,6 +526,7 @@
                         android:orientation="horizontal">
 
                         <LinearLayout
+                            android:id="@+id/sourceSelectorBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_source_selector"
@@ -527,6 +546,7 @@
                                 android:paddingBottom="6dp">
 
                                 <ImageView
+                                    android:id="@+id/iconSourceUsb"
                                     android:layout_width="15dp"
                                     android:layout_height="15dp"
                                     android:duplicateParentState="true"
@@ -534,6 +554,7 @@
                                     android:tint="@color/tint_selected_cyan" />
 
                                 <com.jh.launcher.JhTextView
+                                    android:id="@+id/txtSourceUsb"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginLeft="6dp"
@@ -559,6 +580,7 @@
                                 android:paddingBottom="6dp">
 
                                 <ImageView
+                                    android:id="@+id/iconSourceBt"
                                     android:layout_width="15dp"
                                     android:layout_height="15dp"
                                     android:duplicateParentState="true"
@@ -566,6 +588,7 @@
                                     android:tint="@color/tint_selected_cyan" />
 
                                 <com.jh.launcher.JhTextView
+                                    android:id="@+id/txtSourceBt"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginLeft="6dp"
@@ -603,14 +626,15 @@
                         <FrameLayout
                             android:id="@+id/btnOpenMusic"
                             style="@style/HapticButton"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
                             android:layout_marginLeft="8dp"
                             android:background="@drawable/bg_btn_haptic">
 
                             <ImageView
-                                android:layout_width="26dp"
-                                android:layout_height="26dp"
+                                android:id="@+id/iconOpenMusic"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
                                 android:layout_gravity="center"
                                 android:duplicateParentState="true"
                                 android:src="@drawable/ic_open_in_new"
@@ -635,7 +659,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1" />
 
-                    <!-- Reproduciendo ahora: carátula con vinilo + datos -->
+                    <!-- Reproduciendo ahora: Vinilo Protagonista (Propuesta A) + aguja + datos -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -644,32 +668,46 @@
                         android:orientation="horizontal">
 
                         <FrameLayout
-                            android:layout_width="86dp"
-                            android:layout_height="86dp"
-                            android:layout_marginRight="44dp"
+                            android:id="@+id/vinylStage"
+                            android:layout_width="108dp"
+                            android:layout_height="108dp"
+                            android:layout_marginRight="18dp"
                             android:clipChildren="false">
+
+                            <!-- Aro luminoso exterior (visible mientras reproduce) -->
+                            <View
+                                android:id="@+id/vinylRing"
+                                android:layout_width="108dp"
+                                android:layout_height="108dp" />
 
                             <ImageView
                                 android:id="@+id/vinylDisc"
-                                android:layout_width="78dp"
-                                android:layout_height="78dp"
-                                android:layout_marginLeft="6dp"
-                                android:layout_marginTop="4dp" />
+                                android:layout_width="102dp"
+                                android:layout_height="102dp"
+                                android:layout_gravity="center" />
 
-                            <!-- Carátula: borde cian mientras suena (estado "activated") -->
+                            <!-- Aguja / brazo minimalista (pivote arriba a la derecha) -->
+                            <ImageView
+                                android:id="@+id/vinylTonearm"
+                                android:layout_width="26dp"
+                                android:layout_height="56dp"
+                                android:layout_gravity="top|end"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginRight="-4dp"
+                                android:transformPivotX="17dp"
+                                android:transformPivotY="8dp" />
+
+                            <!-- Vistas legadas ocultas para compatibilidad -->
                             <FrameLayout
                                 android:id="@+id/artCover"
-                                android:layout_width="86dp"
-                                android:layout_height="86dp"
-                                android:background="@drawable/bg_art_cover">
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:visibility="gone">
 
                                 <ImageView
                                     android:id="@+id/artCoverIcon"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_disc"
-                                    android:tint="@color/accent_cyan" />
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp" />
                             </FrameLayout>
                         </FrameLayout>
 
@@ -701,8 +739,7 @@
                                 android:textSize="13dp"
                                 app:jhFont="semibold" />
 
-                            <!-- ● REPRODUCIENDO / EN PAUSA a la izquierda y el tiempo a la derecha (así la barra de
-                                 abajo usa todo el ancho). El punto late junto con el contador de tiempo -->
+                            <!-- ● REPRODUCIENDO / EN PAUSA a la izquierda y el tiempo a la derecha -->
                             <LinearLayout
                                 android:id="@+id/playStatus"
                                 android:layout_width="match_parent"
@@ -751,14 +788,14 @@
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
-                                <!-- Barra de tiempo táctil: tocar o arrastrar y soltar lleva JH Music a ese punto.
-                                     El área de toque es de 36dp de alto para acertarla con el auto en marcha -->
+                                <!-- Barra de tiempo táctil -->
                                 <FrameLayout
                                     android:id="@+id/musicProgressTouch"
                                     android:layout_width="match_parent"
                                     android:layout_height="36dp">
 
                                     <FrameLayout
+                                        android:id="@+id/musicProgressTrack"
                                         android:layout_width="match_parent"
                                         android:layout_height="8dp"
                                         android:layout_gravity="center_vertical"
@@ -787,69 +824,66 @@
                         android:layout_height="0dp"
                         android:layout_weight="1" />
 
-                    <!-- Controles gigantes centrados (Estilo JH Music) -->
+                    <!-- Controles Limpios + Franja táctil gigante invisible (navZoneAt) -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="64dp"
+                        android:layout_height="60dp"
                         android:gravity="center"
                         android:orientation="horizontal">
 
-                        <!-- Pista Anterior -->
+                        <!-- Pista Anterior (Limpio) -->
                         <FrameLayout
                             android:id="@+id/btnPrevTrack"
                             style="@style/HapticButton"
-                            android:layout_width="72dp"
-                            android:layout_height="56dp"
-                            android:background="@drawable/bg_btn_haptic">
+                            android:layout_width="68dp"
+                            android:layout_height="50dp">
 
                             <ImageView
+                                android:id="@+id/iconPrevTrack"
                                 android:layout_width="28dp"
                                 android:layout_height="28dp"
                                 android:layout_gravity="center"
                                 android:duplicateParentState="true"
-                                android:src="@drawable/ic_prev"
-                                android:tint="@color/tint_haptic" />
+                                android:src="@drawable/ic_prev" />
                         </FrameLayout>
 
-                        <!-- Play / Pausa: Más grande, prominente y con radio acentuado (estilo JH Music) -->
+                        <!-- Play / Pausa: Círculo suave moderno (58x58dp) -->
                         <FrameLayout
                             android:id="@+id/btnPlayPause"
                             style="@style/HapticButton"
-                            android:layout_width="106dp"
-                            android:layout_height="64dp"
-                            android:layout_marginLeft="24dp"
-                            android:layout_marginRight="24dp"
-                            android:background="@drawable/bg_btn_play">
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            android:layout_marginLeft="36dp"
+                            android:layout_marginRight="36dp">
 
                             <ImageView
                                 android:id="@+id/playPauseIcon"
-                                android:layout_width="34dp"
-                                android:layout_height="34dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_play"
-                                android:tint="#000000" />
-                        </FrameLayout>
-
-                        <!-- Pista Siguiente -->
-                        <FrameLayout
-                            android:id="@+id/btnNextTrack"
-                            style="@style/HapticButton"
-                            android:layout_width="72dp"
-                            android:layout_height="56dp"
-                            android:background="@drawable/bg_btn_haptic">
-
-                            <ImageView
                                 android:layout_width="28dp"
                                 android:layout_height="28dp"
                                 android:layout_gravity="center"
                                 android:duplicateParentState="true"
-                                android:src="@drawable/ic_next"
-                                android:tint="@color/tint_haptic" />
+                                android:src="@drawable/ic_play" />
+                        </FrameLayout>
+
+                        <!-- Pista Siguiente (Limpio) -->
+                        <FrameLayout
+                            android:id="@+id/btnNextTrack"
+                            style="@style/HapticButton"
+                            android:layout_width="68dp"
+                            android:layout_height="50dp">
+
+                            <ImageView
+                                android:id="@+id/iconNextTrack"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:layout_gravity="center"
+                                android:duplicateParentState="true"
+                                android:src="@drawable/ic_next" />
                         </FrameLayout>
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Fila inferior: JH Video + Radio FM -->
+                <!-- Fila inferior: JH Video + Hueco Chimuelo -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -858,8 +892,8 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
-                        android:layout_width="0dp"
                         android:id="@+id/cardJhVideo"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0.85"
                         android:background="@drawable/bg_card"
@@ -876,8 +910,8 @@
                             android:gravity="center_vertical">
 
                             <FrameLayout
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
                                 android:background="@drawable/bg_badge_video">
 
                                 <ImageView
@@ -890,11 +924,12 @@
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginLeft="14dp"
+                                android:layout_marginLeft="12dp"
                                 android:layout_weight="1"
                                 android:orientation="vertical">
 
                                 <com.jh.launcher.JhTextView
+                                    android:id="@+id/vidTitle"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:letterSpacing="0.02"
@@ -904,9 +939,10 @@
                                     app:jhFont="extrabold" />
 
                                 <com.jh.launcher.JhTextView
+                                    android:id="@+id/vidSub"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="3dp"
+                                    android:layout_marginTop="2dp"
                                     android:ellipsize="end"
                                     android:maxLines="1"
                                     android:text="Videos USB"
@@ -915,22 +951,63 @@
                                     app:jhFont="semibold" />
                             </LinearLayout>
 
-                            <!-- Mismo botón de abrir que JH Music y Radio: mismo ícono, tamaño y lugar -->
                             <FrameLayout
                                 android:id="@+id/btnLaunchJhVideo"
                                 style="@style/HapticButton"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
+                                android:layout_width="52dp"
+                                android:layout_height="52dp"
                                 android:background="@drawable/bg_btn_haptic">
 
                                 <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
+                                    android:id="@+id/iconLaunchJhVideo"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
                                     android:layout_gravity="center"
                                     android:duplicateParentState="true"
                                     android:src="@drawable/ic_open_in_new"
                                     android:tint="@color/tint_haptic" />
                             </FrameLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <View
+                            android:id="@+id/vidDivider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_subtle" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/vidFooterLabel"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Reproductor MP4 local"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11dp"
+                                app:jhFont="bold" />
+
+                            <com.jh.launcher.JhTextView
+                                android:id="@+id/vidReadyChip"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="8dp"
+                                android:paddingTop="3dp"
+                                android:paddingRight="8dp"
+                                android:paddingBottom="3dp"
+                                android:text="USB 1 LISTO"
+                                android:textSize="9dp"
+                                app:jhFont="bold" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -946,11 +1023,13 @@
 
         <!-- ============ 3. DOCK INFERIOR (64dp) ============ -->
         <View
+            android:id="@+id/bottomDivider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/border_subtle" />
 
         <LinearLayout
+            android:id="@+id/bottomDock"
             android:layout_width="match_parent"
             android:layout_height="63dp"
             android:background="@color/bg_bar"
@@ -982,12 +1061,32 @@
                 android:layout_marginLeft="8dp">
 
                 <ImageView
+                    android:id="@+id/stealthIcon"
                     style="@style/DockIcon"
                     android:src="@drawable/ic_moon" />
 
                 <com.jh.launcher.JhTextView
+                    android:id="@+id/stealthLabel"
                     style="@style/DockLabel"
                     android:text="STEALTH" />
+            </LinearLayout>
+
+            <!-- Botón selector Día (Light) / Noche (Dark) justo al lado de STEALTH -->
+            <LinearLayout
+                android:id="@+id/btnTheme"
+                style="@style/DockButton"
+                android:layout_width="68dp"
+                android:layout_marginLeft="8dp">
+
+                <ImageView
+                    android:id="@+id/themeIcon"
+                    style="@style/DockIcon"
+                    android:src="@drawable/ic_sun" />
+
+                <com.jh.launcher.JhTextView
+                    android:id="@+id/themeLabel"
+                    style="@style/DockLabel"
+                    android:text="DÍA" />
             </LinearLayout>
 
             <View
@@ -1005,17 +1104,20 @@
                     android:layout_width="match_parent">
 
                     <ImageView
+                        android:id="@+id/dockMusicIcon"
                         style="@style/DockIcon"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:src="@drawable/ic_note" />
 
                     <com.jh.launcher.JhTextView
+                        android:id="@+id/dockMusicLabel"
                         style="@style/DockLabel"
                         android:text="MÚSICA" />
                 </LinearLayout>
 
                 <View
+                    android:id="@+id/dockMusicDot"
                     android:layout_width="5dp"
                     android:layout_height="5dp"
                     android:layout_gravity="top|end"
@@ -1031,12 +1133,14 @@
                 android:layout_marginLeft="12dp">
 
                 <ImageView
+                    android:id="@+id/dockVideoIcon"
                     style="@style/DockIcon"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:src="@drawable/ic_video" />
 
                 <com.jh.launcher.JhTextView
+                    android:id="@+id/dockVideoLabel"
                     style="@style/DockLabel"
                     android:text="VIDEOS" />
             </LinearLayout>
@@ -1048,12 +1152,14 @@
                 android:layout_marginLeft="12dp">
 
                 <ImageView
+                    android:id="@+id/dockRadioIcon"
                     style="@style/DockIcon"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:src="@drawable/ic_radio" />
 
                 <com.jh.launcher.JhTextView
+                    android:id="@+id/dockRadioLabel"
                     style="@style/DockLabel"
                     android:text="RADIO" />
             </LinearLayout>
@@ -1065,12 +1171,14 @@
                 android:layout_marginLeft="12dp">
 
                 <ImageView
+                    android:id="@+id/dockBtIcon"
                     style="@style/DockIcon"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:src="@drawable/ic_bluetooth" />
 
                 <com.jh.launcher.JhTextView
+                    android:id="@+id/dockBtLabel"
                     style="@style/DockLabel"
                     android:text="LLAMADAS" />
             </LinearLayout>
@@ -1086,10 +1194,12 @@
                 android:layout_width="68dp">
 
                 <ImageView
+                    android:id="@+id/allAppsIcon"
                     style="@style/DockIcon"
                     android:src="@drawable/ic_apps" />
 
                 <com.jh.launcher.JhTextView
+                    android:id="@+id/allAppsLabel"
                     style="@style/DockLabel"
                     android:text="APPS" />
             </LinearLayout>
@@ -1101,10 +1211,12 @@
                 android:layout_marginLeft="8dp">
 
                 <ImageView
+                    android:id="@+id/settingsIcon"
                     style="@style/DockIcon"
                     android:src="@drawable/ic_settings" />
 
                 <com.jh.launcher.JhTextView
+                    android:id="@+id/settingsLabel"
                     style="@style/DockLabel"
                     android:text="AJUSTES" />
             </LinearLayout>
