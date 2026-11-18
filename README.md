@@ -41,7 +41,7 @@ Al lado de JH VIDEO queda un espacio vacío reservado para lo que se ponga ahí 
 |---|---|
 | **AUDIO / MUTED** | Silencio: baja el volumen a 0 y lo devuelve al de antes. No usa el silencio de Android, porque en este radio dejaba mudo el audio Bluetooth para siempre. |
 | **STEALTH** | Apaga la pantalla casi entera y deja la hora y la canción en tono tenue. Se sale tocando cualquier parte o con Atrás. |
-| **DÍA / NOCHE** | Alterna en 1 toque entre el **Tema Claro (Showroom)** y el **Tema Oscuro (Obsidian)**, además del cambio automático por horario (`06:30` Día / `18:30` Noche). |
+| **DÍA / NOCHE** | Alterna en 1 toque entre el **Tema Claro (Showroom)** y el **Tema Oscuro (Obsidian)**. Es 100 % manual y guarda el último tema elegido aunque se apague el auto. |
 | **MÚSICA · VIDEOS · RADIO** | Abren JH MUSIC, JH VIDEO y la radio nativa de fábrica (`com.jancar.radio`). |
 | **LLAMADAS** | Abre la app de llamadas Bluetooth de fábrica (la busca por nombre: «llamada», «manos libres», «teléfono»). |
 | **APPS** | Cajón de apps propio. Arriba a la derecha, **LAUNCHER DE FÁBRICA** abre el launcher original (Launcher3). |
@@ -141,7 +141,7 @@ Anotar los resultados en «Resultados en el radio» de [ANALISIS-RENDIMIENTO.md]
 
 - **Nuevo Tema Claro (Light Mode · Showroom Claro) y mejoras al Tema Dark:**
   - **Tucson 2013 recortado sin fondo** en sus 6 vistas (3 ángulos en Negro Obsidiana y 3 en Gris Acero), posado sobre plataforma elíptica y cielo suave en Día o halo cian en Noche (`CarHaloView`).
-  - **Botón selector `DÍA / NOCHE`** en el dock inferior junto a `STEALTH` para cambiar de tema en 1 toque sin reiniciar la actividad, con conmutación automática a las `06:30` (Día) y `18:30` (Noche).
+  - **Botón selector `DÍA / NOCHE`** en el dock inferior junto a `STEALTH` para cambiar de tema en 1 toque sin reiniciar la actividad (100 % manual y persistente al apagar y encender el auto).
   - **Cajón APPS** adaptado automáticamente al tema Claro u Oscuro activo.
 - **Vinilo Protagonista (`102 dp`) + Aguja y Controles Limpios:**
   - Se eliminó el recuadro gris `artCover` que tapaba el disco: ahora el vinilo con reflejos y su aguja minimalista (`VinylArt`) son el centro de la tarjeta. En **Play** la aguja entra sobre el disco y se enciende el aro exterior; en **Pausa** se retira (0 % de gasto continuo de GPU).
