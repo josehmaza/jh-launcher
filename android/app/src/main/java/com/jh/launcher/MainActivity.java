@@ -119,7 +119,6 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
 
     // Tema Claro (Showroom) / Oscuro (Obsidian) y Vinilo Protagonista (Propuesta A)
     private static final String PREF_THEME_LIGHT = "theme_light";
-    private static final String PREF_AUTO_SLOT = "theme_auto_slot";
     private boolean isLightTheme = true;
     private ThemePalette palette;
     private Bitmap vinylBitmapDark, vinylBitmapLight;
@@ -325,7 +324,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
 
         btnColorBlack.setSelected(true);
         findViewById(R.id.dockMusic).setActivated(true);
-        applyTheme(isLightTheme, false);
+        applyTheme(isLightTheme);
         setAudioSource(false);
 
         // Mantener el estado de JH Music al día aunque el launcher esté en segundo plano
@@ -549,7 +548,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     }
 
     // ------------------------------------------------------------------
-    // Reloj y cambio automático Día (06:30) / Noche (18:30)
+    // Reloj
     // ------------------------------------------------------------------
 
     private void updateClock() {
@@ -565,31 +564,17 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         stealthClock.setText(time);
         statusDate.setText(date);
         stealthDate.setText(date);
-
-        // Conmutación automática cuando cruza la frontera 06:30 (390 min) o 18:30 (1110 min)
-        int slot = (minuteOfDay >= 390 && minuteOfDay < 1110) ? 1 : 2;
-        android.content.SharedPreferences prefs = getSharedPreferences("jh_launcher", MODE_PRIVATE);
-        int lastSlot = prefs.getInt(PREF_AUTO_SLOT, 0);
-        if (lastSlot == 0) {
-            prefs.edit().putInt(PREF_AUTO_SLOT, slot).apply();
-        } else if (lastSlot != slot) {
-            prefs.edit().putInt(PREF_AUTO_SLOT, slot).apply();
-            boolean shouldBeLight = (slot == 1);
-            if (isLightTheme != shouldBeLight) {
-                applyTheme(shouldBeLight, true);
-            }
-        }
     }
 
     // ------------------------------------------------------------------
-    // Tema Claro (Showroom) / Oscuro (Obsidian)
+    // Tema Claro (Showroom) / Oscuro (Obsidian) — 100 % manual y persistente
     // ------------------------------------------------------------------
 
     private void toggleTheme() {
-        applyTheme(!isLightTheme, true);
+        applyTheme(!isLightTheme);
     }
 
-    private void applyTheme(boolean light, boolean notify) {
+    private void applyTheme(boolean light) {
         isLightTheme = light;
         getSharedPreferences("jh_launcher", MODE_PRIVATE).edit().putBoolean(PREF_THEME_LIGHT, light).apply();
         palette = new ThemePalette(light, density);
@@ -714,10 +699,6 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         gestureHudLabel.setTextColor(palette.text1);
         gestureHudBar.setBackground(palette.box(palette.trackBg, 0, 3f));
         gestureHudBarFill.setBackground(palette.box(palette.accent, 0, 3f));
-
-        if (notify) {
-            showToast(light ? "Tema Claro (Día) activado" : "Tema Oscuro (Noche) activado");
-        }
     }
 
     private void styleDockBtn(int btnId, int iconId, int labelId, boolean accentBorder) {
