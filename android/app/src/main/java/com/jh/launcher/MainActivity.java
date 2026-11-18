@@ -11,6 +11,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.media.AudioManager;
@@ -115,6 +116,19 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     private TextView usb1Text, usb2Text;
     private View artCover, playStatus, playStatusDot;
     private TextView playStatusText;
+
+    // Tema Claro (Showroom) / Oscuro (Obsidian) y Vinilo Protagonista (Propuesta A)
+    private static final String PREF_THEME_LIGHT = "theme_light";
+    private static final String PREF_AUTO_SLOT = "theme_auto_slot";
+    private boolean isLightTheme = true;
+    private ThemePalette palette;
+    private Bitmap vinylBitmapDark, vinylBitmapLight;
+    private Bitmap tonearmBitmapDark, tonearmBitmapLight;
+    private CarHaloView carHalo;
+    private View vinylStage, vinylRing, btnTheme;
+    private ImageView vinylTonearm, themeIcon;
+    private TextView themeLabel, vidReadyChip;
+    private boolean lastUsb1State, lastUsb2State;
 
     // Zonas táctiles gigantes de música (Estilo JH Music para manejo a ciegas)
     private static final int PLAY_ZONE_EXTRA_DP = 12;
@@ -292,11 +306,26 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
                 findViewById(R.id.angleDot0), findViewById(R.id.angleDot1), findViewById(R.id.angleDot2)});
         turntable.preload(getAssets(), ioHandler);
 
-        int vinylPx = Math.round(78 * density);
-        vinylDisc.setImageBitmap(VinylArt.create(vinylPx));
+        int vinylPx = Math.round(102 * density);
+        vinylBitmapDark = VinylArt.create(vinylPx, false);
+        vinylBitmapLight = VinylArt.create(vinylPx, true);
+        int armW = Math.round(26 * density);
+        int armH = Math.round(56 * density);
+        tonearmBitmapDark = VinylArt.createTonearm(armW, armH, false);
+        tonearmBitmapLight = VinylArt.createTonearm(armW, armH, true);
+
+        isLightTheme = getSharedPreferences("jh_launcher", MODE_PRIVATE).getBoolean(PREF_THEME_LIGHT, true);
+        if (vinylTonearm != null) vinylTonearm.setRotation(-22f);
+        if (vinylRing != null) vinylRing.setAlpha(0f);
+        if (vinylDisc != null) {
+            vinylDisc.setScaleX(0.96f);
+            vinylDisc.setScaleY(0.96f);
+            vinylDisc.setAlpha(0.82f);
+        }
 
         btnColorBlack.setSelected(true);
         findViewById(R.id.dockMusic).setActivated(true);
+        applyTheme(isLightTheme, false);
         setAudioSource(false);
 
         // Mantener el estado de JH Music al día aunque el launcher esté en segundo plano
@@ -474,6 +503,14 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         btnPlayPause = findViewById(R.id.btnPlayPause);
         btnPrevTrack = findViewById(R.id.btnPrevTrack);
         btnNextTrack = findViewById(R.id.btnNextTrack);
+        carHalo = findViewById(R.id.carHalo);
+        vinylStage = findViewById(R.id.vinylStage);
+        vinylRing = findViewById(R.id.vinylRing);
+        vinylTonearm = findViewById(R.id.vinylTonearm);
+        btnTheme = findViewById(R.id.btnTheme);
+        themeIcon = findViewById(R.id.themeIcon);
+        themeLabel = findViewById(R.id.themeLabel);
+        vidReadyChip = findViewById(R.id.vidReadyChip);
     }
 
     private void bindActions() {
@@ -492,6 +529,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
             else launchJhMusic(jhTrack != null && jhTrack != NO_TRACK && jhTrack.fromMix ? "mix" : "tracks");
         };
         findViewById(R.id.btnOpenMusic).setOnClickListener(openMusicListener);
+        if (vinylStage != null) vinylStage.setOnClickListener(openMusicListener);
         View artCover = findViewById(R.id.artCover);
         if (artCover != null) artCover.setOnClickListener(openMusicListener);
 
@@ -500,6 +538,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
 
         findViewById(R.id.btnMute).setOnClickListener(v -> toggleMute());
         findViewById(R.id.btnStealth).setOnClickListener(v -> enterStealth());
+        if (btnTheme != null) btnTheme.setOnClickListener(v -> toggleTheme());
         stealthOverlay.setOnClickListener(v -> exitStealth());
         findViewById(R.id.dockMusic).setOnClickListener(v -> launchJhMusic(null));
         findViewById(R.id.dockVideo).setOnClickListener(v -> launchJhVideo());
@@ -510,7 +549,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     }
 
     // ------------------------------------------------------------------
-    // Reloj
+    // Reloj y cambio automático Día (06:30) / Noche (18:30)
     // ------------------------------------------------------------------
 
     private void updateClock() {
@@ -526,6 +565,175 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         stealthClock.setText(time);
         statusDate.setText(date);
         stealthDate.setText(date);
+
+        // Conmutación automática cuando cruza la frontera 06:30 (390 min) o 18:30 (1110 min)
+        int slot = (minuteOfDay >= 390 && minuteOfDay < 1110) ? 1 : 2;
+        android.content.SharedPreferences prefs = getSharedPreferences("jh_launcher", MODE_PRIVATE);
+        int lastSlot = prefs.getInt(PREF_AUTO_SLOT, 0);
+        if (lastSlot == 0) {
+            prefs.edit().putInt(PREF_AUTO_SLOT, slot).apply();
+        } else if (lastSlot != slot) {
+            prefs.edit().putInt(PREF_AUTO_SLOT, slot).apply();
+            boolean shouldBeLight = (slot == 1);
+            if (isLightTheme != shouldBeLight) {
+                applyTheme(shouldBeLight, true);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Tema Claro (Showroom) / Oscuro (Obsidian)
+    // ------------------------------------------------------------------
+
+    private void toggleTheme() {
+        applyTheme(!isLightTheme, true);
+    }
+
+    private void applyTheme(boolean light, boolean notify) {
+        isLightTheme = light;
+        getSharedPreferences("jh_launcher", MODE_PRIVATE).edit().putBoolean(PREF_THEME_LIGHT, light).apply();
+        palette = new ThemePalette(light, density);
+
+        getWindow().getDecorView().setBackgroundColor(palette.winBg);
+        mainContent.setBackgroundColor(palette.winBg);
+
+        // 1. Barra superior
+        findViewById(R.id.topBar).setBackgroundColor(palette.barBg);
+        findViewById(R.id.topDivider).setBackgroundColor(palette.border);
+        findViewById(R.id.brandPill).setBackground(palette.box(palette.surface2, palette.border, 8f));
+        ((TextView) findViewById(R.id.brandHyundai)).setTextColor(palette.accent);
+        ((TextView) findViewById(R.id.brandModel)).setTextColor(palette.text1);
+        statusClock.setTextColor(palette.text1);
+        statusDate.setTextColor(palette.accent);
+        updateUsbIndicators(lastUsb1State, lastUsb2State);
+
+        // 2. Tarjeta del vehículo
+        findViewById(R.id.cardVehicle).setBackground(
+                palette.gradientCard(palette.cardVehTop, palette.cardVehBot, palette.border, 14f));
+        ((TextView) findViewById(R.id.greetingSubtitle)).setTextColor(palette.accent);
+        ((TextView) findViewById(R.id.greetingTitle)).setTextColor(palette.text1);
+        findViewById(R.id.colorSwitchBox).setBackground(palette.box(palette.surface2, palette.border, 20f));
+        btnColorBlack.setBackground(palette.selectableTab(14f));
+        btnColorGrey.setBackground(palette.selectableTab(14f));
+        ((TextView) findViewById(R.id.txtColorBlack)).setTextColor(palette.selectableText());
+        ((TextView) findViewById(R.id.txtColorGrey)).setTextColor(palette.selectableText());
+
+        if (carHalo != null) carHalo.setLightMode(light);
+        findViewById(R.id.angleDot0).setBackground(palette.angleDotBg());
+        findViewById(R.id.angleDot1).setBackground(palette.angleDotBg());
+        findViewById(R.id.angleDot2).setBackground(palette.angleDotBg());
+        findViewById(R.id.spinBadge).setBackground(palette.box(palette.accentSoft, palette.accentBorder, 20f));
+        spinDot.setBackground(palette.circle(palette.accent, 0, 0f));
+        ((TextView) findViewById(R.id.spinText)).setTextColor(palette.accent);
+
+        findViewById(R.id.hwBar).setBackground(palette.box(palette.surface2, palette.border, 10f));
+        ((TextView) findViewById(R.id.hwCpuLabel)).setTextColor(palette.text2);
+        ((TextView) findViewById(R.id.hwRamLabel)).setTextColor(palette.text2);
+        ((TextView) findViewById(R.id.hwStorageLabel)).setTextColor(palette.text2);
+        hwCpuVal.setTextColor(palette.text1);
+        hwRamVal.setTextColor(palette.text1);
+        hwStorageVal.setTextColor(palette.text1);
+        findViewById(R.id.hwCpuTrack).setBackground(palette.box(palette.trackBg, 0, 3f));
+        findViewById(R.id.hwRamTrack).setBackground(palette.box(palette.trackBg, 0, 3f));
+        findViewById(R.id.hwStorageTrack).setBackground(palette.box(palette.trackBg, 0, 3f));
+        hwCpuFill.setBackground(palette.box(palette.accent, 0, 3f));
+        hwRamFill.setBackground(palette.box(palette.emerald, 0, 3f));
+        hwStorageFill.setBackground(palette.box(palette.amber, 0, 3f));
+
+        // 3. Tarjeta de música (Propuesta A: Vinilo Protagonista + Controles Limpios)
+        int musicStroke = light ? palette.border : palette.accentBorder;
+        cardMusic.setBackground(palette.gradientCard(palette.cardMusicTop, palette.cardMusicBot, musicStroke, 14f));
+        findViewById(R.id.sourceSelectorBox).setBackground(palette.box(palette.surface2, palette.border, 10f));
+        btnSourceUsb.setBackground(palette.selectableTab(7f));
+        btnSourceBt.setBackground(palette.selectableTab(7f));
+        ((ImageView) findViewById(R.id.iconSourceUsb)).setImageTintList(palette.selectableIcon());
+        ((ImageView) findViewById(R.id.iconSourceBt)).setImageTintList(palette.selectableIcon());
+        ((TextView) findViewById(R.id.txtSourceUsb)).setTextColor(palette.selectableText());
+        ((TextView) findViewById(R.id.txtSourceBt)).setTextColor(palette.selectableText());
+
+        findViewById(R.id.btnOpenMusic).setBackground(palette.openButtonBg());
+        ((ImageView) findViewById(R.id.iconOpenMusic)).setImageTintList(palette.openIconTint());
+
+        if (vinylDisc != null) {
+            vinylDisc.setImageBitmap(light ? vinylBitmapLight : vinylBitmapDark);
+        }
+        if (vinylTonearm != null) {
+            vinylTonearm.setImageBitmap(light ? tonearmBitmapLight : tonearmBitmapDark);
+        }
+        if (vinylRing != null) {
+            vinylRing.setBackground(palette.circle(0x00000000, palette.accent, 2f));
+        }
+
+        trackTitle.setTextColor(palette.text1);
+        trackArtist.setTextColor(palette.text2);
+        updatePlayStatusColors();
+        timeReadout.setTextColor(palette.text2);
+        findViewById(R.id.musicProgressTrack).setBackground(palette.box(palette.trackBg, 0, 4f));
+        musicProgressFill.setBackground(palette.box(palette.accent, 0, 4f));
+        musicProgressThumb.setBackground(palette.circle(0xFFFFFFFF, palette.accent, 3f));
+
+        btnPrevTrack.setBackground(palette.cleanSkipBg());
+        ((ImageView) findViewById(R.id.iconPrevTrack)).setImageTintList(palette.cleanSkipIconTint());
+        btnPlayPause.setBackground(palette.cleanPlayBg());
+        playPauseIcon.setImageTintList(palette.cleanPlayIconTint());
+        btnNextTrack.setBackground(palette.cleanSkipBg());
+        ((ImageView) findViewById(R.id.iconNextTrack)).setImageTintList(palette.cleanSkipIconTint());
+
+        // 4. Tarjeta JH Video
+        findViewById(R.id.cardJhVideo).setBackground(palette.box(palette.cardBg, palette.border, 14f));
+        ((TextView) findViewById(R.id.vidTitle)).setTextColor(palette.text1);
+        ((TextView) findViewById(R.id.vidSub)).setTextColor(palette.text2);
+        findViewById(R.id.btnLaunchJhVideo).setBackground(palette.openButtonBg());
+        ((ImageView) findViewById(R.id.iconLaunchJhVideo)).setImageTintList(palette.openIconTint());
+        findViewById(R.id.vidDivider).setBackgroundColor(palette.border);
+        ((TextView) findViewById(R.id.vidFooterLabel)).setTextColor(palette.text2);
+
+        // 5. Dock inferior (con botón selector Día/Noche junto a STEALTH)
+        findViewById(R.id.bottomDivider).setBackgroundColor(palette.border);
+        findViewById(R.id.bottomDock).setBackgroundColor(palette.barBg);
+
+        styleDockBtn(R.id.btnStealth, R.id.stealthIcon, R.id.stealthLabel, false);
+        styleDockBtn(R.id.btnTheme, R.id.themeIcon, R.id.themeLabel, true);
+        if (themeIcon != null) themeIcon.setImageResource(light ? R.drawable.ic_sun : R.drawable.ic_moon);
+        if (themeLabel != null) themeLabel.setText(light ? "DÍA" : "NOCHE");
+
+        styleDockBtn(R.id.dockMusic, R.id.dockMusicIcon, R.id.dockMusicLabel, false);
+        findViewById(R.id.dockMusicDot).setBackground(palette.circle(palette.accent, 0, 0f));
+        styleDockBtn(R.id.dockVideo, R.id.dockVideoIcon, R.id.dockVideoLabel, false);
+        styleDockBtn(R.id.dockRadio, R.id.dockRadioIcon, R.id.dockRadioLabel, false);
+        styleDockBtn(R.id.dockBluetooth, R.id.dockBtIcon, R.id.dockBtLabel, false);
+        styleDockBtn(R.id.btnAllApps, R.id.allAppsIcon, R.id.allAppsLabel, false);
+        styleDockBtn(R.id.btnSettings, R.id.settingsIcon, R.id.settingsLabel, false);
+        updateMuteUi();
+
+        // 6. Toast y HUD de gestos
+        launchToast.setBackground(palette.box(palette.cardBg, palette.accentBorder, 24f));
+        launchToast.setTextColor(palette.text1);
+        gestureHud.setBackground(palette.circle(palette.cardBg, palette.accentBorder, 2f));
+        gestureHudIcon.setColorFilter(palette.accent);
+        gestureHudLabel.setTextColor(palette.text1);
+        gestureHudBar.setBackground(palette.box(palette.trackBg, 0, 3f));
+        gestureHudBarFill.setBackground(palette.box(palette.accent, 0, 3f));
+
+        if (notify) {
+            showToast(light ? "Tema Claro (Día) activado" : "Tema Oscuro (Noche) activado");
+        }
+    }
+
+    private void styleDockBtn(int btnId, int iconId, int labelId, boolean accentBorder) {
+        View btn = findViewById(btnId);
+        if (btn != null) btn.setBackground(palette.dockBtnBg(accentBorder));
+        ImageView icon = findViewById(iconId);
+        if (icon != null) icon.setImageTintList(palette.dockIconTint(accentBorder));
+        TextView label = findViewById(labelId);
+        if (label != null) label.setTextColor(palette.dockContentTint(accentBorder));
+    }
+
+    private void updatePlayStatusColors() {
+        if (palette == null) return;
+        int c = isPlaying ? palette.accent : palette.textMuted;
+        playStatusDot.setBackground(palette.circle(c, 0, 0f));
+        playStatusText.setTextColor(c);
     }
 
     // ------------------------------------------------------------------
@@ -550,22 +758,30 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     }
 
     private void updateUsbIndicators(boolean usb1, boolean usb2) {
+        lastUsb1State = usb1;
+        lastUsb2State = usb2;
         setUsbIndicatorState(usb1Badge, usb1Icon, usb1Text, usb1);
         setUsbIndicatorState(usb2Badge, usb2Icon, usb2Text, usb2);
+        if (vidReadyChip != null && palette != null) {
+            boolean any = usb1 || usb2;
+            vidReadyChip.setText(usb1 ? "USB 1 LISTO" : usb2 ? "USB 2 LISTO" : "SIN USB");
+            vidReadyChip.setTextColor(any ? palette.emerald : palette.textMuted);
+            vidReadyChip.setBackground(palette.box(
+                    any ? palette.emeraldSoft : palette.surface2,
+                    any ? palette.emeraldBorder : palette.border, 10f));
+        }
     }
 
     private void setUsbIndicatorState(View badge, ImageView icon, TextView text, boolean active) {
-        if (badge == null || icon == null || text == null) return;
+        if (badge == null || icon == null || text == null || palette == null) return;
         if (active) {
-            badge.setBackgroundResource(R.drawable.bg_usb_active);
-            int color = getResources().getColor(R.color.accent_emerald);
-            icon.setColorFilter(color);
-            text.setTextColor(color);
+            badge.setBackground(palette.box(palette.emeraldSoft, palette.emeraldBorder, 6f));
+            icon.setColorFilter(palette.emerald);
+            text.setTextColor(palette.emerald);
         } else {
-            badge.setBackgroundResource(R.drawable.bg_pill);
-            int color = getResources().getColor(R.color.text_muted);
-            icon.setColorFilter(color);
-            text.setTextColor(color);
+            badge.setBackground(palette.box(palette.surface2, palette.border, 6f));
+            icon.setColorFilter(palette.textMuted);
+            text.setTextColor(palette.textMuted);
         }
     }
 
@@ -1057,15 +1273,26 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         playPauseIcon.setImageResource(playing ? R.drawable.ic_pause : R.drawable.ic_play);
         if (!changed) return;
 
-        // Indicador de reproducción sin animaciones continuas (opción B "latido con el segundero"):
-        // vinilo fuera de la carátula pero quieto, carátula iluminada y "● REPRODUCIENDO".
-        // Un vinilo girando obligaba a repintar la pantalla entera ~56 veces por segundo
-        artCover.setActivated(playing);
+        // Propuesta A (Vinilo Protagonista + aguja): cero giro continuo en Mali-400.
+        // En Play la aguja entra sobre el disco y se enciende el aro exterior; en Pausa la aguja se retira.
         playStatus.setActivated(playing);
         playStatusText.setText(playing ? "REPRODUCIENDO" : "EN PAUSA");
         playStatusDot.setAlpha(1f);
-        vinylDisc.animate().translationX(playing ? 20 * density : 0f).setDuration(500)
-                .setInterpolator(new OvershootInterpolator(1.4f));
+        updatePlayStatusColors();
+        if (vinylRing != null) {
+            vinylRing.animate().alpha(playing ? 1f : 0f).setDuration(280).setInterpolator(EASE);
+        }
+        if (vinylDisc != null) {
+            vinylDisc.animate()
+                    .scaleX(playing ? 1f : 0.96f)
+                    .scaleY(playing ? 1f : 0.96f)
+                    .alpha(playing ? 1f : 0.82f)
+                    .setDuration(320).setInterpolator(EASE);
+        }
+        if (vinylTonearm != null) {
+            vinylTonearm.animate().rotation(playing ? 8f : -22f).setDuration(360)
+                    .setInterpolator(new OvershootInterpolator(1.2f));
+        }
     }
 
     /**
@@ -1246,13 +1473,20 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     }
 
     private void updateMuteUi() {
-        ColorStateList color = muted
+        if (palette == null) return;
+        View btn = findViewById(R.id.btnMute);
+        if (btn != null) btn.setBackground(palette.dockBtnBg(false));
+        ColorStateList iconColor = muted
                 ? new ColorStateList(new int[][]{{android.R.attr.state_pressed}, {}},
-                new int[]{Color.BLACK, getResources().getColor(R.color.accent_crimson)})
-                : getResources().getColorStateList(R.color.tint_dock);
+                new int[]{palette.light ? Color.WHITE : Color.BLACK, palette.crimson})
+                : palette.dockIconTint(false);
+        ColorStateList labelColor = muted
+                ? new ColorStateList(new int[][]{{android.R.attr.state_pressed}, {}},
+                new int[]{palette.light ? Color.WHITE : Color.BLACK, palette.crimson})
+                : palette.dockContentTint(false);
         muteIcon.setImageResource(muted ? R.drawable.ic_volume_off : R.drawable.ic_volume);
-        muteIcon.setImageTintList(color);
-        muteLabel.setTextColor(color);
+        muteIcon.setImageTintList(iconColor);
+        muteLabel.setTextColor(labelColor);
         muteLabel.setText(muted ? "MUTED" : "AUDIO");
     }
 

@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maqueta Definitiva 1024×600 · JH Launcher (Light Showroom & Dark Moderno)</title>
+<style>
+  @font-face{font-family:"Jakarta";src:url(fonts/plus-jakarta-sans-latin-500-normal.woff2) format("woff2");font-weight:500}
+  @font-face{font-family:"Jakarta";src:url(fonts/plus-jakarta-sans-latin-600-normal.woff2) format("woff2");font-weight:600}
+  @font-face{font-family:"Jakarta";src:url(fonts/plus-jakarta-sans-latin-700-normal.woff2) format("woff2");font-weight:700}
+  @font-face{font-family:"Jakarta";src:url(fonts/plus-jakarta-sans-latin-800-normal.woff2) format("woff2");font-weight:800}
+  @font-face{font-family:"JBMono";src:url(fonts/jetbrains-mono-latin-700-normal.woff2) format("woff2");font-weight:700}
+  @font-face{font-family:"JBMono";src:url(fonts/jetbrains-mono-latin-800-normal.woff2) format("woff2");font-weight:800}
+
+  :root{
+    --page-bg:#cdd8e7;
+    --page-text:#0f172a;
+    --page-muted:#475569;
+
+    /* ====== TEMA LIGHT (OPCIÓN 1 · SHOWROOM CLARO) ====== */
+    --win-bg:#e8eef6;
+    --bar-bg:#f4f7fb;
+    --card-bg:#ffffff;
+    --card-veh-bg:linear-gradient(180deg,#ffffff 0%,#f5f9ff 100%);
+    --card-music-bg:linear-gradient(180deg,#ffffff 0%,#f7fafe 100%);
+    --surface-2:#eef2f8;
+    --surface-3:#e2e8f0;
+    --border:#d8e1ec;
+    --card-shadow:0 8px 24px rgba(15,23,42,.06);
+
+    --accent:#2563eb;
+    --accent-soft:rgba(37,99,235,.11);
+    --accent-border:rgba(37,99,235,.40);
+
+    --emerald:#059669;
+    --emerald-soft:rgba(5,150,105,.10);
+    --emerald-border:rgba(5,150,105,.35);
+    --amber:#d97706;
+    --coral:#ef4444;
+
+    --text-1:#0f172a;
+    --text-2:#64748b;
+    --text-muted:#94a3b8;
+    --track-bg:#e2e8f0;
+
+    --vinyl-rim:rgba(37,99,235,.35);
+    --vinyl-label:#2563eb;
+    --vinyl-ring:#60a5fa;
+  }
+
+  /* ====== TEMA DARK MODERNO ====== */
+  .screen.dark{
+    --win-bg:#080b10;
+    --bar-bg:#090d14;
+    --card-bg:#0e131c;
+    --card-veh-bg:radial-gradient(ellipse at 50% 62%,#0f2130 0%,#0c1017 75%);
+    --card-music-bg:linear-gradient(135deg,#141a26 0%,#0c1017 100%);
+    --surface-2:#131924;
+    --surface-3:#1b2434;
+    --border:rgba(255,255,255,.08);
+    --card-shadow:0 12px 28px rgba(0,0,0,.45);
+
+    --accent:#00d2ff;
+    --accent-soft:rgba(0,210,255,.13);
+    --accent-border:rgba(0,210,255,.48);
+
+    --emerald:#00e676;
+    --emerald-soft:rgba(0,230,118,.10);
+    --emerald-border:rgba(0,230,118,.40);
+    --amber:#ffaa00;
+    --coral:#ff4757;
+
+    --text-1:#ffffff;
+    --text-2:#94a3b8;
+    --text-muted:#526077;
+    --track-bg:rgba(255,255,255,.10);
+
+    --vinyl-rim:rgba(0,210,255,.55);
+    --vinyl-label:#0066ff;
+    --vinyl-ring:#00d2ff;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--page-bg);
+    color:var(--page-text);
+    font-family:"Jakarta",system-ui,sans-serif;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+    transition:background .25s ease;
+  }
+  body.dark-page{
+    --page-bg:#04060a;
+    --page-text:#e2e8f0;
+    --page-muted:#94a3b8;
+  }
+
+  /* Barra externa de pruebas de la maqueta */
+  .controls-bar{
+    width:1024px;
+    max-width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .controls-bar h1{font-size:17px;font-weight:800}
+  .controls-bar p{font-size:12px;color:var(--page-muted);margin-top:2px}
+  .seg-group{display:flex;flex-wrap:wrap;gap:8px}
+  .seg{
+    display:inline-flex;
+    background:rgba(255,255,255,.9);
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    padding:3px;
+    gap:3px;
+  }
+  body.dark-page .seg{background:#121722;border-color:rgba(255,255,255,.12)}
+  .seg button{
+    border:0;
+    background:transparent;
+    color:#475569;
+    font:700 11.5px/1 "Jakarta",sans-serif;
+    padding:7px 11px;
+    border-radius:7px;
+    cursor:pointer;
+  }
+  body.dark-page .seg button{color:#94a3b8}
+  .seg button.active{
+    background:#2563eb;
+    color:#fff;
+  }
+
+  /* ====== PANTALLA RADIO TUCSON 1024 x 600 ====== */
+  .screen{
+    width:1024px;
+    height:600px;
+    background:var(--win-bg);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 24px 60px rgba(15,23,42,.28),0 0 0 1px rgba(15,23,42,.12);
+    display:flex;
+    flex-direction:column;
+    user-select:none;
+    color:var(--text-1);
+    position:relative;
+    transition:background .22s ease,color .22s ease;
+  }
+
+  /* 1. BARRA SUPERIOR (48px) */
+  .topbar{
+    height:48px;
+    background:var(--bar-bg);
+    border-bottom:1px solid var(--border);
+    padding:0 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:relative;
+    flex-shrink:0;
+  }
+  .brand-pill{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:5px 12px;
+    border-radius:8px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    font-size:11px;
+    font-weight:800;
+  }
+  .brand-pill b{color:var(--accent);letter-spacing:.13em}
+  .brand-pill span{color:var(--text-1);letter-spacing:.04em}
+
+  .clock-wrap{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    text-align:center;
+    line-height:1;
+  }
+  .clock-time{font-family:"JBMono",monospace;font-size:20px;font-weight:800;letter-spacing:.05em}
+  .clock-date{font-size:9px;font-weight:800;color:var(--accent);letter-spacing:.13em;margin-top:3px}
+
+  .top-right{display:flex;align-items:center;gap:6px}
+  .usb-pill{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    padding:4px 9px;
+    border-radius:8px;
+    font-size:10px;
+    font-weight:700;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    color:var(--text-muted);
+  }
+  .usb-pill.on{
+    color:var(--emerald);
+    background:var(--emerald-soft);
+    border-color:var(--emerald-border);
+  }
+
+  /* 2. CUERPO PRINCIPAL (488px) */
+  .body{
+    flex:1;
+    padding:12px 14px;
+    display:flex;
+    gap:12px;
+    min-height:0;
+  }
+
+  /* ===== COLUMNA IZQUIERDA: TUCSON 2013 (420px) ===== */
+  .card-veh{
+    width:420px;
+    background:var(--card-veh-bg);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    box-shadow:var(--card-shadow);
+    position:relative;
+  }
+  .veh-head{display:flex;align-items:flex-start;justify-content:space-between;z-index:2}
+  .veh-sub{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+  .veh-title{font-size:24px;font-weight:800;letter-spacing:-.012em;margin-top:3px}
+
+  .color-switch{
+    display:flex;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:2px;
+    gap:3px;
+  }
+  .color-opt{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:700;
+    color:var(--text-2);
+    cursor:pointer;
+  }
+  .color-opt.active{
+    background:var(--card-bg);
+    color:var(--text-1);
+    box-shadow:0 1px 4px rgba(0,0,0,.10);
+  }
+  .screen.dark .color-opt.active{
+    background:var(--accent-soft);
+    border:1px solid var(--accent-border);
+    color:#fff;
+  }
+  .dot-c{width:7px;height:7px;border-radius:50%;border:1px solid rgba(128,128,128,.45)}
+
+  /* Escenario Showroom del Tucson (fotos reales recortadas) */
+  .car-stage{
+    flex:1;
+    margin:6px 0;
+    border-radius:12px;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:radial-gradient(ellipse 88% 72% at 50% 44%,#d6e8ff 0%,#ebf3ff 52%,rgba(255,255,255,0) 100%);
+    cursor:grab;
+  }
+  .screen.dark .car-stage{
+    background:radial-gradient(ellipse 85% 65% at 50% 56%,rgba(0,210,255,.10) 0%,rgba(0,210,255,0) 75%);
+  }
+
+  /* Plataforma / Halo elíptico bajo el auto (CarHaloView) */
+  .car-halo{
+    position:absolute;
+    bottom:38px;
+    width:84%;
+    height:58px;
+    border-radius:50%;
+    background:radial-gradient(ellipse at center,rgba(37,99,235,.16) 0%,rgba(37,99,235,.05) 55%,rgba(37,99,235,0) 78%);
+    border:1.5px solid rgba(37,99,235,.22);
+    pointer-events:none;
+  }
+  .screen.dark .car-halo{
+    background:radial-gradient(ellipse at center,rgba(0,210,255,.36) 0%,rgba(0,210,255,.12) 55%,rgba(0,210,255,0) 78%);
+    border-color:rgba(0,210,255,.45);
+    box-shadow:0 0 18px rgba(0,210,255,.22);
+  }
+
+  .car-img{
+    width:98%;
+    max-height:242px;
+    object-fit:contain;
+    position:relative;
+    z-index:1;
+    transition:opacity .26s ease,transform .32s cubic-bezier(.22,1,.36,1);
+  }
+  .car-img.slide-out{
+    opacity:0;
+    transform:translateX(-28px);
+  }
+  .car-img.slide-in-start{
+    opacity:0;
+    transform:translateX(28px);
+    transition:none;
+  }
+
+  .angle-dots{
+    position:absolute;
+    bottom:32px;
+    display:flex;
+    gap:7px;
+    z-index:2;
+  }
+  .angle-dots i{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--text-muted);
+    opacity:.45;
+    transition:.25s ease;
+    cursor:pointer;
+  }
+  .angle-dots i.on{
+    width:18px;
+    border-radius:999px;
+    background:var(--accent);
+    opacity:1;
+  }
+
+  .badge-360{
+    position:absolute;
+    bottom:6px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:3px 10px;
+    border-radius:999px;
+    background:var(--accent-soft);
+    border:1px solid var(--accent-border);
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.09em;
+    color:var(--accent);
+    z-index:2;
+  }
+  .badge-360 i{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  /* Telemetría completa (CPU, RAM, ALM) */
+  .hw-bar{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:11px;
+    padding:8px 14px;
+    display:flex;
+    gap:14px;
+  }
+  .hw-item{flex:1}
+  .hw-top{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;color:var(--text-2);letter-spacing:.06em}
+  .hw-top b{font-family:"JBMono",monospace;font-size:13px;color:var(--text-1);letter-spacing:0}
+  .hw-track{height:5px;border-radius:999px;background:var(--track-bg);margin-top:5px;overflow:hidden}
+  .hw-fill{height:100%;border-radius:999px}
+
+  /* ===== COLUMNA DERECHA ===== */
+  .right-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    min-width:0;
+  }
+
+  /* Tarjeta Música (280px) con Propuesta A + Controles Limpios */
+  .card-music{
+    height:280px;
+    background:var(--card-music-bg);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    box-shadow:var(--card-shadow);
+    position:relative;
+  }
+  .screen.dark .card-music{border-color:rgba(0,210,255,.22)}
+
+  .music-top{display:flex;align-items:center;justify-content:space-between}
+  .src-tabs{
+    display:inline-flex;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:3px;
+    gap:4px;
+  }
+  .src-tab{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 12px;
+    border-radius:7px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.04em;
+    color:var(--text-muted);
+    cursor:pointer;
+  }
+  .src-tab.active{
+    background:var(--card-bg);
+    color:var(--text-1);
+    box-shadow:0 1px 4px rgba(0,0,0,.08);
+  }
+  .src-tab.active svg{color:var(--accent)}
+  .screen.dark .src-tab.active{
+    background:var(--accent-soft);
+    border:1px solid var(--accent-border);
+    color:#fff;
+  }
+
+  .btn-open{
+    width:52px;
+    height:52px;
+    border-radius:12px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-1);
+    cursor:pointer;
+  }
+  .btn-open:active{transform:scale(.95)}
+
+  /* Vinilo Protagonista (Propuesta A) */
+  .now-row{display:flex;align-items:center;gap:18px}
+  .vinyl-stage{
+    position:relative;
+    width:108px;
+    height:108px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .vinyl-ring{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    border:2px solid transparent;
+    transition:.25s ease;
+  }
+  .playing .vinyl-ring{
+    border-color:var(--accent);
+    box-shadow:0 0 16px var(--accent-soft);
+  }
+  .vinyl-svg{
+    width:102px;
+    height:102px;
+    border-radius:50%;
+    box-shadow:0 10px 22px rgba(15,23,42,.22);
+    transition:.3s ease;
+  }
+  .paused .vinyl-svg{
+    filter:saturate(.6) brightness(.9);
+    transform:scale(.96);
+  }
+  .tonearm{
+    position:absolute;
+    right:-4px;
+    top:4px;
+    width:24px;
+    height:54px;
+    transform-origin:17px 8px;
+    transform:rotate(-22deg);
+    transition:transform .35s cubic-bezier(.22,1,.36,1);
+    pointer-events:none;
+  }
+  .playing .tonearm{transform:rotate(8deg)}
+
+  .track-info{flex:1;min-width:0}
+  .track-title{font-size:21px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+  .track-artist{font-size:13px;font-weight:600;color:var(--text-2);margin-top:3px}
+  .status-line{display:flex;justify-content:space-between;align-items:center;margin-top:7px}
+  .status-pill{display:flex;align-items:center;gap:7px;font-family:"JBMono",monospace;font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--text-muted)}
+  .playing .status-pill{color:var(--accent)}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .playing .status-dot{animation:pulseDot 1s infinite alternate}
+  @keyframes pulseDot{from{opacity:.4}to{opacity:1}}
+  .time-txt{font-family:"JBMono",monospace;font-size:15px;font-weight:700;color:var(--text-2)}
+
+  .prog-touch{
+    height:28px;
+    display:flex;
+    align-items:center;
+    cursor:pointer;
+    margin-top:2px;
+  }
+  .prog-track{width:100%;height:8px;border-radius:999px;background:var(--track-bg);position:relative}
+  .prog-fill{width:38%;height:100%;border-radius:999px;background:var(--accent);position:relative}
+  .prog-thumb{position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--accent);box-shadow:0 2px 5px rgba(0,0,0,.25)}
+
+  /* Controles Limpios + Franja Táctil Gigante Invisible (navZoneAt) */
+  .music-ctrls-zone{
+    height:60px;
+    display:grid;
+    grid-template-columns:1fr 130px 1fr;
+    align-items:center;
+    justify-items:center;
+    border-radius:12px;
+    cursor:pointer;
+  }
+  .ctrl-clean-skip{
+    width:64px;
+    height:48px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-2);
+    transition:.15s ease;
+  }
+  .ctrl-clean-play{
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    border:1.5px solid var(--accent-border);
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.15s ease;
+  }
+  .ctrl-clean-skip.flash,.ctrl-clean-skip:active{
+    background:var(--accent-soft);
+    color:var(--accent);
+    transform:scale(.94);
+  }
+  .ctrl-clean-play.flash,.ctrl-clean-play:active{
+    background:var(--accent);
+    color:#fff;
+    transform:scale(.94);
+  }
+
+  /* Fila inferior derecha: JH VIDEO + CHIMUELO */
+  .bottom-row{flex:1;display:flex;gap:12px;min-height:0}
+  .card-video{
+    flex:0.85;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:12px 14px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    box-shadow:var(--card-shadow);
+    cursor:pointer;
+  }
+  .vid-head{display:flex;align-items:center;justify-content:space-between}
+  .vid-left{display:flex;align-items:center;gap:12px}
+  .vid-badge{
+    width:38px;height:38px;border-radius:10px;
+    background:var(--coral);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .vid-title{font-size:16px;font-weight:800;letter-spacing:.02em}
+  .vid-sub{font-size:12px;font-weight:600;color:var(--text-2);margin-top:2px}
+  .vid-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-top:8px;
+    border-top:1px solid var(--border);
+    font-size:11px;
+    font-weight:700;
+    color:var(--text-2);
+  }
+  .vid-chip{
+    color:var(--emerald);
+    background:var(--emerald-soft);
+    border:1px solid var(--emerald-border);
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:800;
+  }
+
+  .card-chimuelo{
+    flex:1.15;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    box-shadow:var(--card-shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .chim-bubble{
+    flex:1;
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-2);
+    line-height:1.38;
+  }
+  .chim-bubble b{display:block;color:var(--text-1);font-size:14px;font-weight:800;margin-bottom:3px}
+  .chim-img{height:134px;object-fit:contain;margin-right:-4px;filter:drop-shadow(0 6px 12px rgba(0,0,0,.18))}
+
+  /* ===== 3. DOCK INFERIOR (64px) CON BOTÓN SELECTOR DÍA/NOCHE JUNTO A STEALTH ===== */
+  .dock{
+    height:64px;
+    background:var(--bar-bg);
+    border-top:1px solid var(--border);
+    padding:0 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+  }
+  .dock-sp{flex:1}
+  .dock-btn{
+    height:50px;
+    min-width:68px;
+    padding:0 10px;
+    border-radius:10px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    color:var(--text-2);
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:.05em;
+    cursor:pointer;
+    position:relative;
+    transition:.15s ease;
+  }
+  .dock-btn:active{transform:scale(.95)}
+  .dock-btn.main{min-width:84px}
+  .dock-btn.active{
+    background:var(--accent-soft);
+    border-color:var(--accent-border);
+    color:var(--text-1);
+  }
+  .dock-btn.active svg{color:var(--accent)}
+  .dock-dot{
+    position:absolute;
+    top:5px;
+    right:10px;
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+  /* Botón selector Día / Noche junto a Stealth */
+  .dock-btn.theme-toggle{
+    border-color:var(--accent-border);
+    color:var(--accent);
+  }
+
+  /* ===== CAJÓN DE APPS (AppsActivity) ===== */
+  .apps-drawer{
+    position:absolute;
+    inset:0;
+    background:var(--win-bg);
+    z-index:20;
+    display:none;
+    flex-direction:column;
+  }
+  .apps-drawer.open{display:flex}
+  .apps-top{
+    height:64px;
+    background:var(--bar-bg);
+    border-bottom:1px solid var(--border);
+    padding:0 20px 0 16px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .apps-back{
+    width:64px;
+    height:46px;
+    border-radius:10px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-1);
+    cursor:pointer;
+  }
+  .apps-title{flex:1;font-size:20px;font-weight:800;letter-spacing:.08em}
+  .apps-factory{
+    padding:10px 14px;
+    border-radius:10px;
+    background:var(--accent-soft);
+    border:1px solid var(--accent-border);
+    color:var(--accent);
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .apps-count{font-family:"JBMono",monospace;font-size:13px;color:var(--text-2)}
+  .apps-grid{
+    flex:1;
+    padding:16px;
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:12px;
+    align-content:start;
+  }
+  .app-item{
+    height:112px;
+    border-radius:14px;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    cursor:pointer;
+    box-shadow:var(--card-shadow);
+  }
+  .app-item:active{transform:scale(.96)}
+  .app-icon{
+    width:56px;
+    height:56px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:24px;
+  }
+  .app-label{font-size:12px;font-weight:700;color:var(--text-2)}
+
+  /* ===== MODO STEALTH ===== */
+  .stealth-overlay{
+    position:absolute;
+    inset:0;
+    background:#020305;
+    z-index:30;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .stealth-overlay.open{display:flex}
+  .st-clock{font-family:"JBMono",monospace;font-size:80px;font-weight:800;color:#8da2ba;letter-spacing:.04em}
+  .st-date{font-size:14px;font-weight:800;color:#435467;letter-spacing:.14em;margin-top:10px}
+  .st-track{
+    margin-top:30px;
+    padding:8px 22px;
+    border-radius:999px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.07);
+    color:#8da2ba;
+    font-size:15px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .st-hint{margin-top:42px;font-size:11px;font-weight:700;color:#2b3644;letter-spacing:.09em}
+
+  /* Toast flotante */
+  .toast{
+    position:absolute;
+    top:58px;
+    left:50%;
+    transform:translateX(-50%) translateY(-10px);
+    background:var(--card-bg);
+    border:1px solid var(--accent-border);
+    color:var(--text-1);
+    padding:9px 20px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    opacity:0;
+    pointer-events:none;
+    transition:.22s ease;
+    z-index:25;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="controls-bar">
+  <div>
+    <h1>Maqueta Definitiva 1024×600 · Etapa 1 (Lista para Revisión)</h1>
+    <p>Fotos reales del Tucson recortadas · Vinilo Protagonista · Botones Limpios · Selector Día/Noche junto a STEALTH en el dock.</p>
+  </div>
+  <div class="seg-group">
+    <div class="seg" id="extThemeSeg">
+      <button data-theme="light" class="active">☀️ Día (Light Showroom)</button>
+      <button data-theme="dark">🌙 Noche (Dark Moderno)</button>
+    </div>
+    <div class="seg">
+      <button id="simAutoBtn">🕒 Simular Auto 06:30 / 18:30</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PANTALLA 1024x600 ================= -->
+<div class="screen playing" id="screen">
+
+  <div class="toast" id="toast">Tema Claro (Día) activado</div>
+
+  <!-- 1. BARRA SUPERIOR -->
+  <div class="topbar">
+    <div class="brand-pill"><b>HYUNDAI</b><span>TUCSON ix35</span></div>
+    <div class="clock-wrap">
+      <div class="clock-time" id="clockTime">16:35</div>
+      <div class="clock-date">MIÉRCOLES, 18 DE NOVIEMBRE</div>
+    </div>
+    <div class="top-right">
+      <div class="usb-pill on">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M15 7v4h1v2h-3V5h2l-3-4-3 4h2v8H8v-2.07c.7-.37 1.2-1.08 1.2-1.93 0-1.21-.99-2.2-2.2-2.2-1.21 0-2.2.99-2.2 2.2 0 .85.5 1.56 1.2 1.93V13c0 1.11.89 2 2 2h3v3.05c-.71.37-1.2 1.1-1.2 1.95 0 1.22.99 2.2 2.2 2.2 1.21 0 2.2-.98 2.2-2.2 0-.85-.49-1.58-1.2-1.95V15h3c1.11 0 2-.89 2-2v-2h1V7h-4z"/></svg>
+        USB 1
+      </div>
+      <div class="usb-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M15 7v4h1v2h-3V5h2l-3-4-3 4h2v8H8v-2.07c.7-.37 1.2-1.08 1.2-1.93 0-1.21-.99-2.2-2.2-2.2-1.21 0-2.2.99-2.2 2.2 0 .85.5 1.56 1.2 1.93V13c0 1.11.89 2 2 2h3v3.05c-.71.37-1.2 1.1-1.2 1.95 0 1.22.99 2.2 2.2 2.2 1.21 0 2.2-.98 2.2-2.2 0-.85-.49-1.58-1.2-1.95V15h3c1.11 0 2-.89 2-2v-2h1V7h-4z"/></svg>
+        USB 2
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. CUERPO PRINCIPAL -->
+  <div class="body">
+
+    <!-- COLUMNA IZQUIERDA: TUCSON 2013 -->
+    <div class="card-veh">
+      <div class="veh-head">
+        <div>
+          <div class="veh-sub">BIENVENIDO AL MANDO</div>
+          <div class="veh-title">Hola, Hernan</div>
+        </div>
+        <div class="color-switch">
+          <div class="color-opt active" id="btnBlack"><span class="dot-c" style="background:#0f172a"></span>Negro</div>
+          <div class="color-opt" id="btnGrey"><span class="dot-c" style="background:#64748b"></span>Gris Acero</div>
+        </div>
+      </div>
+
+      <!-- Escenario del Tucson con fotos reales recortadas y giro automático de 3 ángulos -->
+      <div class="car-stage" id="carStage" title="Toca para cambiar ángulo · Doble clic Play/Pausa">
+        <div class="car-halo"></div>
+        <img class="car-img" id="carImage" src="assets/cutout/tucson2013_black_front.png" alt="Tucson ix35">
+        <div class="angle-dots" id="angleDots">
+          <i class="on" data-idx="0"></i>
+          <i data-idx="1"></i>
+          <i data-idx="2"></i>
+        </div>
+        <div class="badge-360"><i></i>360° ACTIVO</div>
+      </div>
+
+      <!-- Telemetría completa (CPU, RAM y ALM) -->
+      <div class="hw-bar">
+        <div class="hw-item">
+          <div class="hw-top"><span>CPU</span><b>24%</b></div>
+          <div class="hw-track"><div class="hw-fill" style="width:24%;background:var(--accent)"></div></div>
+        </div>
+        <div class="hw-item">
+          <div class="hw-top"><span>RAM</span><b>17%</b></div>
+          <div class="hw-track"><div class="hw-fill" style="width:17%;background:var(--emerald)"></div></div>
+        </div>
+        <div class="hw-item">
+          <div class="hw-top"><span>ALM</span><b>12%</b></div>
+          <div class="hw-track"><div class="hw-fill" style="width:12%;background:var(--amber)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="right-col">
+
+      <!-- TARJETA DE MÚSICA (PROPUESTA A + CONTROLES LIMPIOS) -->
+      <div class="card-music">
+        <div class="music-top">
+          <div class="src-tabs">
+            <div class="src-tab active" id="tabUsb">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+              JH MUSIC
+            </div>
+            <div class="src-tab" id="tabBt">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29z"/></svg>
+              BLUETOOTH AUDIO
+            </div>
+          </div>
+          <div class="btn-open" id="btnOpenMusic" title="Abrir JH Music">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+        </div>
+
+        <div class="now-row">
+          <div class="vinyl-stage">
+            <div class="vinyl-ring"></div>
+            <svg class="vinyl-svg" viewBox="0 0 120 120">
+              <defs>
+                <radialGradient id="vDisk" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#1e293b"/>
+                  <stop offset="68%" stop-color="#0d111a"/>
+                  <stop offset="100%" stop-color="#05070b"/>
+                </radialGradient>
+              </defs>
+              <circle cx="60" cy="60" r="57" fill="url(#vDisk)" stroke="var(--vinyl-rim)" stroke-width="1.5"/>
+              <circle cx="60" cy="60" r="49" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="1"/>
+              <circle cx="60" cy="60" r="42" fill="none" stroke="#fff" stroke-opacity=".11" stroke-dasharray="16 5 10 4" stroke-width="1.2"/>
+              <circle cx="60" cy="60" r="35" fill="none" stroke="var(--accent)" stroke-opacity=".30" stroke-dasharray="22 7 9 5" stroke-width="1.2"/>
+              <circle cx="60" cy="60" r="28" fill="none" stroke="#fff" stroke-opacity=".11" stroke-width="1"/>
+              <path d="M60 60 L15 20 A57 57 0 0 1 38 7 Z" fill="#fff" fill-opacity=".13"/>
+              <path d="M60 60 L105 100 A57 57 0 0 1 82 113 Z" fill="#fff" fill-opacity=".13"/>
+              <circle cx="60" cy="60" r="19" fill="var(--vinyl-label)" stroke="var(--vinyl-ring)" stroke-width="2"/>
+              <circle cx="60" cy="60" r="13" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1"/>
+              <circle cx="60" cy="60" r="4.5" fill="#0b0f17" stroke="#fff" stroke-width="1.2"/>
+            </svg>
+            <svg class="tonearm" viewBox="0 0 30 64">
+              <circle cx="20" cy="10" r="5" fill="#94a3b8" stroke="#1e293b" stroke-width="1.5"/>
+              <path d="M20 10 L17 44 L10 53" fill="none" stroke="#cbd5e1" stroke-width="2.6" stroke-linecap="round"/>
+              <rect x="6" y="50" width="7" height="9" rx="2" transform="rotate(28 9 54)" fill="var(--accent)"/>
+            </svg>
+          </div>
+
+          <div class="track-info">
+            <div class="track-title" id="trackTitle">EL TIBURON PROYECTO UNO</div>
+            <div class="track-artist" id="trackArtist">JH Music · USB 1</div>
+            <div class="status-line">
+              <div class="status-pill"><span class="status-dot"></span><span id="statusWord">REPRODUCIENDO</span></div>
+              <div class="time-txt" id="timeReadout">01:58 / 05:20</div>
+            </div>
+            <div class="prog-touch" id="progTouch">
+              <div class="prog-track"><div class="prog-fill" id="progFill"><div class="prog-thumb"></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zonas táctiles gigantes invisibles + Botones Limpios -->
+        <div class="music-ctrls-zone" id="navZone" title="Franja táctil gigante: Izquierda = Anterior · Centro = Play/Pausa · Derecha = Siguiente">
+          <div class="ctrl-clean-skip" id="btnPrev">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </div>
+          <div class="ctrl-clean-play" id="btnPlay">
+            <svg id="playSvg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </div>
+          <div class="ctrl-clean-skip" id="btnNext">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILA INFERIOR: JH VIDEO + CHIMUELO -->
+      <div class="bottom-row">
+        <div class="card-video" id="cardVideo">
+          <div class="vid-head">
+            <div class="vid-left">
+              <div class="vid-badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+              </div>
+              <div>
+                <div class="vid-title">JH VIDEO</div>
+                <div class="vid-sub">Videos USB</div>
+              </div>
+            </div>
+            <div class="btn-open">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </div>
+          </div>
+          <div class="vid-footer">
+            <span>Reproductor MP4 local</span>
+            <span class="vid-chip">USB 1 LISTO</span>
+          </div>
+        </div>
+
+        <div class="card-chimuelo">
+          <div class="chim-bubble">
+            <b>Chimuelo</b>
+            ¡Todo listo al mando, Hernan!<br>Modo Showroom activo.
+          </div>
+          <img class="chim-img" src="assets/chimuelo/chimuelo_sentado.png" alt="Chimuelo">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3. DOCK INFERIOR (CON BOTÓN SELECTOR DÍA/NOCHE JUNTO A STEALTH) -->
+  <div class="dock">
+    <div class="dock-btn" id="btnMute">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      <span id="muteLabel">AUDIO</span>
+    </div>
+
+    <div class="dock-btn" id="btnStealth">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+      <span>STEALTH</span>
+    </div>
+
+    <!-- NUEVO: Botón selector Día / Noche justo al lado de STEALTH -->
+    <div class="dock-btn theme-toggle" id="btnThemeDock" title="Cambiar entre Tema Claro (Día) y Tema Oscuro (Noche)">
+      <svg id="themeDockIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+      </svg>
+      <span id="themeDockLabel">DÍA</span>
+    </div>
+
+    <div class="dock-sp"></div>
+
+    <div class="dock-btn main active">
+      <span class="dock-dot"></span>
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+      <span>MÚSICA</span>
+    </div>
+
+    <div class="dock-btn main" id="dockVideo">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+      <span>VIDEOS</span>
+    </div>
+
+    <div class="dock-btn main" id="dockRadio">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M3.24 6.15C2.51 6.43 2 7.17 2 8v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8c0-1.11-.89-2-2-2H8.3l8.26-3.34L15.88 1 3.24 6.15zM7 20c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-8h-2v-2h-2v2H4V8h16v4z"/></svg>
+      <span>RADIO</span>
+    </div>
+
+    <div class="dock-btn main" id="dockCalls">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29z"/></svg>
+      <span>LLAMADAS</span>
+    </div>
+
+    <div class="dock-sp"></div>
+
+    <div class="dock-btn" id="btnApps">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+      <span>APPS</span>
+    </div>
+
+    <div class="dock-btn" id="btnSettings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      <span>AJUSTES</span>
+    </div>
+  </div>
+
+  <!-- CAJÓN DE APPS (AppsActivity en Light y Dark) -->
+  <div class="apps-drawer" id="appsDrawer">
+    <div class="apps-top">
+      <div class="apps-back" id="appsBack">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </div>
+      <div class="apps-title">APPS</div>
+      <div class="apps-factory" onclick="showToast('Abriendo Launcher3 de fábrica...')">LAUNCHER DE FÁBRICA</div>
+      <div class="apps-count">12 apps</div>
+    </div>
+    <div class="apps-grid">
+      <div class="app-item" onclick="showToast('Abriendo JH Music...')"><div class="app-icon" style="background:#2563eb">🎵</div><div class="app-label">JH Music</div></div>
+      <div class="app-item" onclick="showToast('Abriendo JH Video...')"><div class="app-icon" style="background:#ef4444">🎬</div><div class="app-label">JH Video</div></div>
+      <div class="app-item" onclick="showToast('Abriendo Radio FM...')"><div class="app-icon" style="background:#0284c7">📻</div><div class="app-label">Radio FM</div></div>
+      <div class="app-item" onclick="showToast('Abriendo Bluetooth...')"><div class="app-icon" style="background:#1d4ed8">📞</div><div class="app-label">Teléfono BT</div></div>
+      <div class="app-item" onclick="showToast('Abriendo Ecualizador DSP...')"><div class="app-icon" style="background:#7c3aed">🎚️</div><div class="app-label">Ecualizador</div></div>
+      <div class="app-item" onclick="showToast('Abriendo Archivos...')"><div class="app-icon" style="background:#d97706">📁</div><div class="app-label">Archivos</div></div>
+      <div class="app-item" onclick="showToast('Abriendo Cámara Auxiliar...')"><div class="app-icon" style="background:#059669">📷</div><div class="app-label">Cámara</div></div>
+      <div class="app-item" onclick="showToast('Abriendo Ajustes...')"><div class="app-icon" style="background:#475569">⚙️</div><div class="app-label">Ajustes</div></div>
+    </div>
+  </div>
+
+  <!-- MODO STEALTH -->
+  <div class="stealth-overlay" id="stealthOverlay">
+    <div class="st-clock" id="stealthClock">16:35</div>
+    <div class="st-date">MIÉRCOLES, 18 DE NOVIEMBRE</div>
+    <div class="st-track">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#00d2ff"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+      <span id="stealthTrack">EL TIBURON PROYECTO UNO</span>
+    </div>
+    <div class="st-hint">TOCA CUALQUIER PARTE PARA DESPERTAR LA PANTALLA</div>
+  </div>
+
+</div>
+
+<script>
+  const screen = document.getElementById('screen');
+  const carImage = document.getElementById('carImage');
+  const angleDots = document.querySelectorAll('#angleDots i');
+  const toast = document.getElementById('toast');
+
+  // 6 fotos reales recortadas del Tucson (3 ángulos Negro + 3 ángulos Gris Acero)
+  const CUTOUTS = {
+    black: [
+      'assets/cutout/tucson2013_black_front.png',
+      'assets/cutout/tucson2013_black_side.png',
+      'assets/cutout/tucson2013_black_rear.png'
+    ],
+    grey: [
+      'assets/cutout/tucson_angle_front_right.png',
+      'assets/cutout/tucson_angle_side.png',
+      'assets/cutout/tucson_angle_rear.png'
+    ]
+  };
+
+  let carColor = 'black';
+  let carAngle = 0;
+  let isDark = false;
+  let isPlaying = true;
+  let isMuted = false;
+  let toastTimer = null;
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  // Cambio de ángulo del Tucson con deslizamiento igual que CarTurntable.java
+  function showCarAngle(nextAngle, animate = true) {
+    carAngle = nextAngle % 3;
+    angleDots.forEach((d, idx) => d.classList.toggle('on', idx === carAngle));
+    const src = CUTOUTS[carColor][carAngle];
+    if (!animate) {
+      carImage.src = src;
+      return;
+    }
+    carImage.classList.add('slide-out');
+    setTimeout(() => {
+      carImage.src = src;
+      carImage.classList.remove('slide-out');
+      carImage.classList.add('slide-in-start');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          carImage.classList.remove('slide-in-start');
+        });
+      });
+    }, 190);
+  }
+
+  // Rotación automática cada 3.6 segundos
+  setInterval(() => {
+    if (!document.getElementById('stealthOverlay').classList.contains('open')) {
+      showCarAngle((carAngle + 1) % 3, true);
+    }
+  }, 3600);
+
+  document.getElementById('carStage').onclick = () => showCarAngle((carAngle + 1) % 3, true);
+  document.getElementById('carStage').ondblclick = () => togglePlay();
+
+  document.getElementById('btnBlack').onclick = () => {
+    carColor = 'black';
+    document.getElementById('btnBlack').classList.add('active');
+    document.getElementById('btnGrey').classList.remove('active');
+    showCarAngle(carAngle, false);
+  };
+  document.getElementById('btnGrey').onclick = () => {
+    carColor = 'grey';
+    document.getElementById('btnGrey').classList.add('active');
+    document.getElementById('btnBlack').classList.remove('active');
+    showCarAngle(carAngle, false);
+  };
+
+  // Selector Día (Light) / Noche (Dark) en el Dock (junto a STEALTH)
+  const sunIcon = '<path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>';
+  const moonIcon = '<path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>';
+
+  function applyTheme(dark, reason) {
+    isDark = dark;
+    screen.classList.toggle('dark', isDark);
+    document.body.classList.toggle('dark-page', isDark);
+    document.getElementById('themeDockLabel').textContent = isDark ? 'NOCHE' : 'DÍA';
+    document.getElementById('themeDockIcon').innerHTML = isDark ? moonIcon : sunIcon;
+    document.querySelectorAll('#extThemeSeg button').forEach(b => {
+      b.classList.toggle('active', (b.dataset.theme === 'dark') === isDark);
+    });
+    if (reason) showToast(reason);
+  }
+
+  document.getElementById('btnThemeDock').onclick = () => {
+    applyTheme(!isDark, !isDark ? '🌙 Tema Oscuro (Noche) activado' : '☀️ Tema Claro (Día) activado');
+  };
+
+  document.querySelectorAll('#extThemeSeg button').forEach(btn => {
+    btn.onclick = () => applyTheme(btn.dataset.theme === 'dark');
+  });
+
+  // Simulación del cambio automático por hora (06:30 Día / 18:30 Noche)
+  let simNight = false;
+  document.getElementById('simAutoBtn').onclick = () => {
+    simNight = !simNight;
+    const t = simNight ? '18:30' : '06:30';
+    document.getElementById('clockTime').textContent = t;
+    document.getElementById('stealthClock').textContent = t;
+    applyTheme(simNight, simNight ? '🕒 18:30 h · Cambio automático a Noche (Dark)' : '🕒 06:30 h · Cambio automático a Día (Light)');
+  };
+
+  // Música y Franja Táctil Gigante Invisible (navZoneAt)
+  const tracks = [
+    { title: 'EL TIBURON PROYECTO UNO', artist: 'JH Music · USB 1', total: 320, cur: 118 },
+    { title: 'OBSESIÓN · AVENTURA', artist: 'JH Music · USB 1', total: 252, cur: 64 },
+    { title: 'DILE AL AMOR · AVENTURA', artist: 'JH Music · USB 1', total: 229, cur: 95 }
+  ];
+  let trackIdx = 0;
+
+  function fmt(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function renderTrack() {
+    const t = tracks[trackIdx];
+    document.getElementById('trackTitle').textContent = t.title;
+    document.getElementById('stealthTrack').textContent = t.title;
+    document.getElementById('timeReadout').textContent = fmt(t.cur) + ' / ' + fmt(t.total);
+    document.getElementById('progFill').style.width = ((t.cur / t.total) * 100).toFixed(1) + '%';
+  }
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    screen.classList.toggle('playing', isPlaying);
+    screen.classList.toggle('paused', !isPlaying);
+    document.getElementById('statusWord').textContent = isPlaying ? 'REPRODUCIENDO' : 'EN PAUSA';
+    document.getElementById('playSvg').innerHTML = isPlaying
+      ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
+      : '<path d="M8 5v14l11-7z"/>';
+  }
+
+  function flashBtn(el) {
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 180);
+  }
+
+  document.getElementById('navZone').onclick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width * 0.34) {
+      flashBtn(document.getElementById('btnPrev'));
+      trackIdx = (trackIdx + tracks.length - 1) % tracks.length;
+      renderTrack();
+    } else if (x > rect.width * 0.66) {
+      flashBtn(document.getElementById('btnNext'));
+      trackIdx = (trackIdx + 1) % tracks.length;
+      renderTrack();
+    } else {
+      flashBtn(document.getElementById('btnPlay'));
+      togglePlay();
+    }
+  };
+
+  document.getElementById('progTouch').onclick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    tracks[trackIdx].cur = Math.round(pct * tracks[trackIdx].total);
+    renderTrack();
+  };
+
+  // Pestañas USB / Bluetooth
+  document.getElementById('tabUsb').onclick = () => {
+    document.getElementById('tabUsb').classList.add('active');
+    document.getElementById('tabBt').classList.remove('active');
+    document.getElementById('trackArtist').textContent = 'JH Music · USB 1';
+  };
+  document.getElementById('tabBt').onclick = () => {
+    document.getElementById('tabBt').classList.add('active');
+    document.getElementById('tabUsb').classList.remove('active');
+    document.getElementById('trackArtist').textContent = 'Spotify · Bluetooth Audio';
+  };
+
+  // Dock: Audio, Stealth, Apps
+  document.getElementById('btnMute').onclick = () => {
+    isMuted = !isMuted;
+    document.getElementById('muteLabel').textContent = isMuted ? 'MUTED' : 'AUDIO';
+    document.getElementById('btnMute').classList.toggle('active', isMuted);
+    showToast(isMuted ? '🔇 Audio silenciado (0%)' : '🔊 Audio restaurado');
+  };
+
+  document.getElementById('btnStealth').onclick = () => {
+    document.getElementById('stealthOverlay').classList.add('open');
+  };
+  document.getElementById('stealthOverlay').onclick = () => {
+    document.getElementById('stealthOverlay').classList.remove('open');
+  };
+
+  document.getElementById('btnApps').onclick = () => {
+    document.getElementById('appsDrawer').classList.add('open');
+  };
+  document.getElementById('appsBack').onclick = () => {
+    document.getElementById('appsDrawer').classList.remove('open');
+  };
+</script>
+</body>
+</html>

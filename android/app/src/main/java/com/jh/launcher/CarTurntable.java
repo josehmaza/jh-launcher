@@ -3,12 +3,6 @@ package com.jh.launcher;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Shader;
 import android.os.Handler;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
@@ -21,9 +15,9 @@ import java.io.InputStream;
  * Rotación automática de los renders del Tucson 2013 (frente, perfil, trasera) en Negro Obsidiana
  * o Gris Acero. El cambio de ángulo desliza el auto de lado con un fundido.
  *
- * Las 6 fotos se decodifican una vez en el hilo de E/S y quedan en memoria. A cada una se le
- * funden los 4 bordes (máscara de transparencia) en ese mismo momento, así el auto se disuelve en
- * el fondo de la tarjeta sin que dibujar cueste nada extra: ARGB_8888, ~800 KB cada una (~4,8 MB).
+ * Las 6 fotos ya vienen recortadas sin fondo (PNG con sombra de contacto de showroom) y se
+ * decodifican una sola vez en el hilo de E/S, sirviendo tanto para el Tema Claro (Showroom) como
+ * para el Tema Oscuro sin duplicar memoria.
  */
 final class CarTurntable {
 
@@ -35,13 +29,9 @@ final class CarTurntable {
     private static final long SLIDE_IN_MS = 380;
     private static final float SLIDE_FRACTION = 0.10f;   // del ancho de la imagen
 
-    // Fundido de bordes: porcentaje del alto/ancho donde la foto llega a opacidad total
-    private static final float FADE_V = 0.24f;
-    private static final float FADE_H = 0.09f;
-
     private static final String[][] ANGLES = {
-            {"car/tucson2013_black_front.jpg", "car/tucson2013_black_side.jpg", "car/tucson2013_black_rear.jpg"},
-            {"car/tucson_angle_front_right.jpg", "car/tucson_angle_side.jpg", "car/tucson_angle_rear.jpg"}
+            {"car/tucson2013_black_front.png", "car/tucson2013_black_side.png", "car/tucson2013_black_rear.png"},
+            {"car/tucson_angle_front_right.png", "car/tucson_angle_side.png", "car/tucson_angle_rear.png"}
     };
 
     private final ImageView view;
@@ -80,11 +70,7 @@ final class CarTurntable {
             for (int c = 0; c < ANGLES.length; c++) {
                 for (int a = 0; a < ANGLES[c].length; a++) {
                     try (InputStream in = assets.open(ANGLES[c][a])) {
-                        Bitmap src = BitmapFactory.decodeStream(in);
-                        if (src != null) {
-                            decoded[c][a] = fadeEdges(src);
-                            src.recycle();
-                        }
+                        decoded[c][a] = BitmapFactory.decodeStream(in);
                     } catch (IOException ignored) {
                     }
                 }
@@ -96,31 +82,6 @@ final class CarTurntable {
                 show(0);
             });
         });
-    }
-
-    /** Copia de la foto con los 4 bordes desvanecidos hasta transparente. */
-    private static Bitmap fadeEdges(Bitmap src) {
-        int w = src.getWidth();
-        int h = src.getHeight();
-        Bitmap out = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(out);
-        canvas.drawBitmap(src, 0, 0, null);
-
-        Paint mask = new Paint();
-        mask.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        int clear = 0x00000000;
-        int solid = 0xFF000000;
-
-        mask.setShader(new LinearGradient(0, 0, 0, h,
-                new int[]{clear, solid, solid, clear},
-                new float[]{0f, FADE_V, 1f - FADE_V, 1f}, Shader.TileMode.CLAMP));
-        canvas.drawRect(0, 0, w, h, mask);
-
-        mask.setShader(new LinearGradient(0, 0, w, 0,
-                new int[]{clear, solid, solid, clear},
-                new float[]{0f, FADE_H, 1f - FADE_H, 1f}, Shader.TileMode.CLAMP));
-        canvas.drawRect(0, 0, w, h, mask);
-        return out;
     }
 
     void setColor(int newColor) {

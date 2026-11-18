@@ -24,9 +24,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Cajón de apps propio del launcher (botón APPS). No depende del launcher de fábrica del
- * radio: lista todo lo que tenga ícono de lanzamiento, ordenado por nombre. Los íconos se
- * reducen una sola vez a bitmaps pequeños para que el desplazamiento sea liviano.
+ * Cajón de apps propio del launcher (botón APPS). Respeta el tema activo (Claro / Oscuro)
+ * guardado en SharedPreferences.
  */
 public class AppsActivity extends Activity {
 
@@ -34,6 +33,7 @@ public class AppsActivity extends Activity {
 
     private GridView grid;
     private TextView count;
+    private ThemePalette palette;
     private List<AppEntry> apps = new ArrayList<>();
     private volatile boolean destroyed;
 
@@ -41,11 +41,16 @@ public class AppsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_apps);
+
+        boolean light = getSharedPreferences("jh_launcher", MODE_PRIVATE).getBoolean("theme_light", false);
+        palette = new ThemePalette(light, getResources().getDisplayMetrics().density);
+
         grid = findViewById(R.id.appsGrid);
         count = findViewById(R.id.appsCount);
         findViewById(R.id.appsBack).setOnClickListener(v -> finish());
+        applyTheme();
+
         grid.setOnItemClickListener((parent, view, position, id) -> open(apps.get(position)));
-        // Mantener pulsada una app muestra su paquete (sirve para identificar apps de fábrica del radio)
         grid.setOnItemLongClickListener((parent, view, position, id) -> {
             Toast.makeText(this, apps.get(position).component.getPackageName(), Toast.LENGTH_LONG).show();
             return true;
@@ -54,18 +59,33 @@ public class AppsActivity extends Activity {
         loadApps();
     }
 
-    /**
-     * Busca otro launcher instalado (el de fábrica, normalmente Launcher3) y deja un botón para
-     * abrirlo sin pasar por los ajustes aunque JH Launcher esté como inicio predeterminado.
-     * Con el componente explícito Android no pregunta ni cambia el inicio predeterminado.
-     */
+    private void applyTheme() {
+        getWindow().getDecorView().setBackgroundColor(palette.winBg);
+        findViewById(R.id.appsRoot).setBackgroundColor(palette.winBg);
+        findViewById(R.id.appsTopBar).setBackgroundColor(palette.barBg);
+
+        View backBtn = findViewById(R.id.appsBack);
+        backBtn.setBackground(palette.dockBtnBg(false));
+        ImageView backIcon = findViewById(R.id.appsBackIcon);
+        if (backIcon != null) backIcon.setImageTintList(palette.dockIconTint(false));
+
+        TextView title = findViewById(R.id.appsTitle);
+        if (title != null) title.setTextColor(palette.text1);
+
+        TextView factory = findViewById(R.id.btnFactoryLauncher);
+        if (factory != null) {
+            factory.setBackground(palette.box(palette.accentSoft, palette.accentBorder, 10f));
+            factory.setTextColor(palette.accent);
+        }
+        count.setTextColor(palette.text2);
+    }
+
     private void setupFactoryLauncher() {
         Intent home = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME);
         ComponentName found = null;
         for (ResolveInfo ri : getPackageManager().queryIntentActivities(home, 0)) {
             if (ri.activityInfo == null || getPackageName().equals(ri.activityInfo.packageName)) continue;
             ComponentName cn = new ComponentName(ri.activityInfo.packageName, ri.activityInfo.name);
-            // Si hay varios, se prefiere el que se llama Launcher3
             if (found == null || cn.getPackageName().contains("launcher3")) found = cn;
         }
         if (found == null) return;
@@ -191,10 +211,12 @@ public class AppsActivity extends Activity {
                 v = inflater.inflate(R.layout.item_app, parent, false);
                 v.setTag(new Holder(v));
             }
+            v.setBackground(palette.box(palette.cardBg, palette.border, 12f));
             Holder h = (Holder) v.getTag();
             AppEntry app = apps.get(position);
             h.icon.setImageBitmap(app.icon);
             h.label.setText(app.label);
+            h.label.setTextColor(palette.text2);
             return v;
         }
     }

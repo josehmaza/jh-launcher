@@ -10,8 +10,8 @@ android {
         applicationId "com.jh.launcher"
         minSdk 21
         targetSdk 28
-        versionCode 17
-        versionName "1.7.1"
+        versionCode 18
+        versionName "1.8.0"
     }
 
     buildFeatures {
@@ -63,9 +63,9 @@ def generatedCarAssets = file("${buildDir}/generated/jh-assets")
 android.sourceSets.main.assets.srcDirs += generatedCarAssets
 
 tasks.register('syncCarImages', Sync) {
-    from "${rootProject.projectDir.parentFile}/assets"
+    from "${rootProject.projectDir.parentFile}/assets/cutout"
     into "${generatedCarAssets}/car"
-    include '*.jpg'
+    include '*.png'
 }
 
 tasks.named('preBuild').configure {
