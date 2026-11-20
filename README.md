@@ -2,7 +2,7 @@
 
 Launcher nativo, 100 % offline, para la pantalla de **1024 × 600** del radio Android (Autochips AC8227L, Android 8.1 aunque Ajustes diga 10) de la **Hyundai Tucson ix35 2013**. Reemplaza la pantalla de inicio de fábrica y reúne música, video y Bluetooth en una sola pantalla (la radio FM se abre con la app de fábrica), con botones grandes para usar manejando (el auto no tiene mandos en el volante).
 
-Versión actual: **1.9.0** · [Releases](https://github.com/josehmaza/jh-launcher/releases)
+Versión actual: **1.9.1** · [Releases](https://github.com/josehmaza/jh-launcher/releases)
 
 Va con [JH MUSIC](https://github.com/josehmaza/jh-music) (2.10.0 o superior) y [JH VIDEO](https://github.com/josehmaza/jh-video). JH RADIO ya no se usa.
 
@@ -136,6 +136,11 @@ adb shell dumpsys gfxinfo com.jh.launcher
 adb shell dumpsys meminfo com.jh.launcher
 ```
 Anotar los resultados en «Resultados en el radio» de [ANALISIS-RENDIMIENTO.md](ANALISIS-RENDIMIENTO.md). Referencia del emulador: ~19 cuadros/s en reposo y 6 ms en el percentil 90.
+
+## Novedades de la 1.9.1
+
+- **El nombre del teléfono ya no sale como dirección** (`FC:A9:F5:80:C9:65`): si el módulo de fábrica entrega una MAC, se busca el nombre entre los dispositivos emparejados de Android, se conserva el nombre bueno que ya había o, si no hay ninguno, no se muestra la dirección (la tarjeta dice «TELÉFONO»).
+- **El estado de reproducción del teléfono se conserva al cambiar de pestaña:** al volver de JH MUSIC a BLUETOOTH ya no dice «EN PAUSA» si el teléfono seguía sonando (`btStreaming`).
 
 ## Novedades de la 1.9.0
 

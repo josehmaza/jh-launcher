@@ -162,6 +162,8 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     private long stealthSince;
     private boolean sourceBt;
     private boolean btConnecting;
+    /** El teléfono está transmitiendo audio por Bluetooth (se actualiza aunque la fuente a la vista sea JH Music). */
+    private boolean btStreaming;
     private int usbIdx;
     // Audio Bluetooth: lo que informa el módulo Bluetooth de fábrica
     private BtMusicLink btLink;
@@ -1030,6 +1032,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
                 // por si el módulo quedó callado de antes: si aquí no hay silencio, el módulo tampoco debe tenerlo
                 if (!muted) btLink.muteMusic(false);
             }
+            setPlaying(btStreaming && btPhone != null);
             refreshBtUi();
         }
         updateBtControlsEnabled();
@@ -1062,9 +1065,10 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         @Override
         public void onPhone(boolean connected, String name) {
             btConnecting = false;
-            btPhone = connected ? name : null;
+            btPhone = connected ? friendlyPhoneName(name, btPhone) : null;
             if (!connected) {
                 btTrack = null;
+                btStreaming = false;
                 if (sourceBt) setPlaying(false);
             }
             refreshBtUi();
@@ -1074,6 +1078,9 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         public void onStreaming(boolean streaming) {
             // Si el teléfono empieza a sonar, la tarjeta pasa a Bluetooth: así los botones y los gestos sobre el
             // Tucson (deslizar = siguiente / anterior) mandan al teléfono y no a JH Music
+            // El estado del teléfono se guarda aunque la fuente a la vista sea JH Music: al volver a BLUETOOTH
+            // debe verse lo que el teléfono hace de verdad, no lo último de JH Music
+            btStreaming = streaming;
             if (streaming && !sourceBt) setAudioSource(true);
             if (sourceBt) setPlaying(streaming);
         }
@@ -1301,6 +1308,31 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
      * si se retiró el pendrive avisa con un Toast ("Pendrive no conectado") y cancela
      * en vez de aparentar que funcionó.
      */
+    private static final java.util.regex.Pattern MAC_ADDRESS =
+            java.util.regex.Pattern.compile("^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$");
+
+    /**
+     * El módulo de fábrica a veces entrega la dirección del teléfono (FC:A9:F5:…) como nombre. Si es una dirección:
+     * se busca el nombre entre los dispositivos emparejados de Android; si no está, se conserva el nombre bueno
+     * que ya había; y si no hay ninguno, queda vacío (la tarjeta dice «TELÉFONO»), nunca la dirección.
+     */
+    private String friendlyPhoneName(String name, String previous) {
+        String n = name == null ? "" : name.trim();
+        if (!MAC_ADDRESS.matcher(n).matches()) return n;
+        try {
+            android.bluetooth.BluetoothAdapter adapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+            if (adapter != null) {
+                for (android.bluetooth.BluetoothDevice d : adapter.getBondedDevices()) {
+                    String dn = d.getName();
+                    if (n.equalsIgnoreCase(d.getAddress()) && dn != null && !dn.trim().isEmpty()) return dn.trim();
+                }
+            }
+        } catch (Throwable ignored) {
+            // sin permiso o con el Bluetooth de Android apagado: se sigue sin nombre
+        }
+        return previous != null && !MAC_ADDRESS.matcher(previous).matches() ? previous : "";
+    }
+
     /** Fuente Bluetooth sin teléfono conectado: no hay nada que reproducir, pausar ni saltar. */
     private boolean btNoPhone() {
         return sourceBt && btPhone == null;
