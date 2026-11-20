@@ -140,6 +140,7 @@ Anotar los resultados en «Resultados en el radio» de [ANALISIS-RENDIMIENTO.md]
 ## Novedades de la 1.9.1
 
 - **El nombre del teléfono ya no sale como dirección** (`FC:A9:F5:80:C9:65`): si el módulo de fábrica entrega una MAC, se busca el nombre entre los dispositivos emparejados de Android, se conserva el nombre bueno que ya había o, si no hay ninguno, no se muestra la dirección (la tarjeta dice «TELÉFONO»).
+- **Si se pierde el módulo Bluetooth, la tarjeta ya no queda a medias:** se olvida el teléfono, la canción y el audio (antes decía «Teléfono conectado» y «REPRODUCIENDO» con el punto en gris y dejaba tocar Play).
 - **El estado de reproducción del teléfono se conserva al cambiar de pestaña:** al volver de JH MUSIC a BLUETOOTH ya no dice «EN PAUSA» si el teléfono seguía sonando (`btStreaming`).
 
 ## Novedades de la 1.9.0

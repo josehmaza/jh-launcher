@@ -1053,6 +1053,15 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         @Override
         public void onLink(boolean linked) {
             btLinked = linked;
+            if (!linked) {
+                // Se perdió el módulo Bluetooth: ya no hay teléfono, ni canción, ni audio. Antes quedaba el teléfono
+                // de antes (la tarjeta decía «Teléfono conectado» y «REPRODUCIENDO» con el punto en gris)
+                btPhone = null;
+                btTrack = null;
+                btConnecting = false;
+                btStreaming = false;
+                if (sourceBt) setPlaying(false);
+            }
             refreshBtUi();
         }
 
