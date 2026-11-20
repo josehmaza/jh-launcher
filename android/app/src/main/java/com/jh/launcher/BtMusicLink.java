@@ -32,6 +32,9 @@ final class BtMusicLink {
         /** Hay (o ya no hay) un teléfono conectado; el nombre puede ir vacío. */
         void onPhone(boolean connected, String name);
 
+        /** El módulo está conectando con un teléfono (aún no hay enlace). */
+        void onConnecting();
+
         /** El teléfono está transmitiendo audio (true) o está en pausa (false). */
         void onStreaming(boolean streaming);
 
@@ -244,7 +247,15 @@ final class BtMusicLink {
         @Override
         public void onConnectStatus(final int status, final String name, String addr) {
             Log.d(TAG, "conexión " + status + " " + name + " " + addr);
-            if (status == CONNECTING) return;
+            if (status == CONNECTING) {
+                main.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onConnecting();
+                    }
+                });
+                return;
+            }
             // 1 = conectado; 3 = falló; cualquier otro valor: sin teléfono
             final boolean connected = status == CONNECTED;
             main.post(new Runnable() {

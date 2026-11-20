@@ -2,7 +2,7 @@
 
 Launcher nativo, 100 % offline, para la pantalla de **1024 × 600** del radio Android (Autochips AC8227L, Android 8.1 aunque Ajustes diga 10) de la **Hyundai Tucson ix35 2013**. Reemplaza la pantalla de inicio de fábrica y reúne música, video y Bluetooth en una sola pantalla (la radio FM se abre con la app de fábrica), con botones grandes para usar manejando (el auto no tiene mandos en el volante).
 
-Versión actual: **1.8.0** · [Releases](https://github.com/josehmaza/jh-launcher/releases)
+Versión actual: **1.9.0** · [Releases](https://github.com/josehmaza/jh-launcher/releases)
 
 Va con [JH MUSIC](https://github.com/josehmaza/jh-music) (2.10.0 o superior) y [JH VIDEO](https://github.com/josehmaza/jh-video). JH RADIO ya no se usa.
 
@@ -28,7 +28,7 @@ Va con [JH MUSIC](https://github.com/josehmaza/jh-music) (2.10.0 o superior) y [
 ### Tarjeta de música
 Dos pestañas:
 - **JH MUSIC:** canción, artista, un disco de vinilo (todavía no muestra la carátula de la canción, ver [MEJORAS.md](MEJORAS.md) §6.1), tiempo y ⏮ ▶ ⏭. La **barra de tiempo se toca o se arrastra** para ir a cualquier minuto (orden `SEEK` a JH MUSIC). El botón grande abre JH MUSIC.
-- **BLUETOOTH AUDIO:** controla la música del teléfono (YouTube, Spotify, etc.) por el módulo Bluetooth del radio (`com.jancar.btservice`). Muestra la canción si el teléfono la manda. **Cambia sola a esta pestaña cuando el teléfono empieza a sonar.**
+- **BLUETOOTH:** controla la música del teléfono (YouTube, Spotify, etc.) por el módulo Bluetooth del radio (`com.jancar.btservice`). Muestra la canción si el teléfono la manda. **Cambia sola a esta pestaña cuando el teléfono empieza a sonar.**
 
 ### Tarjeta de video
 Abre **JH VIDEO** (videos del pendrive).
@@ -136,6 +136,14 @@ adb shell dumpsys gfxinfo com.jh.launcher
 adb shell dumpsys meminfo com.jh.launcher
 ```
 Anotar los resultados en «Resultados en el radio» de [ANALISIS-RENDIMIENTO.md](ANALISIS-RENDIMIENTO.md). Referencia del emulador: ~19 cuadros/s en reposo y 6 ms en el percentil 90.
+
+## Novedades de la 1.9.0
+
+- **La pestaña BLUETOOTH (antes «BLUETOOTH AUDIO») muestra si hay teléfono conectado:** ícono del color del tema, punto **verde** sólido y el nombre del teléfono cuando está conectado; ícono y punto **naranja que parpadea** mientras conecta; ícono y texto atenuados con punto **gris hueco** si no hay teléfono. El estado «conectando» depende de que el módulo de fábrica lo avise (`onConnecting` en `BtMusicLink`).
+- **Bluetooth sin teléfono:** los botones ⏮ ▶ ⏭ se ven apagados y no hacen nada (avisan «Conecta tu teléfono por Bluetooth»), el estado dice EN PAUSA y el tiempo 00:00 / 00:00. Antes mostraba «REPRODUCIENDO» y el tiempo de JH MUSIC.
+- **STEALTH tiene su propio ícono** (ojo tachado, `ic_stealth`) y ya no repite la luna del botón NOCHE.
+- **Tocar el vinilo o la carátula ya no abre JH MUSIC:** solo lo abre el botón ↗ de la tarjeta (se tocaba sin querer).
+- **Reloj en 2 columnas y tipografía más suelta** para leer mejor manejando.
 
 ## Novedades de la 1.8.0
 
