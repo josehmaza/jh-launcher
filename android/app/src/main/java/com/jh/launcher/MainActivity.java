@@ -14,6 +14,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.GradientDrawable;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +30,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -158,6 +161,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
     private boolean stealthActive;
     private long stealthSince;
     private boolean sourceBt;
+    private boolean btConnecting;
     private int usbIdx;
     // Audio Bluetooth: lo que informa el módulo Bluetooth de fábrica
     private BtMusicLink btLink;
@@ -543,9 +547,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
                 sendMusicCommand("TOGGLE_SHUFFLE");
             });
         }
-        if (vinylStage != null) vinylStage.setOnClickListener(openMusicListener);
-        View artCover = findViewById(R.id.artCover);
-        if (artCover != null) artCover.setOnClickListener(openMusicListener);
+        // Solo el botón ↗ abre JH Music: tocar el vinilo o la carátula ya no lo abre (se tocaba sin querer)
 
         findViewById(R.id.btnLaunchJhVideo).setOnClickListener(v -> launchJhVideo());
         findViewById(R.id.cardJhVideo).setOnClickListener(v -> launchJhVideo());
@@ -690,6 +692,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         ((ImageView) findViewById(R.id.iconSourceBt)).setImageTintList(palette.selectableIcon());
         ((TextView) findViewById(R.id.txtSourceUsb)).setTextColor(palette.selectableText());
         ((TextView) findViewById(R.id.txtSourceBt)).setTextColor(palette.selectableText());
+        updateBtTabIndicator();
 
         findViewById(R.id.btnOpenMusic).setBackground(palette.openButtonBg());
         ((ImageView) findViewById(R.id.iconOpenMusic)).setImageTintList(palette.openIconTint());
@@ -1029,6 +1032,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
             }
             refreshBtUi();
         }
+        updateBtControlsEnabled();
         updateTrackDisplay();
         updateProgressUi();
     }
@@ -1050,7 +1054,14 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         }
 
         @Override
+        public void onConnecting() {
+            btConnecting = true;
+            updateBtTabIndicator();
+        }
+
+        @Override
         public void onPhone(boolean connected, String name) {
+            btConnecting = false;
             btPhone = connected ? name : null;
             if (!connected) {
                 btTrack = null;
@@ -1081,8 +1092,72 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         }
     };
 
+    /**
+     * Indicador de conexión en la pestaña BLUETOOTH AUDIO (aunque la pestaña no esté elegida):
+     * conectado = ícono cian, texto firme, punto verde sólido y nombre del teléfono;
+     * conectando = ícono y punto ámbar parpadeando;
+     * sin teléfono = ícono y texto atenuados y punto gris hueco (estado normal, no alarma).
+     */
+    private void updateBtTabIndicator() {
+        if (palette == null) return;
+        View dot = findViewById(R.id.dotBtStatus);
+        TextView name = (TextView) findViewById(R.id.txtBtPhone);
+        ImageView icon = (ImageView) findViewById(R.id.iconSourceBt);
+        TextView label = (TextView) findViewById(R.id.txtSourceBt);
+        if (dot == null || name == null) return;
+        boolean connecting = btConnecting;
+        boolean connected = !connecting && btLinked && btPhone != null;
+        float d = getResources().getDisplayMetrics().density;
+        GradientDrawable shape = new GradientDrawable();
+        shape.setShape(GradientDrawable.OVAL);
+        if (connected) {
+            shape.setColor(palette.emerald);
+        } else if (connecting) {
+            shape.setColor(palette.amber);
+        } else {
+            shape.setColor(Color.TRANSPARENT);
+            shape.setStroke(Math.max(1, Math.round(2 * d)), palette.textMuted);
+        }
+        dot.setBackground(shape);
+
+        dot.clearAnimation();
+        if (connecting) {
+            AlphaAnimation blink = new AlphaAnimation(1f, 0.25f);
+            blink.setDuration(500);
+            blink.setRepeatMode(Animation.REVERSE);
+            blink.setRepeatCount(Animation.INFINITE);
+            dot.startAnimation(blink);
+        }
+
+        if (connected && !btPhone.isEmpty()) {
+            name.setText(btPhone);
+            name.setTextColor(palette.text2);
+            name.setVisibility(View.VISIBLE);
+        } else {
+            name.setVisibility(View.GONE);
+        }
+
+        if (connected) {
+            icon.setImageTintList(ColorStateList.valueOf(palette.accent));
+            label.setTextColor(palette.text1);
+        } else if (connecting) {
+            icon.setImageTintList(ColorStateList.valueOf(palette.amber));
+            label.setTextColor(palette.text1);
+        } else {
+            icon.setImageTintList(palette.selectableIcon());
+            label.setTextColor(palette.selectableText());
+        }
+        float alpha = connected || connecting ? 1f : 0.6f;
+        icon.setAlpha(alpha);
+        label.setAlpha(alpha);
+        dot.setContentDescription(connected ? "Bluetooth conectado"
+                : connecting ? "Bluetooth conectando" : "Bluetooth sin teléfono");
+    }
+
     /** Pone al día la tarjeta de música con lo último que dijo el módulo Bluetooth (solo se ve en la pestaña BT). */
     private void refreshBtUi() {
+        updateBtTabIndicator();
+        updateBtControlsEnabled();
         if (!sourceBt) return;
         String badge;
         if (!btLinked) badge = "SIN MÓDULO BT";
@@ -1226,7 +1301,26 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
      * si se retiró el pendrive avisa con un Toast ("Pendrive no conectado") y cancela
      * en vez de aparentar que funcionó.
      */
+    /** Fuente Bluetooth sin teléfono conectado: no hay nada que reproducir, pausar ni saltar. */
+    private boolean btNoPhone() {
+        return sourceBt && btPhone == null;
+    }
+
+    /** Con Bluetooth sin teléfono, los botones se ven apagados y no hacen nada (antes mostraba «REPRODUCIENDO»). */
+    private void updateBtControlsEnabled() {
+        boolean off = btNoPhone();
+        float alpha = off ? 0.35f : 1f;
+        if (btnPlayPause != null) btnPlayPause.setAlpha(alpha);
+        if (btnPrevTrack != null) btnPrevTrack.setAlpha(alpha);
+        if (btnNextTrack != null) btnNextTrack.setAlpha(alpha);
+        if (off && isPlaying) setPlaying(false);
+    }
+
     private boolean checkPlaybackReady() {
+        if (btNoPhone()) {
+            showToast("Conecta tu teléfono por Bluetooth");
+            return false;
+        }
         if (sourceBt) return true;
 
         boolean anyUsb = hwMonitor != null && (hwMonitor.isUsb1Connected() || hwMonitor.isUsb2Connected());
@@ -1377,7 +1471,7 @@ public class MainActivity extends Activity implements BlindGestureListener.Callb
         if (seekDragging) return; // mientras se arrastra manda el dedo, no el reloj
         Track t = currentTrack();
         musicProgressThumb.setVisibility(canSeek(t) ? View.VISIBLE : View.GONE);
-        if (t == NO_TRACK) {
+        if (t == NO_TRACK || btNoPhone()) {
             setProgressFraction(0f);
             timeReadout.setText("00:00 / 00:00");
             return;

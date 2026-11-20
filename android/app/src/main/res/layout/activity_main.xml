@@ -62,26 +62,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <com.jh.launcher.JhTextView
                     android:id="@+id/statusClock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:letterSpacing="0.05"
+                    android:letterSpacing="0.04"
                     android:textColor="@color/text_primary"
-                    android:textSize="20dp"
+                    android:textSize="28dp"
                     app:jhFont="mono" />
 
                 <com.jh.launcher.JhTextView
                     android:id="@+id/statusDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:letterSpacing="0.133"
+                    android:layout_marginLeft="12dp"
+                    android:letterSpacing="0.06"
                     android:textColor="@color/accent_cyan"
-                    android:textSize="9dp"
+                    android:textSize="15dp"
                     app:jhFont="bold" />
             </LinearLayout>
 
@@ -196,21 +196,21 @@
                             android:id="@+id/greetingSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:letterSpacing="0.12"
+                            android:letterSpacing="0.10"
                             android:text="@string/greeting_subtitle"
                             android:textColor="@color/accent_cyan"
-                            android:textSize="10dp"
+                            android:textSize="12dp"
                             app:jhFont="bold" />
 
                         <com.jh.launcher.JhTextView
                             android:id="@+id/greetingTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="2dp"
                             android:letterSpacing="-0.012"
                             android:text="@string/greeting_title"
                             android:textColor="@color/text_primary"
-                            android:textSize="24dp"
+                            android:textSize="28dp"
                             app:jhFont="extrabold" />
                     </LinearLayout>
 
@@ -230,14 +230,14 @@
                             android:background="@drawable/bg_color_opt"
                             android:clickable="true"
                             android:gravity="center_vertical"
-                            android:paddingLeft="10dp"
-                            android:paddingTop="4dp"
-                            android:paddingRight="10dp"
-                            android:paddingBottom="4dp">
+                            android:paddingLeft="11dp"
+                            android:paddingTop="5dp"
+                            android:paddingRight="11dp"
+                            android:paddingBottom="5dp">
 
                             <View
-                                android:layout_width="7dp"
-                                android:layout_height="7dp"
+                                android:layout_width="8dp"
+                                android:layout_height="8dp"
                                 android:background="@drawable/bg_dot_black" />
 
                             <com.jh.launcher.JhTextView
@@ -248,7 +248,7 @@
                                 android:duplicateParentState="true"
                                 android:text="Negro"
                                 android:textColor="@color/text_selected_white"
-                                android:textSize="10dp"
+                                android:textSize="12dp"
                                 app:jhFont="bold" />
                         </LinearLayout>
 
@@ -260,14 +260,14 @@
                             android:background="@drawable/bg_color_opt"
                             android:clickable="true"
                             android:gravity="center_vertical"
-                            android:paddingLeft="10dp"
-                            android:paddingTop="4dp"
-                            android:paddingRight="10dp"
-                            android:paddingBottom="4dp">
+                            android:paddingLeft="11dp"
+                            android:paddingTop="5dp"
+                            android:paddingRight="11dp"
+                            android:paddingBottom="5dp">
 
                             <View
-                                android:layout_width="7dp"
-                                android:layout_height="7dp"
+                                android:layout_width="8dp"
+                                android:layout_height="8dp"
                                 android:background="@drawable/bg_dot_grey" />
 
                             <com.jh.launcher.JhTextView
@@ -278,7 +278,7 @@
                                 android:duplicateParentState="true"
                                 android:text="Gris Acero"
                                 android:textColor="@color/text_selected_white"
-                                android:textSize="10dp"
+                                android:textSize="12dp"
                                 app:jhFont="bold" />
                         </LinearLayout>
                     </LinearLayout>
@@ -540,15 +540,15 @@
                                 android:background="@drawable/bg_source_tab"
                                 android:clickable="true"
                                 android:gravity="center_vertical"
-                                android:paddingLeft="12dp"
-                                android:paddingTop="6dp"
-                                android:paddingRight="12dp"
-                                android:paddingBottom="6dp">
+                                android:paddingLeft="13dp"
+                                android:paddingTop="7dp"
+                                android:paddingRight="13dp"
+                                android:paddingBottom="7dp">
 
                                 <ImageView
                                     android:id="@+id/iconSourceUsb"
-                                    android:layout_width="15dp"
-                                    android:layout_height="15dp"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
                                     android:duplicateParentState="true"
                                     android:src="@drawable/ic_note"
                                     android:tint="@color/tint_selected_cyan" />
@@ -557,12 +557,12 @@
                                     android:id="@+id/txtSourceUsb"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="6dp"
+                                    android:layout_marginLeft="7dp"
                                     android:duplicateParentState="true"
-                                    android:letterSpacing="0.045"
+                                    android:letterSpacing="0.07"
                                     android:text="JH MUSIC"
                                     android:textColor="@color/text_selected_white"
-                                    android:textSize="11dp"
+                                    android:textSize="13dp"
                                     app:jhFont="bold" />
                             </LinearLayout>
 
@@ -574,15 +574,15 @@
                                 android:background="@drawable/bg_source_tab"
                                 android:clickable="true"
                                 android:gravity="center_vertical"
-                                android:paddingLeft="12dp"
-                                android:paddingTop="6dp"
-                                android:paddingRight="12dp"
-                                android:paddingBottom="6dp">
+                                android:paddingLeft="13dp"
+                                android:paddingTop="7dp"
+                                android:paddingRight="13dp"
+                                android:paddingBottom="7dp">
 
                                 <ImageView
                                     android:id="@+id/iconSourceBt"
-                                    android:layout_width="15dp"
-                                    android:layout_height="15dp"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
                                     android:duplicateParentState="true"
                                     android:src="@drawable/ic_bluetooth"
                                     android:tint="@color/tint_selected_cyan" />
@@ -591,12 +591,31 @@
                                     android:id="@+id/txtSourceBt"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="6dp"
+                                    android:layout_marginLeft="7dp"
                                     android:duplicateParentState="true"
-                                    android:letterSpacing="0.045"
-                                    android:text="BLUETOOTH AUDIO"
+                                    android:letterSpacing="0.07"
+                                    android:text="BLUETOOTH"
                                     android:textColor="@color/text_selected_white"
+                                    android:textSize="13dp"
+                                    app:jhFont="bold" />
+
+                                <!-- Estado de conexión: punto verde sólido (conectado) / gris hueco (sin teléfono) -->
+                                <View
+                                    android:id="@+id/dotBtStatus"
+                                    android:layout_width="9dp"
+                                    android:layout_height="9dp"
+                                    android:layout_marginLeft="8dp" />
+
+                                <com.jh.launcher.JhTextView
+                                    android:id="@+id/txtBtPhone"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="6dp"
+                                    android:ellipsize="end"
+                                    android:maxWidth="110dp"
+                                    android:singleLine="true"
                                     android:textSize="11dp"
+                                    android:visibility="gone"
                                     app:jhFont="bold" />
                             </LinearLayout>
                         </LinearLayout>
@@ -770,8 +789,8 @@
 
                                 <View
                                     android:id="@+id/playStatusDot"
-                                    android:layout_width="7dp"
-                                    android:layout_height="7dp"
+                                    android:layout_width="9dp"
+                                    android:layout_height="9dp"
                                     android:background="@drawable/bg_status_dot" />
 
                                 <com.jh.launcher.JhTextView
@@ -779,10 +798,10 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginLeft="7dp"
-                                    android:letterSpacing="0.1"
+                                    android:letterSpacing="0.08"
                                     android:text="EN PAUSA"
                                     android:textColor="@color/text_play_status"
-                                    android:textSize="10dp"
+                                    android:textSize="13dp"
                                     app:jhFont="mono" />
 
                                 <View
@@ -1083,7 +1102,7 @@
                 <ImageView
                     android:id="@+id/stealthIcon"
                     style="@style/DockIcon"
-                    android:src="@drawable/ic_moon" />
+                    android:src="@drawable/ic_stealth" />
 
                 <com.jh.launcher.JhTextView
                     android:id="@+id/stealthLabel"
